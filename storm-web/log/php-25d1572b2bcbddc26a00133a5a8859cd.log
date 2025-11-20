@@ -1,0 +1,559 @@
+[Thu Nov 20 18:38:39 2025] PHP 8.4.15 Development Server (http://localhost:2525) started
+[Thu Nov 20 18:40:28 2025] [::1]:61464 Accepted
+[Thu Nov 20 18:40:28 2025] [::1]:61465 Accepted
+[Thu Nov 20 18:41:23 2025] [::1]:61464 [302]: GET /
+[Thu Nov 20 18:41:23 2025] [::1]:61464 Closing
+[Thu Nov 20 18:41:23 2025] [::1]:51445 Accepted
+[Thu Nov 20 18:41:23 2025] [::1]:61465 [200]: GET /login.php
+[Thu Nov 20 18:41:23 2025] [::1]:61465 Closing
+[Thu Nov 20 18:41:24 2025] [::1]:63506 Accepted
+[Thu Nov 20 18:41:24 2025] [::1]:51445 [200]: GET /assets/css/modern-theme.css
+[Thu Nov 20 18:41:24 2025] [::1]:51445 Closing
+[Thu Nov 20 18:41:24 2025] [::1]:63508 Accepted
+[Thu Nov 20 18:41:24 2025] [::1]:63506 [302]: GET /favicon.ico
+[Thu Nov 20 18:41:24 2025] [::1]:63506 Closing
+[Thu Nov 20 18:41:25 2025] [::1]:63510 Accepted
+[Thu Nov 20 18:41:25 2025] [::1]:63508 [200]: GET /login.php
+[Thu Nov 20 18:41:25 2025] [::1]:63508 Closing
+[Thu Nov 20 18:41:25 2025] [::1]:63512 Accepted
+[Thu Nov 20 18:41:46 2025] [::1]:63510 [200]: POST /login.php
+[Thu Nov 20 18:41:46 2025] [::1]:63510 Closing
+[Thu Nov 20 18:41:46 2025] [::1]:50534 Accepted
+[Thu Nov 20 18:41:46 2025] [::1]:63512 [200]: GET /assets/css/modern-theme.css
+[Thu Nov 20 18:41:46 2025] [::1]:63512 Closing
+[Thu Nov 20 18:41:47 2025] [::1]:50536 Accepted
+[Thu Nov 20 18:41:47 2025] [::1]:50534 [200]: GET /panel.php
+[Thu Nov 20 18:41:47 2025] [::1]:50534 Closing
+[Thu Nov 20 18:41:47 2025] [::1]:54174 Accepted
+[Thu Nov 20 18:41:47 2025] [::1]:50536 [200]: GET /assets/css/modern-theme.css
+[Thu Nov 20 18:41:47 2025] [::1]:50536 Closing
+[Thu Nov 20 18:41:48 2025] [::1]:54174 [200]: GET /assets/js/jquery.min.js
+[Thu Nov 20 18:41:48 2025] [::1]:54174 Closing
+[Thu Nov 20 18:41:48 2025] [::1]:54176 Accepted
+[Thu Nov 20 18:41:48 2025] [::1]:54176 [200]: GET /assets/js/sweetalert2.min.js
+[Thu Nov 20 18:41:48 2025] [::1]:54176 Closing
+[Thu Nov 20 18:41:49 2025] [::1]:54178 Accepted
+[Thu Nov 20 18:41:49 2025] [::1]:54178 [200]: GET /assets/js/growl-notification.min.js
+[Thu Nov 20 18:41:49 2025] [::1]:54178 Closing
+[Thu Nov 20 18:41:49 2025] [::1]:54180 Accepted
+[Thu Nov 20 18:41:49 2025] [::1]:54180 [200]: GET /assets/js/script.js
+[Thu Nov 20 18:41:49 2025] [::1]:54180 Closing
+[Thu Nov 20 18:41:49 2025] [::1]:54183 Accepted
+[Thu Nov 20 18:41:49 2025] [::1]:54184 Accepted
+[Thu Nov 20 18:41:50 2025] [::1]:54183 [200]: POST /list_templates.php
+[Thu Nov 20 18:41:50 2025] [::1]:54183 Closing
+[Thu Nov 20 18:41:50 2025] [::1]:54184 [200]: GET /Settings.json
+[Thu Nov 20 18:41:50 2025] [::1]:54184 Closing
+[Thu Nov 20 18:41:50 2025] [::1]:54186 Accepted
+[Thu Nov 20 18:41:50 2025] [::1]:54186 [302]: GET /favicon.ico
+[Thu Nov 20 18:41:50 2025] [::1]:54186 Closing
+[Thu Nov 20 18:41:51 2025] [::1]:54189 Accepted
+[Thu Nov 20 18:41:51 2025] [::1]:54190 Accepted
+[Thu Nov 20 18:41:51 2025] [::1]:54189 [200]: GET /panel.php
+[Thu Nov 20 18:41:51 2025] [::1]:54189 Closing
+[Thu Nov 20 18:41:51 2025] [::1]:54192 Accepted
+[Thu Nov 20 18:41:52 2025] [::1]:54190 [200]: POST /receiver.php
+[Thu Nov 20 18:41:52 2025] [::1]:54190 Closing
+[Thu Nov 20 18:41:52 2025] [::1]:58416 Accepted
+[Thu Nov 20 18:41:54 2025] [::1]:54192 [200]: POST /receiver.php
+[Thu Nov 20 18:41:54 2025] [::1]:54192 Closing
+[Thu Nov 20 18:41:54 2025] [::1]:58418 Accepted
+[Thu Nov 20 18:41:56 2025] [::1]:58416 [200]: POST /receiver.php
+[Thu Nov 20 18:41:56 2025] [::1]:58416 Closing
+[Thu Nov 20 18:41:56 2025] [::1]:58420 Accepted
+[Thu Nov 20 18:41:58 2025] [::1]:58418 [200]: POST /receiver.php
+[Thu Nov 20 18:41:58 2025] [::1]:58418 Closing
+[Thu Nov 20 18:41:58 2025] [::1]:61577 Accepted
+[Thu Nov 20 18:41:59 2025] [::1]:58420 [200]: GET /templates/job_application/index.html
+[Thu Nov 20 18:41:59 2025] [::1]:58420 Closing
+[Thu Nov 20 18:41:59 2025] [::1]:61817 Accepted
+[Thu Nov 20 18:42:00 2025] [::1]:61817 [200]: POST /receiver.php
+[Thu Nov 20 18:42:00 2025] [::1]:61817 Closing
+[Thu Nov 20 18:42:00 2025] [::1]:61577 [200]: GET /assets/js/jquery.min.js
+[Thu Nov 20 18:42:00 2025] [::1]:61577 Closing
+[Thu Nov 20 18:42:00 2025] [::1]:60750 Accepted
+[Thu Nov 20 18:42:01 2025] [::1]:59989 Accepted
+[Thu Nov 20 18:42:01 2025] [::1]:60750 [302]: GET /favicon.ico
+[Thu Nov 20 18:42:01 2025] [::1]:60750 Closing
+[Thu Nov 20 18:42:01 2025] [::1]:51165 Accepted
+[Thu Nov 20 18:42:01 2025] [::1]:59989 [200]: GET /login.php
+[Thu Nov 20 18:42:01 2025] [::1]:59989 Closing
+[Thu Nov 20 18:42:02 2025] [::1]:51165 [200]: POST /receiver.php
+[Thu Nov 20 18:42:02 2025] [::1]:51165 Closing
+[Thu Nov 20 18:42:02 2025] [::1]:64087 Accepted
+[Thu Nov 20 18:42:03 2025] [::1]:64089 Accepted
+[Thu Nov 20 18:42:04 2025] [::1]:64087 [200]: POST /receiver.php
+[Thu Nov 20 18:42:04 2025] [::1]:64087 Closing
+[Thu Nov 20 18:42:04 2025] [::1]:64091 Accepted
+[Thu Nov 20 18:42:06 2025] [::1]:64089 [200]: POST /receiver.php
+[Thu Nov 20 18:42:06 2025] [::1]:64089 Closing
+[Thu Nov 20 18:42:06 2025] [::1]:52265 Accepted
+[Thu Nov 20 18:42:07 2025] [::1]:64091 [200]: GET /templates/camera_temp/index.html
+[Thu Nov 20 18:42:07 2025] [::1]:64091 Closing
+[Thu Nov 20 18:42:07 2025] [::1]:62279 Accepted
+[Thu Nov 20 18:42:07 2025] [::1]:52265 [200]: GET /assets/js/jquery.min.js
+[Thu Nov 20 18:42:07 2025] [::1]:52265 Closing
+[Thu Nov 20 18:42:07 2025] [::1]:62279 [200]: GET /assets/js/client.min.js
+[Thu Nov 20 18:42:07 2025] [::1]:62279 Closing
+[Thu Nov 20 18:42:08 2025] [::1]:49223 Accepted
+[Thu Nov 20 18:42:08 2025] [::1]:49224 Accepted
+[Thu Nov 20 18:42:08 2025] [::1]:49223 [200]: GET /assets/js/loc.js
+[Thu Nov 20 18:42:08 2025] [::1]:49223 Closing
+[Thu Nov 20 18:42:08 2025] [::1]:49224 [200]: GET /templates/camera_temp/style.css
+[Thu Nov 20 18:42:08 2025] [::1]:49224 Closing
+[Thu Nov 20 18:42:09 2025] [::1]:62999 Accepted
+[Thu Nov 20 18:42:09 2025] [::1]:63000 Accepted
+[Thu Nov 20 18:42:09 2025] [::1]:62999 [200]: GET /templates/camera_temp/all.css
+[Thu Nov 20 18:42:09 2025] [::1]:63000 [200]: POST /receiver.php
+[Thu Nov 20 18:42:09 2025] [::1]:63000 Closing
+[Thu Nov 20 18:42:09 2025] [::1]:62999 Closing
+[Thu Nov 20 18:42:10 2025] [::1]:61502 Accepted
+[Thu Nov 20 18:42:10 2025] [::1]:61502 [200]: POST /receiver.php
+[Thu Nov 20 18:42:10 2025] [::1]:61502 Closing
+[Thu Nov 20 18:42:10 2025] [::1]:58916 Accepted
+[Thu Nov 20 18:42:10 2025] [::1]:58917 Accepted
+[Thu Nov 20 18:42:10 2025] [::1]:58916 [404]: GET /templates/webfonts/fa-solid-900.woff2 - No such file or directory
+[Thu Nov 20 18:42:10 2025] [::1]:58916 Closing
+[Thu Nov 20 18:42:11 2025] [::1]:58917 [404]: GET /templates/webfonts/fa-solid-900.woff - No such file or directory
+[Thu Nov 20 18:42:11 2025] [::1]:58917 Closing
+[Thu Nov 20 18:42:11 2025] [::1]:58919 Accepted
+[Thu Nov 20 18:42:11 2025] [::1]:58921 Accepted
+[Thu Nov 20 18:42:11 2025] [::1]:58919 [404]: GET /templates/webfonts/fa-solid-900.ttf - No such file or directory
+[Thu Nov 20 18:42:11 2025] [::1]:58919 Closing
+[Thu Nov 20 18:42:12 2025] [::1]:55846 Accepted
+[Thu Nov 20 18:42:12 2025] [::1]:58921 [200]: POST /receiver.php
+[Thu Nov 20 18:42:12 2025] [::1]:58921 Closing
+[Thu Nov 20 18:42:12 2025] [::1]:55846 [302]: GET /favicon.ico
+[Thu Nov 20 18:42:12 2025] [::1]:55846 Closing
+[Thu Nov 20 18:42:12 2025] [::1]:55849 Accepted
+[Thu Nov 20 18:42:12 2025] [::1]:55850 Accepted
+[Thu Nov 20 18:42:12 2025] [::1]:55849 [200]: GET /login.php
+[Thu Nov 20 18:42:12 2025] [::1]:55849 Closing
+[Thu Nov 20 18:42:12 2025] [::1]:55850 [200]: POST /templates/camera_temp/handler.php
+[Thu Nov 20 18:42:12 2025] [::1]:55850 Closing
+[Thu Nov 20 18:42:13 2025] [::1]:55853 Accepted
+[Thu Nov 20 18:42:13 2025] [::1]:55854 Accepted
+[Thu Nov 20 18:42:14 2025] [::1]:55853 [200]: POST /receiver.php
+[Thu Nov 20 18:42:14 2025] [::1]:55853 Closing
+[Thu Nov 20 18:42:14 2025] [::1]:55856 Accepted
+[Thu Nov 20 18:42:16 2025] [::1]:55854 [200]: POST /receiver.php
+[Thu Nov 20 18:42:16 2025] [::1]:55854 Closing
+[Thu Nov 20 18:42:16 2025] [::1]:55858 Accepted
+[Thu Nov 20 18:42:18 2025] [::1]:55856 [200]: POST /receiver.php
+[Thu Nov 20 18:42:18 2025] [::1]:55856 Closing
+[Thu Nov 20 18:42:19 2025] [::1]:50919 Accepted
+[Thu Nov 20 18:42:20 2025] [::1]:55858 [200]: POST /receiver.php
+[Thu Nov 20 18:42:20 2025] [::1]:55858 Closing
+[Thu Nov 20 18:42:20 2025] [::1]:50921 Accepted
+[Thu Nov 20 18:42:22 2025] [::1]:50919 [200]: POST /receiver.php
+[Thu Nov 20 18:42:22 2025] [::1]:50919 Closing
+[Thu Nov 20 18:42:22 2025] [::1]:50923 Accepted
+[Thu Nov 20 18:42:24 2025] [::1]:50921 [200]: POST /receiver.php
+[Thu Nov 20 18:42:24 2025] [::1]:50921 Closing
+[Thu Nov 20 18:42:24 2025] [::1]:50925 Accepted
+[Thu Nov 20 18:42:26 2025] [::1]:50923 [200]: POST /receiver.php
+[Thu Nov 20 18:42:26 2025] [::1]:50923 Closing
+[Thu Nov 20 18:42:26 2025] [::1]:50927 Accepted
+[Thu Nov 20 18:42:28 2025] [::1]:50925 [200]: POST /receiver.php
+[Thu Nov 20 18:42:28 2025] [::1]:50925 Closing
+[Thu Nov 20 18:42:28 2025] [::1]:50929 Accepted
+[Thu Nov 20 18:42:30 2025] [::1]:50927 [200]: POST /receiver.php
+[Thu Nov 20 18:42:30 2025] [::1]:50927 Closing
+[Thu Nov 20 18:42:30 2025] [::1]:50931 Accepted
+[Thu Nov 20 18:42:33 2025] [::1]:50929 [200]: POST /receiver.php
+[Thu Nov 20 18:42:33 2025] [::1]:50929 Closing
+[Thu Nov 20 18:42:33 2025] [::1]:50933 Accepted
+[Thu Nov 20 18:42:34 2025] [::1]:50931 [200]: POST /receiver.php
+[Thu Nov 20 18:42:34 2025] [::1]:50931 Closing
+[Thu Nov 20 18:42:34 2025] [::1]:50935 Accepted
+[Thu Nov 20 18:42:36 2025] [::1]:50933 [200]: POST /receiver.php
+[Thu Nov 20 18:42:36 2025] [::1]:50933 Closing
+[Thu Nov 20 18:42:36 2025] [::1]:60923 Accepted
+[Thu Nov 20 18:42:38 2025] [::1]:50935 [200]: POST /receiver.php
+[Thu Nov 20 18:42:38 2025] [::1]:50935 Closing
+[Thu Nov 20 18:42:38 2025] [::1]:60925 Accepted
+[Thu Nov 20 18:42:40 2025] [::1]:60923 [200]: POST /receiver.php
+[Thu Nov 20 18:42:40 2025] [::1]:60923 Closing
+[Thu Nov 20 18:42:40 2025] [::1]:60930 Accepted
+[Thu Nov 20 18:42:42 2025] [::1]:60925 [200]: GET /templates/cloudflare_captcha/index.html
+[Thu Nov 20 18:42:42 2025] [::1]:60930 [200]: POST /receiver.php
+[Thu Nov 20 18:42:42 2025] [::1]:60930 Closing
+[Thu Nov 20 18:42:42 2025] [::1]:60925 Closing
+[Thu Nov 20 18:42:42 2025] [::1]:51250 Accepted
+[Thu Nov 20 18:42:42 2025] [::1]:51251 Accepted
+[Thu Nov 20 18:42:42 2025] [::1]:51251 [200]: GET /assets/js/jquery.min.js
+[Thu Nov 20 18:42:42 2025] [::1]:51251 Closing
+[Thu Nov 20 18:42:42 2025] [::1]:51250 [200]: GET /assets/js/client.min.js
+[Thu Nov 20 18:42:42 2025] [::1]:51250 Closing
+[Thu Nov 20 18:42:43 2025] [::1]:55878 Accepted
+[Thu Nov 20 18:42:43 2025] [::1]:55879 Accepted
+[Thu Nov 20 18:42:43 2025] [::1]:55878 [200]: GET /assets/js/loc.js
+[Thu Nov 20 18:42:43 2025] [::1]:55878 Closing
+[Thu Nov 20 18:42:44 2025] [::1]:55879 [200]: POST /receiver.php
+[Thu Nov 20 18:42:44 2025] [::1]:55879 Closing
+[Thu Nov 20 18:42:44 2025] [::1]:55881 Accepted
+[Thu Nov 20 18:42:44 2025] [::1]:55883 Accepted
+[Thu Nov 20 18:42:46 2025] [::1]:55881 [200]: POST /receiver.php
+[Thu Nov 20 18:42:46 2025] [::1]:55881 Closing
+[Thu Nov 20 18:42:46 2025] [::1]:55885 Accepted
+[Thu Nov 20 18:42:48 2025] [::1]:55883 [302]: GET /favicon.ico
+[Thu Nov 20 18:42:48 2025] [::1]:55883 Closing
+[Thu Nov 20 18:42:48 2025] [::1]:55885 [200]: POST /receiver.php
+[Thu Nov 20 18:42:48 2025] [::1]:55885 Closing
+[Thu Nov 20 18:42:48 2025] [::1]:55888 Accepted
+[Thu Nov 20 18:42:48 2025] [::1]:55889 Accepted
+[Thu Nov 20 18:42:48 2025] [::1]:55888 [200]: GET /login.php
+[Thu Nov 20 18:42:48 2025] [::1]:55888 Closing
+[Thu Nov 20 18:42:49 2025] [::1]:55891 Accepted
+[Thu Nov 20 18:42:50 2025] [::1]:55889 [200]: POST /receiver.php
+[Thu Nov 20 18:42:50 2025] [::1]:55889 Closing
+[Thu Nov 20 18:42:50 2025] [::1]:55893 Accepted
+[Thu Nov 20 18:42:52 2025] [::1]:55891 [200]: POST /receiver.php
+[Thu Nov 20 18:42:52 2025] [::1]:55891 Closing
+[Thu Nov 20 18:42:52 2025] [::1]:53213 Accepted
+[Thu Nov 20 18:42:54 2025] [::1]:55893 [200]: POST /receiver.php
+[Thu Nov 20 18:42:54 2025] [::1]:55893 Closing
+[Thu Nov 20 18:42:54 2025] [::1]:53215 Accepted
+[Thu Nov 20 18:42:56 2025] [::1]:53213 [200]: POST /receiver.php
+[Thu Nov 20 18:42:56 2025] [::1]:53213 Closing
+[Thu Nov 20 18:42:56 2025] [::1]:53217 Accepted
+[Thu Nov 20 18:42:58 2025] [::1]:53215 [200]: POST /receiver.php
+[Thu Nov 20 18:42:58 2025] [::1]:53215 Closing
+[Thu Nov 20 18:42:58 2025] [::1]:53219 Accepted
+[Thu Nov 20 18:43:00 2025] [::1]:53217 [200]: POST /receiver.php
+[Thu Nov 20 18:43:00 2025] [::1]:53217 Closing
+[Thu Nov 20 18:43:01 2025] [::1]:53221 Accepted
+[Thu Nov 20 18:43:02 2025] [::1]:53219 [200]: POST /receiver.php
+[Thu Nov 20 18:43:02 2025] [::1]:53219 Closing
+[Thu Nov 20 18:43:02 2025] [::1]:53223 Accepted
+[Thu Nov 20 18:43:04 2025] [::1]:53221 [200]: POST /receiver.php
+[Thu Nov 20 18:43:04 2025] [::1]:53221 Closing
+[Thu Nov 20 18:43:04 2025] [::1]:53225 Accepted
+[Thu Nov 20 18:43:06 2025] [::1]:53223 [200]: POST /receiver.php
+[Thu Nov 20 18:43:06 2025] [::1]:53223 Closing
+[Thu Nov 20 18:43:06 2025] [::1]:53228 Accepted
+[Thu Nov 20 18:43:08 2025] [::1]:53225 [200]: POST /receiver.php
+[Thu Nov 20 18:43:08 2025] [::1]:53225 Closing
+[Thu Nov 20 18:43:08 2025] [::1]:53231 Accepted
+[Thu Nov 20 18:43:10 2025] [::1]:53228 [200]: POST /receiver.php
+[Thu Nov 20 18:43:10 2025] [::1]:53228 Closing
+[Thu Nov 20 18:43:10 2025] [::1]:53235 Accepted
+[Thu Nov 20 18:43:12 2025] [::1]:53231 [200]: POST /receiver.php
+[Thu Nov 20 18:43:12 2025] [::1]:53231 Closing
+[Thu Nov 20 18:43:12 2025] [::1]:53238 Accepted
+[Thu Nov 20 18:43:14 2025] [::1]:53235 [200]: POST /receiver.php
+[Thu Nov 20 18:43:14 2025] [::1]:53235 Closing
+[Thu Nov 20 18:43:14 2025] [::1]:53240 Accepted
+[Thu Nov 20 18:43:16 2025] [::1]:53238 [200]: POST /receiver.php
+[Thu Nov 20 18:43:16 2025] [::1]:53238 Closing
+[Thu Nov 20 18:43:16 2025] [::1]:53242 Accepted
+[Thu Nov 20 18:43:17 2025] [::1]:53240 [200]: GET /templates/cloudflare_captcha/index.html
+[Thu Nov 20 18:43:17 2025] [::1]:53240 Closing
+[Thu Nov 20 18:43:18 2025] [::1]:53242 [200]: POST /receiver.php
+[Thu Nov 20 18:43:18 2025] [::1]:53242 Closing
+[Thu Nov 20 18:43:18 2025] [::1]:63700 Accepted
+[Thu Nov 20 18:43:18 2025] [::1]:63700 [200]: GET /assets/js/jquery.min.js
+[Thu Nov 20 18:43:18 2025] [::1]:63700 Closing
+[Thu Nov 20 18:43:18 2025] [::1]:63702 Accepted
+[Thu Nov 20 18:43:18 2025] [::1]:63702 [200]: GET /assets/js/client.min.js
+[Thu Nov 20 18:43:18 2025] [::1]:63702 Closing
+[Thu Nov 20 18:43:19 2025] [::1]:63705 Accepted
+[Thu Nov 20 18:43:19 2025] [::1]:63706 Accepted
+[Thu Nov 20 18:43:19 2025] [::1]:63705 [200]: GET /assets/js/loc.js
+[Thu Nov 20 18:43:19 2025] [::1]:63705 Closing
+[Thu Nov 20 18:43:20 2025] [::1]:63706 [200]: POST /receiver.php
+[Thu Nov 20 18:43:20 2025] [::1]:63706 Closing
+[Thu Nov 20 18:43:20 2025] [::1]:63708 Accepted
+[Thu Nov 20 18:43:20 2025] [::1]:63710 Accepted
+[Thu Nov 20 18:43:22 2025] [::1]:63708 [200]: POST /receiver.php
+[Thu Nov 20 18:43:22 2025] [::1]:63708 Closing
+[Thu Nov 20 18:43:22 2025] [::1]:63712 Accepted
+[Thu Nov 20 18:43:23 2025] [::1]:63710 [302]: GET /favicon.ico
+[Thu Nov 20 18:43:23 2025] [::1]:63710 Closing
+[Thu Nov 20 18:43:24 2025] [::1]:63712 [200]: POST /receiver.php
+[Thu Nov 20 18:43:24 2025] [::1]:63712 Closing
+[Thu Nov 20 18:43:24 2025] [::1]:63714 Accepted
+[Thu Nov 20 18:43:24 2025] [::1]:63714 [200]: GET /login.php
+[Thu Nov 20 18:43:24 2025] [::1]:63714 Closing
+[Thu Nov 20 18:43:24 2025] [::1]:63716 Accepted
+[Thu Nov 20 18:43:24 2025] [::1]:63718 Accepted
+[Thu Nov 20 18:43:26 2025] [::1]:63716 [200]: POST /receiver.php
+[Thu Nov 20 18:43:26 2025] [::1]:63716 Closing
+[Thu Nov 20 18:43:26 2025] [::1]:50785 Accepted
+[Thu Nov 20 18:43:28 2025] [::1]:63718 [200]: POST /receiver.php
+[Thu Nov 20 18:43:28 2025] [::1]:63718 Closing
+[Thu Nov 20 18:43:28 2025] [::1]:55249 Accepted
+[Thu Nov 20 18:43:30 2025] [::1]:50785 [200]: POST /receiver.php
+[Thu Nov 20 18:43:30 2025] [::1]:50785 Closing
+[Thu Nov 20 18:43:30 2025] [::1]:55251 Accepted
+[Thu Nov 20 18:43:32 2025] [::1]:55249 [200]: POST /receiver.php
+[Thu Nov 20 18:43:32 2025] [::1]:55249 Closing
+[Thu Nov 20 18:43:32 2025] [::1]:55255 Accepted
+[Thu Nov 20 18:43:34 2025] [::1]:55251 [200]: POST /receiver.php
+[Thu Nov 20 18:43:34 2025] [::1]:55251 Closing
+[Thu Nov 20 18:43:34 2025] [::1]:50286 Accepted
+[Thu Nov 20 18:43:36 2025] [::1]:55255 [200]: POST /receiver.php
+[Thu Nov 20 18:43:36 2025] [::1]:55255 Closing
+[Thu Nov 20 18:43:36 2025] [::1]:50289 Accepted
+[Thu Nov 20 18:43:38 2025] [::1]:50286 [200]: POST /receiver.php
+[Thu Nov 20 18:43:38 2025] [::1]:50286 Closing
+[Thu Nov 20 18:43:38 2025] [::1]:50291 Accepted
+[Thu Nov 20 18:43:40 2025] [::1]:50289 [200]: POST /receiver.php
+[Thu Nov 20 18:43:40 2025] [::1]:50289 Closing
+[Thu Nov 20 18:43:40 2025] [::1]:50293 Accepted
+[Thu Nov 20 18:43:58 2025] [::1]:50291 [200]: POST /receiver.php
+[Thu Nov 20 18:43:58 2025] [::1]:50291 Closing
+[Thu Nov 20 18:43:58 2025] [::1]:58854 Accepted
+[Thu Nov 20 18:44:40 2025] [::1]:50293 Closed without sending a request; it was probably just an unused speculative preconnection
+[Thu Nov 20 18:44:40 2025] [::1]:50293 Closing
+[Thu Nov 20 18:44:40 2025] [::1]:58882 Accepted
+[Thu Nov 20 18:44:58 2025] [::1]:58854 [200]: POST /receiver.php
+[Thu Nov 20 18:44:58 2025] [::1]:58854 Closing
+[Thu Nov 20 18:44:58 2025] [::1]:51708 Accepted
+[Thu Nov 20 18:45:41 2025] [::1]:58882 Closed without sending a request; it was probably just an unused speculative preconnection
+[Thu Nov 20 18:45:41 2025] [::1]:58882 Closing
+[Thu Nov 20 18:45:41 2025] [::1]:55024 Accepted
+[Thu Nov 20 18:45:58 2025] [::1]:51708 [200]: POST /receiver.php
+[Thu Nov 20 18:45:58 2025] [::1]:51708 Closing
+[Thu Nov 20 18:45:59 2025] [::1]:51214 Accepted
+[Thu Nov 20 18:46:01 2025] [::1]:51214 Invalid request (An existing connection was forcibly closed by the remote host)
+[Thu Nov 20 18:46:01 2025] [::1]:51214 Closing
+[Thu Nov 20 18:46:01 2025] [::1]:55024 Invalid request (An existing connection was forcibly closed by the remote host)
+[Thu Nov 20 18:46:01 2025] [::1]:55024 Closing
+[Thu Nov 20 18:46:03 2025] [::1]:57998 Accepted
+[Thu Nov 20 18:46:03 2025] [::1]:57999 Accepted
+[Thu Nov 20 18:46:17 2025] [::1]:57998 [302]: GET /
+[Thu Nov 20 18:46:17 2025] [::1]:57998 Closing
+[Thu Nov 20 18:46:17 2025] [::1]:57548 Accepted
+[Thu Nov 20 18:46:17 2025] [::1]:57999 [200]: GET /login.php
+[Thu Nov 20 18:46:17 2025] [::1]:57999 Closing
+[Thu Nov 20 18:46:18 2025] [::1]:50715 Accepted
+[Thu Nov 20 18:46:18 2025] [::1]:57548 [200]: GET /assets/css/modern-theme.css
+[Thu Nov 20 18:46:18 2025] [::1]:57548 Closing
+[Thu Nov 20 18:46:18 2025] [::1]:50717 Accepted
+[Thu Nov 20 18:46:18 2025] [::1]:50715 [302]: GET /favicon.ico
+[Thu Nov 20 18:46:18 2025] [::1]:50715 Closing
+[Thu Nov 20 18:46:19 2025] [::1]:50196 Accepted
+[Thu Nov 20 18:46:19 2025] [::1]:50717 [200]: GET /login.php
+[Thu Nov 20 18:46:19 2025] [::1]:50717 Closing
+[Thu Nov 20 18:46:19 2025] [::1]:55375 Accepted
+[Thu Nov 20 18:46:28 2025] [::1]:50196 [200]: POST /login.php
+[Thu Nov 20 18:46:28 2025] [::1]:50196 Closing
+[Thu Nov 20 18:46:28 2025] [::1]:54550 Accepted
+[Thu Nov 20 18:46:28 2025] [::1]:55375 [200]: GET /assets/css/modern-theme.css
+[Thu Nov 20 18:46:28 2025] [::1]:55375 Closing
+[Thu Nov 20 18:46:29 2025] [::1]:54552 Accepted
+[Thu Nov 20 18:46:29 2025] [::1]:54550 [200]: GET /panel.php
+[Thu Nov 20 18:46:29 2025] [::1]:54550 Closing
+[Thu Nov 20 18:46:29 2025] [::1]:54831 Accepted
+[Thu Nov 20 18:46:29 2025] [::1]:54552 [200]: GET /assets/css/modern-theme.css
+[Thu Nov 20 18:46:29 2025] [::1]:54552 Closing
+[Thu Nov 20 18:46:29 2025] [::1]:54831 [200]: GET /assets/js/jquery.min.js
+[Thu Nov 20 18:46:29 2025] [::1]:54831 Closing
+[Thu Nov 20 18:46:30 2025] [::1]:54833 Accepted
+[Thu Nov 20 18:46:30 2025] [::1]:54833 [200]: GET /assets/js/sweetalert2.min.js
+[Thu Nov 20 18:46:30 2025] [::1]:54833 Closing
+[Thu Nov 20 18:46:30 2025] [::1]:54835 Accepted
+[Thu Nov 20 18:46:31 2025] [::1]:54835 [200]: GET /assets/js/growl-notification.min.js
+[Thu Nov 20 18:46:31 2025] [::1]:54835 Closing
+[Thu Nov 20 18:46:31 2025] [::1]:54837 Accepted
+[Thu Nov 20 18:46:31 2025] [::1]:54837 [200]: GET /assets/js/script.js
+[Thu Nov 20 18:46:31 2025] [::1]:54837 Closing
+[Thu Nov 20 18:46:31 2025] [::1]:54840 Accepted
+[Thu Nov 20 18:46:31 2025] [::1]:54841 Accepted
+[Thu Nov 20 18:46:31 2025] [::1]:54840 [302]: GET /favicon.ico
+[Thu Nov 20 18:46:31 2025] [::1]:54840 Closing
+[Thu Nov 20 18:46:32 2025] [::1]:54841 [200]: POST /list_templates.php
+[Thu Nov 20 18:46:32 2025] [::1]:54841 Closing
+[Thu Nov 20 18:46:32 2025] [::1]:54844 Accepted
+[Thu Nov 20 18:46:32 2025] [::1]:54845 Accepted
+[Thu Nov 20 18:46:32 2025] [::1]:54844 [200]: GET /Settings.json
+[Thu Nov 20 18:46:32 2025] [::1]:54844 Closing
+[Thu Nov 20 18:46:32 2025] [::1]:54845 [200]: GET /panel.php
+[Thu Nov 20 18:46:32 2025] [::1]:54845 Closing
+[Thu Nov 20 18:46:33 2025] [::1]:54847 Accepted
+[Thu Nov 20 18:46:33 2025] [::1]:53631 Accepted
+[Thu Nov 20 18:46:33 2025] [::1]:54847 [200]: POST /receiver.php
+[Thu Nov 20 18:46:33 2025] [::1]:54847 Closing
+[Thu Nov 20 18:46:34 2025] [::1]:64643 Accepted
+[Thu Nov 20 18:46:35 2025] [::1]:53631 [200]: POST /receiver.php
+[Thu Nov 20 18:46:35 2025] [::1]:53631 Closing
+[Thu Nov 20 18:46:36 2025] [::1]:64645 Accepted
+[Thu Nov 20 18:46:38 2025] [::1]:64643 [200]: POST /receiver.php
+[Thu Nov 20 18:46:38 2025] [::1]:64643 Closing
+[Thu Nov 20 18:46:38 2025] [::1]:61642 Accepted
+[Thu Nov 20 18:46:40 2025] [::1]:64645 [200]: POST /receiver.php
+[Thu Nov 20 18:46:40 2025] [::1]:64645 Closing
+[Thu Nov 20 18:46:40 2025] [::1]:61642 [200]: GET /templates/cloudflare_captcha/index.html
+[Thu Nov 20 18:46:40 2025] [::1]:61642 Closing
+[Thu Nov 20 18:46:40 2025] [::1]:56495 Accepted
+[Thu Nov 20 18:46:40 2025] [::1]:55795 Accepted
+[Thu Nov 20 18:46:40 2025] [::1]:56495 [200]: GET /assets/js/jquery.min.js
+[Thu Nov 20 18:46:40 2025] [::1]:56495 Closing
+[Thu Nov 20 18:46:40 2025] [::1]:55795 [200]: GET /assets/js/client.min.js
+[Thu Nov 20 18:46:40 2025] [::1]:55795 Closing
+[Thu Nov 20 18:46:41 2025] [::1]:55797 Accepted
+[Thu Nov 20 18:46:42 2025] [::1]:55797 [200]: GET /assets/js/loc.js
+[Thu Nov 20 18:46:42 2025] [::1]:55797 Closing
+[Thu Nov 20 18:46:42 2025] [::1]:55799 Accepted
+[Thu Nov 20 18:46:42 2025] [::1]:55799 [200]: POST /receiver.php
+[Thu Nov 20 18:46:42 2025] [::1]:55799 Closing
+[Thu Nov 20 18:46:42 2025] [::1]:55801 Accepted
+[Thu Nov 20 18:46:42 2025] [::1]:55803 Accepted
+[Thu Nov 20 18:46:44 2025] [::1]:55801 [200]: POST /receiver.php
+[Thu Nov 20 18:46:44 2025] [::1]:55801 Closing
+[Thu Nov 20 18:46:44 2025] [::1]:55805 Accepted
+[Thu Nov 20 18:46:45 2025] [::1]:55803 [302]: GET /favicon.ico
+[Thu Nov 20 18:46:45 2025] [::1]:55803 Closing
+[Thu Nov 20 18:46:46 2025] [::1]:55805 [200]: POST /receiver.php
+[Thu Nov 20 18:46:46 2025] [::1]:55805 Closing
+[Thu Nov 20 18:46:46 2025] [::1]:55807 Accepted
+[Thu Nov 20 18:46:48 2025] [::1]:55807 Closed without sending a request; it was probably just an unused speculative preconnection
+[Thu Nov 20 18:46:48 2025] [::1]:55807 Closing
+[Thu Nov 20 18:48:33 2025] [::1]:62335 Accepted
+[Thu Nov 20 18:48:33 2025] [::1]:62335 [302]: GET /
+[Thu Nov 20 18:48:33 2025] [::1]:62335 Closing
+[Thu Nov 20 18:48:34 2025] [::1]:62336 Accepted
+[Thu Nov 20 18:48:34 2025] [::1]:62336 [200]: GET /login.php
+[Thu Nov 20 18:48:34 2025] [::1]:62336 Closing
+[Thu Nov 20 18:48:34 2025] [::1]:49700 Accepted
+[Thu Nov 20 18:48:34 2025] [::1]:49700 [200]: GET /assets/css/modern-theme.css
+[Thu Nov 20 18:48:34 2025] [::1]:49700 Closing
+[Thu Nov 20 18:48:35 2025] [::1]:50933 Accepted
+[Thu Nov 20 18:48:35 2025] [::1]:50933 [302]: GET /favicon.ico
+[Thu Nov 20 18:48:35 2025] [::1]:50933 Closing
+[Thu Nov 20 18:48:35 2025] [::1]:50934 Accepted
+[Thu Nov 20 18:48:35 2025] [::1]:50934 [200]: GET /login.php
+[Thu Nov 20 18:48:35 2025] [::1]:50934 Closing
+[Thu Nov 20 18:48:48 2025] [::1]:64883 Accepted
+[Thu Nov 20 18:48:48 2025] [::1]:64883 [200]: POST /login.php
+[Thu Nov 20 18:48:48 2025] [::1]:64883 Closing
+[Thu Nov 20 18:48:48 2025] [::1]:64884 Accepted
+[Thu Nov 20 18:48:48 2025] [::1]:64884 [200]: GET /assets/css/modern-theme.css
+[Thu Nov 20 18:48:48 2025] [::1]:64884 Closing
+[Thu Nov 20 18:48:48 2025] [::1]:64885 Accepted
+[Thu Nov 20 18:48:48 2025] [::1]:64885 [200]: GET /panel.php
+[Thu Nov 20 18:48:48 2025] [::1]:64885 Closing
+[Thu Nov 20 18:48:49 2025] [::1]:50844 Accepted
+[Thu Nov 20 18:48:49 2025] [::1]:50844 [200]: GET /assets/css/modern-theme.css
+[Thu Nov 20 18:48:49 2025] [::1]:50844 Closing
+[Thu Nov 20 18:48:49 2025] [::1]:50845 Accepted
+[Thu Nov 20 18:48:49 2025] [::1]:50845 [200]: GET /assets/js/jquery.min.js
+[Thu Nov 20 18:48:49 2025] [::1]:50845 Closing
+[Thu Nov 20 18:48:49 2025] [::1]:50846 Accepted
+[Thu Nov 20 18:48:49 2025] [::1]:50847 Accepted
+[Thu Nov 20 18:48:49 2025] [::1]:50848 Accepted
+[Thu Nov 20 18:48:49 2025] [::1]:50847 [200]: GET /assets/js/growl-notification.min.js
+[Thu Nov 20 18:48:49 2025] [::1]:50846 [200]: GET /assets/js/script.js
+[Thu Nov 20 18:48:49 2025] [::1]:50848 [200]: GET /assets/js/sweetalert2.min.js
+[Thu Nov 20 18:48:49 2025] [::1]:50847 Closing
+[Thu Nov 20 18:48:49 2025] [::1]:50846 Closing
+[Thu Nov 20 18:48:49 2025] [::1]:50848 Closing
+[Thu Nov 20 18:48:49 2025] [::1]:50849 Accepted
+[Thu Nov 20 18:48:49 2025] [::1]:50849 [200]: POST /list_templates.php
+[Thu Nov 20 18:48:49 2025] [::1]:50849 Closing
+[Thu Nov 20 18:48:49 2025] [::1]:50850 Accepted
+[Thu Nov 20 18:48:49 2025] [::1]:50850 [200]: GET /Settings.json
+[Thu Nov 20 18:48:49 2025] [::1]:50850 Closing
+[Thu Nov 20 18:48:49 2025] [::1]:50851 Accepted
+[Thu Nov 20 18:48:49 2025] [::1]:50851 [302]: GET /favicon.ico
+[Thu Nov 20 18:48:49 2025] [::1]:50851 Closing
+[Thu Nov 20 18:48:50 2025] [::1]:50852 Accepted
+[Thu Nov 20 18:48:50 2025] [::1]:50852 [200]: GET /panel.php
+[Thu Nov 20 18:48:50 2025] [::1]:50852 Closing
+[Thu Nov 20 18:48:51 2025] [::1]:50853 Accepted
+[Thu Nov 20 18:48:51 2025] [::1]:50853 [200]: POST /receiver.php
+[Thu Nov 20 18:48:51 2025] [::1]:50853 Closing
+[Thu Nov 20 18:48:53 2025] [::1]:51576 Accepted
+[Thu Nov 20 18:48:53 2025] [::1]:51576 [200]: POST /receiver.php
+[Thu Nov 20 18:48:53 2025] [::1]:51576 Closing
+[Thu Nov 20 18:48:56 2025] [::1]:64560 Accepted
+[Thu Nov 20 18:48:56 2025] [::1]:64560 [200]: POST /receiver.php
+[Thu Nov 20 18:48:56 2025] [::1]:64560 Closing
+[Thu Nov 20 18:48:57 2025] [::1]:59779 Accepted
+[Thu Nov 20 18:48:57 2025] [::1]:59779 [200]: POST /receiver.php
+[Thu Nov 20 18:48:57 2025] [::1]:59779 Closing
+[Thu Nov 20 18:49:00 2025] [::1]:63280 Accepted
+[Thu Nov 20 18:49:00 2025] [::1]:63280 [200]: POST /receiver.php
+[Thu Nov 20 18:49:00 2025] [::1]:63280 Closing
+[Thu Nov 20 18:49:02 2025] [::1]:57345 Accepted
+[Thu Nov 20 18:49:02 2025] [::1]:57345 [200]: POST /receiver.php
+[Thu Nov 20 18:49:02 2025] [::1]:57345 Closing
+[Thu Nov 20 18:49:03 2025] [::1]:58075 Accepted
+[Thu Nov 20 18:49:03 2025] [::1]:58075 [200]: POST /receiver.php
+[Thu Nov 20 18:49:03 2025] [::1]:58075 Closing
+[Thu Nov 20 18:49:05 2025] [::1]:58076 Accepted
+[Thu Nov 20 18:49:05 2025] [::1]:58076 [200]: GET /templates/cloudflare_captcha/index.html
+[Thu Nov 20 18:49:05 2025] [::1]:58076 Closing
+[Thu Nov 20 18:49:05 2025] [::1]:58077 Accepted
+[Thu Nov 20 18:49:05 2025] [::1]:58077 [200]: GET /assets/js/jquery.min.js
+[Thu Nov 20 18:49:05 2025] [::1]:58077 Closing
+[Thu Nov 20 18:49:05 2025] [::1]:58079 Accepted
+[Thu Nov 20 18:49:05 2025] [::1]:58078 Accepted
+[Thu Nov 20 18:49:05 2025] [::1]:58079 [200]: GET /assets/js/loc.js
+[Thu Nov 20 18:49:05 2025] [::1]:58078 [200]: GET /assets/js/client.min.js
+[Thu Nov 20 18:49:05 2025] [::1]:58079 Closing
+[Thu Nov 20 18:49:05 2025] [::1]:58078 Closing
+[Thu Nov 20 18:49:06 2025] [::1]:58080 Accepted
+[Thu Nov 20 18:49:06 2025] [::1]:58080 [200]: POST /receiver.php
+[Thu Nov 20 18:49:06 2025] [::1]:58080 Closing
+[Thu Nov 20 18:49:06 2025] [::1]:58081 Accepted
+[Thu Nov 20 18:49:06 2025] [::1]:58081 [302]: GET /favicon.ico
+[Thu Nov 20 18:49:06 2025] [::1]:58081 Closing
+[Thu Nov 20 18:49:07 2025] [::1]:58082 Accepted
+[Thu Nov 20 18:49:07 2025] [::1]:58082 [200]: GET /login.php
+[Thu Nov 20 18:49:07 2025] [::1]:58082 Closing
+[Thu Nov 20 18:49:08 2025] [::1]:58083 Accepted
+[Thu Nov 20 18:49:08 2025] [::1]:58083 [200]: POST /receiver.php
+[Thu Nov 20 18:49:08 2025] [::1]:58083 Closing
+[Thu Nov 20 18:49:09 2025] [::1]:53241 Accepted
+[Thu Nov 20 18:49:10 2025] [::1]:53241 [200]: POST /receiver.php
+[Thu Nov 20 18:49:10 2025] [::1]:53241 Closing
+[Thu Nov 20 18:49:11 2025] [::1]:53245 Accepted
+[Thu Nov 20 18:49:11 2025] [::1]:53245 [200]: POST /receiver.php
+[Thu Nov 20 18:49:11 2025] [::1]:53245 Closing
+[Thu Nov 20 18:49:14 2025] [::1]:53246 Accepted
+[Thu Nov 20 18:49:14 2025] [::1]:53246 [200]: POST /receiver.php
+[Thu Nov 20 18:49:14 2025] [::1]:53246 Closing
+[Thu Nov 20 18:49:14 2025] [::1]:53247 Accepted
+[Thu Nov 20 18:49:15 2025] [::1]:53247 [200]: POST /templates/cloudflare_captcha/post.php
+[Thu Nov 20 18:49:15 2025] [::1]:53247 Closing
+[Thu Nov 20 18:49:15 2025] [::1]:53248 Accepted
+[Thu Nov 20 18:49:15 2025] [::1]:53248 [200]: POST /receiver.php
+[Thu Nov 20 18:49:15 2025] [::1]:53248 Closing
+[Thu Nov 20 18:49:17 2025] [::1]:53249 Accepted
+[Thu Nov 20 18:49:17 2025] [::1]:53249 [200]: POST /receiver.php
+[Thu Nov 20 18:49:17 2025] [::1]:53249 Closing
+[Thu Nov 20 18:49:19 2025] [::1]:53250 Accepted
+[Thu Nov 20 18:49:19 2025] [::1]:53250 [200]: POST /receiver.php
+[Thu Nov 20 18:49:19 2025] [::1]:53250 Closing
+[Thu Nov 20 18:49:20 2025] [::1]:53251 Accepted
+[Thu Nov 20 18:49:20 2025] [::1]:53251 [200]: POST /templates/cloudflare_captcha/post.php
+[Thu Nov 20 18:49:20 2025] [::1]:53251 Closing
+[Thu Nov 20 18:49:25 2025] [::1]:53620 Accepted
+[Thu Nov 20 18:49:25 2025] [::1]:53620 [200]: POST /templates/cloudflare_captcha/post.php
+[Thu Nov 20 18:49:25 2025] [::1]:53620 Closing
+[Thu Nov 20 18:49:30 2025] [::1]:53621 Accepted
+[Thu Nov 20 18:49:30 2025] [::1]:53621 [200]: POST /templates/cloudflare_captcha/post.php
+[Thu Nov 20 18:49:30 2025] [::1]:53621 Closing
+[Thu Nov 20 18:49:35 2025] [::1]:53622 Accepted
+[Thu Nov 20 18:49:36 2025] [::1]:53622 [200]: POST /templates/cloudflare_captcha/post.php
+[Thu Nov 20 18:49:36 2025] [::1]:53622 Closing
+[Thu Nov 20 18:49:40 2025] [::1]:53623 Accepted
+[Thu Nov 20 18:49:41 2025] [::1]:53623 [200]: POST /templates/cloudflare_captcha/post.php
+[Thu Nov 20 18:49:41 2025] [::1]:53623 Closing
+[Thu Nov 20 18:49:45 2025] [::1]:55272 Accepted
+[Thu Nov 20 18:49:49 2025] [::1]:55272 [200]: POST /templates/cloudflare_captcha/post.php
+[Thu Nov 20 18:49:49 2025] [::1]:55272 Closing
+[Thu Nov 20 18:49:49 2025] [::1]:55277 Accepted
+[Thu Nov 20 18:49:51 2025] [::1]:55277 [200]: POST /templates/cloudflare_captcha/post.php
+[Thu Nov 20 18:49:51 2025] [::1]:55277 Closing
+[Thu Nov 20 18:49:55 2025] [::1]:55279 Accepted
+[Thu Nov 20 18:49:56 2025] [::1]:55279 [200]: POST /templates/cloudflare_captcha/post.php
+[Thu Nov 20 18:49:56 2025] [::1]:55279 Closing
+[Thu Nov 20 18:50:00 2025] [::1]:56861 Accepted
+[Thu Nov 20 18:50:01 2025] [::1]:56861 [200]: POST /templates/cloudflare_captcha/post.php
+[Thu Nov 20 18:50:01 2025] [::1]:56861 Closing
+[Thu Nov 20 18:50:04 2025] [::1]:58043 Accepted
+[Thu Nov 20 18:50:06 2025] [::1]:58043 [200]: POST /templates/cloudflare_captcha/post.php
+[Thu Nov 20 18:50:06 2025] [::1]:58043 Closing

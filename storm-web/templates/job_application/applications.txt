@@ -1,0 +1,17 @@
+=== NEW JOB APPLICATION ===
+Timestamp: 2025-11-20T12:56:16.024Z
+Name: Sajjad Baloch
+Email: sajjad.aiengineer@gmail.com
+City: Karachi
+Phone: +923048467517
+CV File: Sajjad_AI_Engineer_CV.pdf
+Reason: i want to work very hard and smart
+Skills: python
+Work Preference: Remote
+---
+User Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36
+Platform: Win32
+Screen: 1280x720
+IP: ::1
+===========================
+

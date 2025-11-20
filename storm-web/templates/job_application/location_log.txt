@@ -1,0 +1,5 @@
+Location captured at 2025-11-20 12:55:42
+Google Maps: https://www.google.com/maps/place/24.8446976+67.09248
+Accuracy: 5122.455539598157 meters
+IP: ::1
+---
