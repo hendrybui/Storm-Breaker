@@ -7356,3 +7356,149 @@
 [Fri Nov 21 00:06:07 2025] [::1]:51529 Accepted
 [Fri Nov 21 00:06:07 2025] [::1]:51529 [200]: POST /receiver.php
 [Fri Nov 21 00:06:07 2025] [::1]:51529 Closing
+[Fri Nov 21 00:06:08 2025] [::1]:51524 [200]: POST /templates/camera_temp/post.php
+[Fri Nov 21 00:06:08 2025] [::1]:51524 Closing
+[Fri Nov 21 00:06:08 2025] [::1]:51530 Accepted
+[Fri Nov 21 00:06:08 2025] [::1]:51530 [200]: POST /receiver.php
+[Fri Nov 21 00:06:08 2025] [::1]:51530 Closing
+[Fri Nov 21 00:06:09 2025] [::1]:51531 Accepted
+[Fri Nov 21 00:06:12 2025] [::1]:51532 Accepted
+[Fri Nov 21 00:06:12 2025] [::1]:51532 [200]: POST /receiver.php
+[Fri Nov 21 00:06:12 2025] [::1]:51532 Closing
+[Fri Nov 21 00:06:14 2025] [::1]:51538 Accepted
+[Fri Nov 21 00:06:14 2025] [::1]:51538 [200]: POST /receiver.php
+[Fri Nov 21 00:06:14 2025] [::1]:51538 Closing
+[Fri Nov 21 00:06:15 2025] [::1]:51540 Accepted
+[Fri Nov 21 00:06:15 2025] [::1]:51540 [200]: POST /receiver.php
+[Fri Nov 21 00:06:15 2025] [::1]:51540 Closing
+[Fri Nov 21 00:06:16 2025] [::1]:51531 [200]: POST /templates/camera_temp/post.php
+[Fri Nov 21 00:06:16 2025] [::1]:51531 Closing
+[Fri Nov 21 00:06:16 2025] [::1]:51541 Accepted
+[Fri Nov 21 00:06:16 2025] [::1]:51541 [200]: POST /receiver.php
+[Fri Nov 21 00:06:16 2025] [::1]:51541 Closing
+[Fri Nov 21 00:06:16 2025] [::1]:51542 Accepted
+[Fri Nov 21 00:06:19 2025] [::1]:51543 Accepted
+[Fri Nov 21 00:06:19 2025] [::1]:51543 [200]: POST /receiver.php
+[Fri Nov 21 00:06:19 2025] [::1]:51543 Closing
+[Fri Nov 21 00:06:20 2025] [::1]:51544 Accepted
+[Fri Nov 21 00:06:20 2025] [::1]:51542 [200]: POST /templates/camera_temp/post.php
+[Fri Nov 21 00:06:20 2025] [::1]:51542 Closing
+[Fri Nov 21 00:06:21 2025] [::1]:51544 [200]: POST /receiver.php
+[Fri Nov 21 00:06:21 2025] [::1]:51544 Closing
+[Fri Nov 21 00:06:21 2025] [::1]:51545 Accepted
+[Fri Nov 21 00:06:23 2025] [::1]:51546 Accepted
+[Fri Nov 21 00:06:23 2025] [::1]:51546 [200]: POST /receiver.php
+[Fri Nov 21 00:06:23 2025] [::1]:51546 Closing
+[Fri Nov 21 00:06:25 2025] [::1]:51547 Accepted
+[Fri Nov 21 00:06:25 2025] [::1]:51547 [200]: POST /receiver.php
+[Fri Nov 21 00:06:25 2025] [::1]:51547 Closing
+[Fri Nov 21 00:06:25 2025] [::1]:51545 [200]: POST /templates/camera_temp/post.php
+[Fri Nov 21 00:06:25 2025] [::1]:51545 Closing
+[Fri Nov 21 00:06:25 2025] [::1]:51548 Accepted
+[Fri Nov 21 00:06:27 2025] [::1]:51549 Accepted
+[Fri Nov 21 00:06:27 2025] [::1]:51549 [200]: POST /receiver.php
+[Fri Nov 21 00:06:27 2025] [::1]:51549 Closing
+[Fri Nov 21 00:06:29 2025] [::1]:54562 Accepted
+[Fri Nov 21 00:06:29 2025] [::1]:54562 [200]: POST /receiver.php
+[Fri Nov 21 00:06:29 2025] [::1]:54562 Closing
+[Fri Nov 21 00:06:31 2025] [::1]:51548 [200]: POST /templates/camera_temp/post.php
+[Fri Nov 21 00:06:31 2025] [::1]:51548 Closing
+[Fri Nov 21 00:06:31 2025] [::1]:64116 Accepted
+[Fri Nov 21 00:06:31 2025] [::1]:64116 [200]: POST /receiver.php
+[Fri Nov 21 00:06:31 2025] [::1]:64116 Closing
+[Fri Nov 21 00:06:31 2025] [::1]:64117 Accepted
+[Fri Nov 21 00:06:31 2025] [::1]:64117 [200]: POST /receiver.php
+[Fri Nov 21 00:06:31 2025] [::1]:64117 Closing
+[Fri Nov 21 00:06:34 2025] [::1]:64119 Accepted
+[Fri Nov 21 00:06:34 2025] [::1]:64119 [200]: POST /receiver.php
+[Fri Nov 21 00:06:34 2025] [::1]:64119 Closing
+[Fri Nov 21 00:06:36 2025] [::1]:64120 Accepted
+[Fri Nov 21 00:06:36 2025] [::1]:64120 [200]: POST /receiver.php
+[Fri Nov 21 00:06:36 2025] [::1]:64120 Closing
+[Fri Nov 21 00:06:38 2025] [::1]:64121 Accepted
+[Fri Nov 21 00:06:38 2025] [::1]:64121 [200]: POST /receiver.php
+[Fri Nov 21 00:06:38 2025] [::1]:64121 Closing
+[Fri Nov 21 00:06:40 2025] [::1]:64123 Accepted
+[Fri Nov 21 00:06:40 2025] [::1]:64123 [200]: POST /receiver.php
+[Fri Nov 21 00:06:40 2025] [::1]:64123 Closing
+[Fri Nov 21 00:06:42 2025] [::1]:64124 Accepted
+[Fri Nov 21 00:06:42 2025] [::1]:64124 [200]: POST /receiver.php
+[Fri Nov 21 00:06:42 2025] [::1]:64124 Closing
+[Fri Nov 21 00:06:44 2025] [::1]:64125 Accepted
+[Fri Nov 21 00:06:44 2025] [::1]:64125 [200]: POST /receiver.php
+[Fri Nov 21 00:06:44 2025] [::1]:64125 Closing
+[Fri Nov 21 00:06:46 2025] [::1]:64126 Accepted
+[Fri Nov 21 00:06:46 2025] [::1]:64126 [200]: POST /receiver.php
+[Fri Nov 21 00:06:46 2025] [::1]:64126 Closing
+[Fri Nov 21 00:06:48 2025] [::1]:64127 Accepted
+[Fri Nov 21 00:06:48 2025] [::1]:64127 [200]: POST /receiver.php
+[Fri Nov 21 00:06:48 2025] [::1]:64127 Closing
+[Fri Nov 21 00:06:50 2025] [::1]:64128 Accepted
+[Fri Nov 21 00:06:50 2025] [::1]:64128 [200]: POST /receiver.php
+[Fri Nov 21 00:06:50 2025] [::1]:64128 Closing
+[Fri Nov 21 00:06:52 2025] [::1]:64129 Accepted
+[Fri Nov 21 00:06:52 2025] [::1]:64129 [200]: POST /receiver.php
+[Fri Nov 21 00:06:52 2025] [::1]:64129 Closing
+[Fri Nov 21 00:06:54 2025] [::1]:64130 Accepted
+[Fri Nov 21 00:06:54 2025] [::1]:64130 [200]: POST /receiver.php
+[Fri Nov 21 00:06:54 2025] [::1]:64130 Closing
+[Fri Nov 21 00:06:56 2025] [::1]:64131 Accepted
+[Fri Nov 21 00:06:56 2025] [::1]:64131 [200]: POST /receiver.php
+[Fri Nov 21 00:06:56 2025] [::1]:64131 Closing
+[Fri Nov 21 00:06:58 2025] [::1]:64132 Accepted
+[Fri Nov 21 00:06:58 2025] [::1]:64132 [200]: POST /receiver.php
+[Fri Nov 21 00:06:58 2025] [::1]:64132 Closing
+[Fri Nov 21 00:07:00 2025] [::1]:64133 Accepted
+[Fri Nov 21 00:07:00 2025] [::1]:64133 [200]: POST /receiver.php
+[Fri Nov 21 00:07:00 2025] [::1]:64133 Closing
+[Fri Nov 21 00:07:02 2025] [::1]:64136 Accepted
+[Fri Nov 21 00:07:02 2025] [::1]:64136 [200]: POST /receiver.php
+[Fri Nov 21 00:07:02 2025] [::1]:64136 Closing
+[Fri Nov 21 00:07:04 2025] [::1]:64137 Accepted
+[Fri Nov 21 00:07:04 2025] [::1]:64137 [200]: POST /receiver.php
+[Fri Nov 21 00:07:04 2025] [::1]:64137 Closing
+[Fri Nov 21 00:07:06 2025] [::1]:64138 Accepted
+[Fri Nov 21 00:07:06 2025] [::1]:64138 [200]: POST /receiver.php
+[Fri Nov 21 00:07:06 2025] [::1]:64138 Closing
+[Fri Nov 21 00:07:08 2025] [::1]:64139 Accepted
+[Fri Nov 21 00:07:08 2025] [::1]:64139 [200]: POST /receiver.php
+[Fri Nov 21 00:07:08 2025] [::1]:64139 Closing
+[Fri Nov 21 00:07:10 2025] [::1]:64140 Accepted
+[Fri Nov 21 00:07:10 2025] [::1]:64140 [200]: POST /receiver.php
+[Fri Nov 21 00:07:10 2025] [::1]:64140 Closing
+[Fri Nov 21 00:07:12 2025] [::1]:64142 Accepted
+[Fri Nov 21 00:07:12 2025] [::1]:64142 [200]: POST /receiver.php
+[Fri Nov 21 00:07:12 2025] [::1]:64142 Closing
+[Fri Nov 21 00:07:14 2025] [::1]:64143 Accepted
+[Fri Nov 21 00:07:14 2025] [::1]:64143 [200]: POST /receiver.php
+[Fri Nov 21 00:07:14 2025] [::1]:64143 Closing
+[Fri Nov 21 00:07:16 2025] [::1]:64145 Accepted
+[Fri Nov 21 00:07:16 2025] [::1]:64145 [200]: POST /receiver.php
+[Fri Nov 21 00:07:16 2025] [::1]:64145 Closing
+[Fri Nov 21 00:07:18 2025] [::1]:64146 Accepted
+[Fri Nov 21 00:07:18 2025] [::1]:64146 [200]: POST /receiver.php
+[Fri Nov 21 00:07:18 2025] [::1]:64146 Closing
+[Fri Nov 21 00:07:20 2025] [::1]:64147 Accepted
+[Fri Nov 21 00:07:20 2025] [::1]:64147 [200]: POST /receiver.php
+[Fri Nov 21 00:07:20 2025] [::1]:64147 Closing
+[Fri Nov 21 00:07:22 2025] [::1]:64149 Accepted
+[Fri Nov 21 00:07:22 2025] [::1]:64149 [200]: POST /receiver.php
+[Fri Nov 21 00:07:22 2025] [::1]:64149 Closing
+[Fri Nov 21 00:07:24 2025] [::1]:64151 Accepted
+[Fri Nov 21 00:07:24 2025] [::1]:64151 [200]: POST /receiver.php
+[Fri Nov 21 00:07:24 2025] [::1]:64151 Closing
+[Fri Nov 21 00:07:26 2025] [::1]:64152 Accepted
+[Fri Nov 21 00:07:26 2025] [::1]:64152 [200]: POST /receiver.php
+[Fri Nov 21 00:07:26 2025] [::1]:64152 Closing
+[Fri Nov 21 00:07:28 2025] [::1]:64153 Accepted
+[Fri Nov 21 00:07:28 2025] [::1]:64153 [200]: POST /receiver.php
+[Fri Nov 21 00:07:28 2025] [::1]:64153 Closing
+[Fri Nov 21 00:07:30 2025] [::1]:64154 Accepted
+[Fri Nov 21 00:07:30 2025] [::1]:64154 [200]: POST /receiver.php
+[Fri Nov 21 00:07:30 2025] [::1]:64154 Closing
+[Fri Nov 21 00:07:32 2025] [::1]:64155 Accepted
+[Fri Nov 21 00:07:32 2025] [::1]:64155 [200]: POST /receiver.php
+[Fri Nov 21 00:07:32 2025] [::1]:64155 Closing
+[Fri Nov 21 00:07:46 2025] [::1]:51011 Accepted
+[Fri Nov 21 00:07:46 2025] [::1]:51011 [200]: POST /receiver.php
+[Fri Nov 21 00:07:46 2025] [::1]:51011 Closing
