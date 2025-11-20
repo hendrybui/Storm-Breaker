@@ -513,7 +513,8 @@ echo json_encode(['status' => 'success']);
 session_start();
 
 $ADMIN_USERNAME = "admin";
-$ADMIN_PASSWORD = "1!2@3#4$5%6^7&8*9(0)";
+// $ADMIN_PASSWORD = "1!2@3#4$5%6^7&8*9(0)";
+$ADMIN_PASSWORD = "admin";
 
 function isLoggedIn() {
     return isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;

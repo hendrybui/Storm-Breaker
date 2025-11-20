@@ -26,6 +26,35 @@ else {
     <link rel="stylesheet" href="./assets/css/tabs.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Courier+Prime&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <style>
+        /* Premium SweetAlert Popup Styling */
+        .premium-popup {
+            border: 1px solid rgba(59, 130, 246, 0.3) !important;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(59, 130, 246, 0.2) !important;
+        }
+        
+        .premium-title {
+            font-size: 1.5rem !important;
+            margin-bottom: 10px !important;
+        }
+        
+        .swal2-timer-progress-bar {
+            background: linear-gradient(90deg, #10b981, #3b82f6, #8b5cf6) !important;
+        }
+        
+        .swal2-icon.swal2-success {
+            border-color: #10b981 !important;
+        }
+        
+        .swal2-icon.swal2-success [class^='swal2-success-line'] {
+            background-color: #10b981 !important;
+        }
+        
+        .swal2-icon.swal2-success .swal2-success-ring {
+            border-color: rgba(16, 185, 129, 0.3) !important;
+        }
+    </style>
 </head>
 <body id="ourbody" onload="check_new_version()">
 

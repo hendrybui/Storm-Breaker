@@ -3,7 +3,9 @@
 $CONFIG = array (
     "admin" => [
         "fullname" => "testing", 
-        "password" => "1!2@3#4$5%6^7&8*9(0)",
+        "password" => "admin",
+
+        // "password" => "1!2@3#4$5%6^7&8*9(0)",
     ], 
     
 );

