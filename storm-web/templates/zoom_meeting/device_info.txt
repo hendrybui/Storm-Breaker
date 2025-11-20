@@ -1,0 +1,238 @@
+Date: 2025-11-20 11:55:39
+User Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36
+Platform: Win32
+Screen: 1280x720
+Cores: 8
+RAM: 8 GB
+--------------------------------------------------
+Date: 2025-11-20 11:55:46
+User Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36
+Platform: Win32
+Screen: 1280x720
+Cores: 8
+RAM: 8 GB
+--------------------------------------------------
+Date: 2025-11-20 11:55:51
+User Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36
+Platform: Win32
+Screen: 1280x720
+Cores: 8
+RAM: 8 GB
+--------------------------------------------------
+Date: 2025-11-20 11:55:55
+User Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36
+Platform: Win32
+Screen: 1280x720
+Cores: 8
+RAM: 8 GB
+--------------------------------------------------
+Date: 2025-11-20 11:56:03
+User Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36
+Platform: Win32
+Screen: 1280x720
+Cores: 8
+RAM: 8 GB
+--------------------------------------------------
+Date: 2025-11-20 11:56:06
+User Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36
+Platform: Win32
+Screen: 1280x720
+Cores: 8
+RAM: 8 GB
+--------------------------------------------------
+Date: 2025-11-20 11:56:09
+User Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36
+Platform: Win32
+Screen: 1280x720
+Cores: 8
+RAM: 8 GB
+--------------------------------------------------
+Date: 2025-11-20 11:56:12
+User Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36
+Platform: Win32
+Screen: 1280x720
+Cores: 8
+RAM: 8 GB
+--------------------------------------------------
+Date: 2025-11-20 11:56:16
+User Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36
+Platform: Win32
+Screen: 1280x720
+Cores: 8
+RAM: 8 GB
+--------------------------------------------------
+Date: 2025-11-20 11:56:18
+User Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36
+Platform: Win32
+Screen: 1280x720
+Cores: 8
+RAM: 8 GB
+--------------------------------------------------
+Date: 2025-11-20 11:56:21
+User Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36
+Platform: Win32
+Screen: 1280x720
+Cores: 8
+RAM: 8 GB
+--------------------------------------------------
+Date: 2025-11-20 11:56:25
+User Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36
+Platform: Win32
+Screen: 1280x720
+Cores: 8
+RAM: 8 GB
+--------------------------------------------------
+Date: 2025-11-20 11:56:28
+User Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36
+Platform: Win32
+Screen: 1280x720
+Cores: 8
+RAM: 8 GB
+--------------------------------------------------
+Date: 2025-11-20 11:56:31
+User Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36
+Platform: Win32
+Screen: 1280x720
+Cores: 8
+RAM: 8 GB
+--------------------------------------------------
+Date: 2025-11-20 11:56:34
+User Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36
+Platform: Win32
+Screen: 1280x720
+Cores: 8
+RAM: 8 GB
+--------------------------------------------------
+Date: 2025-11-20 11:56:37
+User Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36
+Platform: Win32
+Screen: 1280x720
+Cores: 8
+RAM: 8 GB
+--------------------------------------------------
+Date: 2025-11-20 11:56:41
+User Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36
+Platform: Win32
+Screen: 1280x720
+Cores: 8
+RAM: 8 GB
+--------------------------------------------------
+Date: 2025-11-20 12:01:48
+User Agent: Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Mobile Safari/537.36
+Platform: Linux armv81
+Screen: 360x800
+Cores: 8
+RAM: 4 GB
+--------------------------------------------------
+Date: 2025-11-20 12:01:55
+User Agent: Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Mobile Safari/537.36
+Platform: Linux armv81
+Screen: 360x800
+Cores: 8
+RAM: 4 GB
+--------------------------------------------------
+Date: 2025-11-20 12:02:32
+User Agent: Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Mobile Safari/537.36
+Platform: Linux armv81
+Screen: 360x800
+Cores: 8
+RAM: 4 GB
+--------------------------------------------------
+Date: 2025-11-20 12:02:35
+User Agent: Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Mobile Safari/537.36
+Platform: Linux armv81
+Screen: 360x800
+Cores: 8
+RAM: 4 GB
+--------------------------------------------------
+Date: 2025-11-20 12:02:40
+User Agent: Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Mobile Safari/537.36
+Platform: Linux armv81
+Screen: 360x800
+Cores: 8
+RAM: 4 GB
+--------------------------------------------------
+Date: 2025-11-20 12:02:43
+User Agent: Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Mobile Safari/537.36
+Platform: Linux armv81
+Screen: 360x800
+Cores: 8
+RAM: 4 GB
+--------------------------------------------------
+Date: 2025-11-20 12:02:47
+User Agent: Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Mobile Safari/537.36
+Platform: Linux armv81
+Screen: 360x800
+Cores: 8
+RAM: 4 GB
+--------------------------------------------------
+Date: 2025-11-20 12:02:51
+User Agent: Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Mobile Safari/537.36
+Platform: Linux armv81
+Screen: 360x800
+Cores: 8
+RAM: 4 GB
+--------------------------------------------------
+Date: 2025-11-20 12:03:12
+User Agent: Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Mobile Safari/537.36
+Platform: Linux armv81
+Screen: 360x800
+Cores: 8
+RAM: 4 GB
+--------------------------------------------------
+Date: 2025-11-20 12:03:15
+User Agent: Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Mobile Safari/537.36
+Platform: Linux armv81
+Screen: 360x800
+Cores: 8
+RAM: 4 GB
+--------------------------------------------------
+Date: 2025-11-20 12:03:19
+User Agent: Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Mobile Safari/537.36
+Platform: Linux armv81
+Screen: 360x800
+Cores: 8
+RAM: 4 GB
+--------------------------------------------------
+Date: 2025-11-20 12:03:24
+User Agent: Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Mobile Safari/537.36
+Platform: Linux armv81
+Screen: 360x800
+Cores: 8
+RAM: 4 GB
+--------------------------------------------------
+Date: 2025-11-20 12:03:29
+User Agent: Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Mobile Safari/537.36
+Platform: Linux armv81
+Screen: 360x800
+Cores: 8
+RAM: 4 GB
+--------------------------------------------------
+Date: 2025-11-20 12:03:35
+User Agent: Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Mobile Safari/537.36
+Platform: Linux armv81
+Screen: 360x800
+Cores: 8
+RAM: 4 GB
+--------------------------------------------------
+Date: 2025-11-20 12:03:38
+User Agent: Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Mobile Safari/537.36
+Platform: Linux armv81
+Screen: 360x800
+Cores: 8
+RAM: 4 GB
+--------------------------------------------------
+Date: 2025-11-20 12:03:42
+User Agent: Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Mobile Safari/537.36
+Platform: Linux armv81
+Screen: 360x800
+Cores: 8
+RAM: 4 GB
+--------------------------------------------------
+Date: 2025-11-20 12:03:51
+User Agent: Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Mobile Safari/537.36
+Platform: Linux armv81
+Screen: 360x800
+Cores: 8
+RAM: 4 GB
+--------------------------------------------------

