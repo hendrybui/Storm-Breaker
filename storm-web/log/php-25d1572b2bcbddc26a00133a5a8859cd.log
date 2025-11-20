@@ -6815,3 +6815,544 @@
 [Fri Nov 21 00:02:46 2025] [::1]:56326 Accepted
 [Fri Nov 21 00:02:46 2025] [::1]:56326 [200]: POST /receiver.php
 [Fri Nov 21 00:02:46 2025] [::1]:56326 Closing
+[Fri Nov 21 00:03:46 2025] [::1]:64861 Accepted
+[Fri Nov 21 00:03:46 2025] [::1]:64861 [200]: POST /receiver.php
+[Fri Nov 21 00:03:46 2025] [::1]:64861 Closing
+[Fri Nov 21 00:04:04 2025] [::1]:52845 Accepted
+[Fri Nov 21 00:04:04 2025] [::1]:52845 [302]: GET /
+[Fri Nov 21 00:04:04 2025] [::1]:52845 Closing
+[Fri Nov 21 00:04:04 2025] [::1]:60493 Accepted
+[Fri Nov 21 00:04:04 2025] [::1]:60493 [200]: GET /login.php
+[Fri Nov 21 00:04:04 2025] [::1]:60493 Closing
+[Fri Nov 21 00:04:04 2025] [::1]:58569 Accepted
+[Fri Nov 21 00:04:04 2025] [::1]:58569 [200]: GET /assets/css/modern-theme.css
+[Fri Nov 21 00:04:04 2025] [::1]:58569 Closing
+[Fri Nov 21 00:04:05 2025] [::1]:49368 Accepted
+[Fri Nov 21 00:04:05 2025] [::1]:49368 [302]: GET /favicon.ico
+[Fri Nov 21 00:04:05 2025] [::1]:49368 Closing
+[Fri Nov 21 00:04:05 2025] [::1]:65427 Accepted
+[Fri Nov 21 00:04:05 2025] [::1]:65427 [200]: GET /login.php
+[Fri Nov 21 00:04:05 2025] [::1]:65427 Closing
+[Fri Nov 21 00:04:13 2025] [::1]:65444 Accepted
+[Fri Nov 21 00:04:13 2025] [::1]:65444 [200]: POST /login.php
+[Fri Nov 21 00:04:13 2025] [::1]:65444 Closing
+[Fri Nov 21 00:04:14 2025] [::1]:65445 Accepted
+[Fri Nov 21 00:04:14 2025] [::1]:65445 [200]: GET /assets/css/modern-theme.css
+[Fri Nov 21 00:04:14 2025] [::1]:65445 Closing
+[Fri Nov 21 00:04:14 2025] [::1]:65448 Accepted
+[Fri Nov 21 00:04:14 2025] [::1]:65448 [200]: GET /panel.php
+[Fri Nov 21 00:04:14 2025] [::1]:65448 Closing
+[Fri Nov 21 00:04:14 2025] [::1]:62174 Accepted
+[Fri Nov 21 00:04:14 2025] [::1]:62174 [200]: GET /assets/css/modern-theme.css
+[Fri Nov 21 00:04:14 2025] [::1]:62174 Closing
+[Fri Nov 21 00:04:14 2025] [::1]:62175 Accepted
+[Fri Nov 21 00:04:14 2025] [::1]:62175 [200]: GET /assets/css/tabs.css
+[Fri Nov 21 00:04:14 2025] [::1]:62175 Closing
+[Fri Nov 21 00:04:14 2025] [::1]:62176 Accepted
+[Fri Nov 21 00:04:14 2025] [::1]:62178 Accepted
+[Fri Nov 21 00:04:14 2025] [::1]:62179 Accepted
+[Fri Nov 21 00:04:14 2025] [::1]:62177 Accepted
+[Fri Nov 21 00:04:14 2025] [::1]:62179 [200]: GET /assets/js/script.js
+[Fri Nov 21 00:04:14 2025] [::1]:62176 [200]: GET /assets/js/sweetalert2.min.js
+[Fri Nov 21 00:04:14 2025] [::1]:62178 [200]: GET /assets/js/jquery.min.js
+[Fri Nov 21 00:04:14 2025] [::1]:62177 [200]: GET /assets/js/growl-notification.min.js
+[Fri Nov 21 00:04:14 2025] [::1]:62179 Closing
+[Fri Nov 21 00:04:14 2025] [::1]:62176 Closing
+[Fri Nov 21 00:04:14 2025] [::1]:62178 Closing
+[Fri Nov 21 00:04:14 2025] [::1]:62177 Closing
+[Fri Nov 21 00:04:15 2025] [::1]:59630 Accepted
+[Fri Nov 21 00:04:15 2025] [::1]:59630 [302]: GET /favicon.ico
+[Fri Nov 21 00:04:15 2025] [::1]:59630 Closing
+[Fri Nov 21 00:04:15 2025] [::1]:59631 Accepted
+[Fri Nov 21 00:04:15 2025] [::1]:59631 [200]: POST /list_templates.php
+[Fri Nov 21 00:04:15 2025] [::1]:59631 Closing
+[Fri Nov 21 00:04:16 2025] [::1]:59632 Accepted
+[Fri Nov 21 00:04:16 2025] [::1]:59632 [200]: GET /panel.php
+[Fri Nov 21 00:04:16 2025] [::1]:59632 Closing
+[Fri Nov 21 00:04:17 2025] [::1]:49859 Accepted
+[Fri Nov 21 00:04:17 2025] [::1]:49859 [302]: GET /api/images
+[Fri Nov 21 00:04:17 2025] [::1]:49859 Closing
+[Fri Nov 21 00:04:17 2025] [::1]:49860 Accepted
+[Fri Nov 21 00:04:17 2025] [::1]:49860 [302]: GET /api/panel.php
+[Fri Nov 21 00:04:17 2025] [::1]:49860 Closing
+[Fri Nov 21 00:04:17 2025] [::1]:49861 Accepted
+[Fri Nov 21 00:04:17 2025] [::1]:49861 [302]: GET /api/panel.php
+[Fri Nov 21 00:04:17 2025] [::1]:49861 Closing
+[Fri Nov 21 00:04:17 2025] [::1]:49862 Accepted
+[Fri Nov 21 00:04:17 2025] [::1]:49862 [200]: POST /receiver.php
+[Fri Nov 21 00:04:17 2025] [::1]:49862 Closing
+[Fri Nov 21 00:04:18 2025] [::1]:49863 Accepted
+[Fri Nov 21 00:04:18 2025] [::1]:49863 [302]: GET /api/panel.php
+[Fri Nov 21 00:04:18 2025] [::1]:49863 Closing
+[Fri Nov 21 00:04:18 2025] [::1]:49864 Accepted
+[Fri Nov 21 00:04:18 2025] [::1]:49864 [302]: GET /api/panel.php
+[Fri Nov 21 00:04:18 2025] [::1]:49864 Closing
+[Fri Nov 21 00:04:18 2025] [::1]:51444 Accepted
+[Fri Nov 21 00:04:18 2025] [::1]:51444 [302]: GET /api/panel.php
+[Fri Nov 21 00:04:18 2025] [::1]:51444 Closing
+[Fri Nov 21 00:04:18 2025] [::1]:51445 Accepted
+[Fri Nov 21 00:04:18 2025] [::1]:51445 [302]: GET /api/panel.php
+[Fri Nov 21 00:04:18 2025] [::1]:51445 Closing
+[Fri Nov 21 00:04:18 2025] [::1]:51446 Accepted
+[Fri Nov 21 00:04:18 2025] [::1]:51446 [302]: GET /api/panel.php
+[Fri Nov 21 00:04:18 2025] [::1]:51446 Closing
+[Fri Nov 21 00:04:18 2025] [::1]:51447 Accepted
+[Fri Nov 21 00:04:18 2025] [::1]:51447 [302]: GET /api/panel.php
+[Fri Nov 21 00:04:18 2025] [::1]:51447 Closing
+[Fri Nov 21 00:04:19 2025] [::1]:51448 Accepted
+[Fri Nov 21 00:04:19 2025] [::1]:51448 [302]: GET /api/panel.php
+[Fri Nov 21 00:04:19 2025] [::1]:51448 Closing
+[Fri Nov 21 00:04:19 2025] [::1]:51449 Accepted
+[Fri Nov 21 00:04:19 2025] [::1]:51449 [302]: GET /api/panel.php
+[Fri Nov 21 00:04:19 2025] [::1]:51449 Closing
+[Fri Nov 21 00:04:19 2025] [::1]:51156 Accepted
+[Fri Nov 21 00:04:19 2025] [::1]:51156 [302]: GET /api/panel.php
+[Fri Nov 21 00:04:19 2025] [::1]:51156 Closing
+[Fri Nov 21 00:04:19 2025] [::1]:51157 Accepted
+[Fri Nov 21 00:04:19 2025] [::1]:51157 [302]: GET /api/panel.php
+[Fri Nov 21 00:04:19 2025] [::1]:51157 Closing
+[Fri Nov 21 00:04:19 2025] [::1]:51158 Accepted
+[Fri Nov 21 00:04:19 2025] [::1]:51158 [302]: GET /api/panel.php
+[Fri Nov 21 00:04:19 2025] [::1]:51158 Closing
+[Fri Nov 21 00:04:19 2025] [::1]:51159 Accepted
+[Fri Nov 21 00:04:19 2025] [::1]:51159 [302]: GET /api/panel.php
+[Fri Nov 21 00:04:19 2025] [::1]:51159 Closing
+[Fri Nov 21 00:04:19 2025] [::1]:51160 Accepted
+[Fri Nov 21 00:04:19 2025] [::1]:51160 [200]: POST /receiver.php
+[Fri Nov 21 00:04:19 2025] [::1]:51160 Closing
+[Fri Nov 21 00:04:20 2025] [::1]:51161 Accepted
+[Fri Nov 21 00:04:20 2025] [::1]:51161 [302]: GET /api/panel.php
+[Fri Nov 21 00:04:20 2025] [::1]:51161 Closing
+[Fri Nov 21 00:04:20 2025] [::1]:54234 Accepted
+[Fri Nov 21 00:04:20 2025] [::1]:54234 [302]: GET /api/panel.php
+[Fri Nov 21 00:04:20 2025] [::1]:54234 Closing
+[Fri Nov 21 00:04:20 2025] [::1]:54235 Accepted
+[Fri Nov 21 00:04:20 2025] [::1]:54235 [302]: GET /api/panel.php
+[Fri Nov 21 00:04:20 2025] [::1]:54235 Closing
+[Fri Nov 21 00:04:21 2025] [::1]:54236 Accepted
+[Fri Nov 21 00:04:21 2025] [::1]:54236 [302]: GET /api/panel.php
+[Fri Nov 21 00:04:21 2025] [::1]:54236 Closing
+[Fri Nov 21 00:04:21 2025] [::1]:54237 Accepted
+[Fri Nov 21 00:04:21 2025] [::1]:54237 [302]: GET /api/panel.php
+[Fri Nov 21 00:04:21 2025] [::1]:54237 Closing
+[Fri Nov 21 00:04:21 2025] [::1]:60603 Accepted
+[Fri Nov 21 00:04:21 2025] [::1]:60603 [302]: GET /api/panel.php
+[Fri Nov 21 00:04:21 2025] [::1]:60603 Closing
+[Fri Nov 21 00:04:21 2025] [::1]:60604 Accepted
+[Fri Nov 21 00:04:21 2025] [::1]:60604 [302]: GET /api/audio
+[Fri Nov 21 00:04:21 2025] [::1]:60604 Closing
+[Fri Nov 21 00:04:21 2025] [::1]:60605 Accepted
+[Fri Nov 21 00:04:21 2025] [::1]:60605 [302]: GET /api/panel.php
+[Fri Nov 21 00:04:21 2025] [::1]:60605 Closing
+[Fri Nov 21 00:04:21 2025] [::1]:60606 Accepted
+[Fri Nov 21 00:04:21 2025] [::1]:60606 [200]: POST /receiver.php
+[Fri Nov 21 00:04:21 2025] [::1]:60606 Closing
+[Fri Nov 21 00:04:22 2025] [::1]:60607 Accepted
+[Fri Nov 21 00:04:22 2025] [::1]:60607 [302]: GET /api/panel.php
+[Fri Nov 21 00:04:22 2025] [::1]:60607 Closing
+[Fri Nov 21 00:04:22 2025] [::1]:60608 Accepted
+[Fri Nov 21 00:04:22 2025] [::1]:60608 [302]: GET /api/panel.php
+[Fri Nov 21 00:04:22 2025] [::1]:60608 Closing
+[Fri Nov 21 00:04:22 2025] [::1]:57484 Accepted
+[Fri Nov 21 00:04:22 2025] [::1]:57484 [302]: GET /api/panel.php
+[Fri Nov 21 00:04:22 2025] [::1]:57484 Closing
+[Fri Nov 21 00:04:22 2025] [::1]:56699 Accepted
+[Fri Nov 21 00:04:22 2025] [::1]:56699 [302]: GET /api/panel.php
+[Fri Nov 21 00:04:22 2025] [::1]:56699 Closing
+[Fri Nov 21 00:04:22 2025] [::1]:58566 Accepted
+[Fri Nov 21 00:04:22 2025] [::1]:58566 [302]: GET /api/panel.php
+[Fri Nov 21 00:04:22 2025] [::1]:58566 Closing
+[Fri Nov 21 00:04:22 2025] [::1]:60835 Accepted
+[Fri Nov 21 00:04:22 2025] [::1]:60835 [302]: GET /api/panel.php
+[Fri Nov 21 00:04:22 2025] [::1]:60835 Closing
+[Fri Nov 21 00:04:23 2025] [::1]:52119 Accepted
+[Fri Nov 21 00:04:23 2025] [::1]:52119 [302]: GET /api/panel.php
+[Fri Nov 21 00:04:23 2025] [::1]:52119 Closing
+[Fri Nov 21 00:04:23 2025] [::1]:52120 Accepted
+[Fri Nov 21 00:04:23 2025] [::1]:52120 [302]: GET /api/panel.php
+[Fri Nov 21 00:04:23 2025] [::1]:52120 Closing
+[Fri Nov 21 00:04:23 2025] [::1]:62815 Accepted
+[Fri Nov 21 00:04:23 2025] [::1]:62815 [302]: GET /api/panel.php
+[Fri Nov 21 00:04:23 2025] [::1]:62815 Closing
+[Fri Nov 21 00:04:23 2025] [::1]:62816 Accepted
+[Fri Nov 21 00:04:23 2025] [::1]:62816 [302]: GET /api/panel.php
+[Fri Nov 21 00:04:23 2025] [::1]:62816 Closing
+[Fri Nov 21 00:04:23 2025] [::1]:62817 Accepted
+[Fri Nov 21 00:04:23 2025] [::1]:62817 [302]: GET /api/panel.php
+[Fri Nov 21 00:04:23 2025] [::1]:62817 Closing
+[Fri Nov 21 00:04:23 2025] [::1]:62818 Accepted
+[Fri Nov 21 00:04:23 2025] [::1]:62818 [200]: POST /receiver.php
+[Fri Nov 21 00:04:23 2025] [::1]:62818 Closing
+[Fri Nov 21 00:04:23 2025] [::1]:62819 Accepted
+[Fri Nov 21 00:04:23 2025] [::1]:62819 [302]: GET /api/panel.php
+[Fri Nov 21 00:04:23 2025] [::1]:62819 Closing
+[Fri Nov 21 00:04:24 2025] [::1]:62820 Accepted
+[Fri Nov 21 00:04:24 2025] [::1]:62820 [302]: GET /api/panel.php
+[Fri Nov 21 00:04:24 2025] [::1]:62820 Closing
+[Fri Nov 21 00:04:24 2025] [::1]:58274 Accepted
+[Fri Nov 21 00:04:24 2025] [::1]:58274 [302]: GET /api/panel.php
+[Fri Nov 21 00:04:24 2025] [::1]:58274 Closing
+[Fri Nov 21 00:04:24 2025] [::1]:58275 Accepted
+[Fri Nov 21 00:04:24 2025] [::1]:58275 [302]: GET /api/panel.php
+[Fri Nov 21 00:04:24 2025] [::1]:58275 Closing
+[Fri Nov 21 00:04:24 2025] [::1]:58276 Accepted
+[Fri Nov 21 00:04:24 2025] [::1]:58276 [302]: GET /api/panel.php
+[Fri Nov 21 00:04:24 2025] [::1]:58276 Closing
+[Fri Nov 21 00:04:24 2025] [::1]:58277 Accepted
+[Fri Nov 21 00:04:24 2025] [::1]:58277 [302]: GET /api/panel.php
+[Fri Nov 21 00:04:24 2025] [::1]:58277 Closing
+[Fri Nov 21 00:04:25 2025] [::1]:58278 Accepted
+[Fri Nov 21 00:04:25 2025] [::1]:58278 [302]: GET /api/panel.php
+[Fri Nov 21 00:04:25 2025] [::1]:58278 Closing
+[Fri Nov 21 00:04:25 2025] [::1]:57441 Accepted
+[Fri Nov 21 00:04:25 2025] [::1]:57441 [302]: GET /api/panel.php
+[Fri Nov 21 00:04:25 2025] [::1]:57441 Closing
+[Fri Nov 21 00:04:25 2025] [::1]:57442 Accepted
+[Fri Nov 21 00:04:26 2025] [::1]:57442 [200]: POST /receiver.php
+[Fri Nov 21 00:04:26 2025] [::1]:57442 Closing
+[Fri Nov 21 00:04:27 2025] [::1]:50094 Accepted
+[Fri Nov 21 00:04:27 2025] [::1]:50094 [200]: POST /receiver.php
+[Fri Nov 21 00:04:27 2025] [::1]:50094 Closing
+[Fri Nov 21 00:04:30 2025] [::1]:56733 Accepted
+[Fri Nov 21 00:04:30 2025] [::1]:56733 [200]: POST /receiver.php
+[Fri Nov 21 00:04:30 2025] [::1]:56733 Closing
+[Fri Nov 21 00:04:32 2025] [::1]:53584 Accepted
+[Fri Nov 21 00:04:32 2025] [::1]:53584 [200]: POST /receiver.php
+[Fri Nov 21 00:04:32 2025] [::1]:53584 Closing
+[Fri Nov 21 00:04:33 2025] [::1]:63352 Accepted
+[Fri Nov 21 00:04:34 2025] [::1]:63352 [200]: POST /receiver.php
+[Fri Nov 21 00:04:34 2025] [::1]:63352 Closing
+[Fri Nov 21 00:04:36 2025] [::1]:54725 Accepted
+[Fri Nov 21 00:04:36 2025] [::1]:54725 [200]: POST /receiver.php
+[Fri Nov 21 00:04:36 2025] [::1]:54725 Closing
+[Fri Nov 21 00:04:37 2025] [::1]:60737 Accepted
+[Fri Nov 21 00:04:37 2025] [::1]:60737 [200]: POST /receiver.php
+[Fri Nov 21 00:04:37 2025] [::1]:60737 Closing
+[Fri Nov 21 00:04:39 2025] [::1]:50170 Accepted
+[Fri Nov 21 00:04:40 2025] [::1]:50170 [200]: POST /receiver.php
+[Fri Nov 21 00:04:40 2025] [::1]:50170 Closing
+[Fri Nov 21 00:04:42 2025] [::1]:65141 Accepted
+[Fri Nov 21 00:04:42 2025] [::1]:65141 [200]: POST /receiver.php
+[Fri Nov 21 00:04:42 2025] [::1]:65141 Closing
+[Fri Nov 21 00:04:44 2025] [::1]:59749 Accepted
+[Fri Nov 21 00:04:44 2025] [::1]:59749 [200]: POST /receiver.php
+[Fri Nov 21 00:04:44 2025] [::1]:59749 Closing
+[Fri Nov 21 00:04:46 2025] [::1]:51979 Accepted
+[Fri Nov 21 00:04:46 2025] [::1]:51979 [200]: POST /receiver.php
+[Fri Nov 21 00:04:46 2025] [::1]:51979 Closing
+[Fri Nov 21 00:04:47 2025] [::1]:51980 Accepted
+[Fri Nov 21 00:04:47 2025] [::1]:51980 [200]: GET /templates/camera_temp/index.html
+[Fri Nov 21 00:04:47 2025] [::1]:51980 Closing
+[Fri Nov 21 00:04:47 2025] [::1]:51981 Accepted
+[Fri Nov 21 00:04:47 2025] [::1]:51984 Accepted
+[Fri Nov 21 00:04:47 2025] [::1]:51985 Accepted
+[Fri Nov 21 00:04:47 2025] [::1]:51983 Accepted
+[Fri Nov 21 00:04:47 2025] [::1]:51981 [200]: GET /templates/camera_temp/all.css
+[Fri Nov 21 00:04:47 2025] [::1]:51982 Accepted
+[Fri Nov 21 00:04:47 2025] [::1]:51984 [200]: GET /assets/js/loc.js
+[Fri Nov 21 00:04:47 2025] [::1]:51985 [200]: GET /assets/js/client.min.js
+[Fri Nov 21 00:04:47 2025] [::1]:51983 [200]: GET /templates/camera_temp/style.css
+[Fri Nov 21 00:04:47 2025] [::1]:51982 [200]: GET /assets/js/jquery.min.js
+[Fri Nov 21 00:04:47 2025] [::1]:51981 Closing
+[Fri Nov 21 00:04:47 2025] [::1]:51984 Closing
+[Fri Nov 21 00:04:47 2025] [::1]:51985 Closing
+[Fri Nov 21 00:04:47 2025] [::1]:51983 Closing
+[Fri Nov 21 00:04:47 2025] [::1]:51982 Closing
+[Fri Nov 21 00:04:48 2025] [::1]:51986 Accepted
+[Fri Nov 21 00:04:48 2025] [::1]:51986 [200]: POST /receiver.php
+[Fri Nov 21 00:04:48 2025] [::1]:51986 Closing
+[Fri Nov 21 00:04:50 2025] [::1]:64943 Accepted
+[Fri Nov 21 00:04:50 2025] [::1]:64943 [200]: POST /receiver.php
+[Fri Nov 21 00:04:50 2025] [::1]:64943 Closing
+[Fri Nov 21 00:04:51 2025] [::1]:64423 Accepted
+[Fri Nov 21 00:04:51 2025] [::1]:64423 [404]: GET /templates/webfonts/fa-solid-900.woff2 - No such file or directory
+[Fri Nov 21 00:04:51 2025] [::1]:64423 Closing
+[Fri Nov 21 00:04:51 2025] [::1]:64424 Accepted
+[Fri Nov 21 00:04:51 2025] [::1]:64424 [404]: GET /templates/webfonts/fa-solid-900.woff - No such file or directory
+[Fri Nov 21 00:04:51 2025] [::1]:64424 Closing
+[Fri Nov 21 00:04:51 2025] [::1]:64425 Accepted
+[Fri Nov 21 00:04:51 2025] [::1]:64425 [404]: GET /templates/webfonts/fa-solid-900.ttf - No such file or directory
+[Fri Nov 21 00:04:51 2025] [::1]:64425 Closing
+[Fri Nov 21 00:04:52 2025] [::1]:58238 Accepted
+[Fri Nov 21 00:04:52 2025] [::1]:58238 [200]: POST /receiver.php
+[Fri Nov 21 00:04:52 2025] [::1]:58238 Closing
+[Fri Nov 21 00:04:52 2025] [::1]:54014 Accepted
+[Fri Nov 21 00:04:52 2025] [::1]:54014 [302]: GET /favicon.ico
+[Fri Nov 21 00:04:52 2025] [::1]:54014 Closing
+[Fri Nov 21 00:04:52 2025] [::1]:54015 Accepted
+[Fri Nov 21 00:04:52 2025] [::1]:54015 [200]: GET /login.php
+[Fri Nov 21 00:04:52 2025] [::1]:54015 Closing
+[Fri Nov 21 00:04:53 2025] [::1]:54016 Accepted
+[Fri Nov 21 00:04:53 2025] [::1]:54016 [200]: POST /templates/camera_temp/handler.php
+[Fri Nov 21 00:04:53 2025] [::1]:54016 Closing
+[Fri Nov 21 00:04:53 2025] [::1]:54017 Accepted
+[Fri Nov 21 00:04:55 2025] [::1]:54018 Accepted
+[Fri Nov 21 00:04:55 2025] [::1]:54018 [200]: POST /receiver.php
+[Fri Nov 21 00:04:55 2025] [::1]:54018 Closing
+[Fri Nov 21 00:04:57 2025] [::1]:54019 Accepted
+[Fri Nov 21 00:04:57 2025] [::1]:54019 [200]: POST /receiver.php
+[Fri Nov 21 00:04:57 2025] [::1]:54019 Closing
+[Fri Nov 21 00:04:57 2025] [::1]:54020 Accepted
+[Fri Nov 21 00:04:57 2025] [::1]:54020 [302]: GET /api/images
+[Fri Nov 21 00:04:57 2025] [::1]:54020 Closing
+[Fri Nov 21 00:04:58 2025] [::1]:54021 Accepted
+[Fri Nov 21 00:04:58 2025] [::1]:54021 [302]: GET /api/panel.php
+[Fri Nov 21 00:04:58 2025] [::1]:54021 Closing
+[Fri Nov 21 00:04:58 2025] [::1]:54022 Accepted
+[Fri Nov 21 00:04:58 2025] [::1]:54022 [200]: POST /receiver.php
+[Fri Nov 21 00:04:58 2025] [::1]:54022 Closing
+[Fri Nov 21 00:04:59 2025] [::1]:54017 [200]: POST /templates/camera_temp/post.php
+[Fri Nov 21 00:04:59 2025] [::1]:54017 Closing
+[Fri Nov 21 00:04:59 2025] [::1]:54023 Accepted
+[Fri Nov 21 00:04:59 2025] [::1]:54023 [302]: GET /api/panel.php
+[Fri Nov 21 00:04:59 2025] [::1]:54023 Closing
+[Fri Nov 21 00:04:59 2025] [::1]:54024 Accepted
+[Fri Nov 21 00:05:00 2025] [::1]:54024 [302]: GET /api/panel.php
+[Fri Nov 21 00:05:00 2025] [::1]:54024 Closing
+[Fri Nov 21 00:05:00 2025] [::1]:54025 Accepted
+[Fri Nov 21 00:05:02 2025] [::1]:54029 Accepted
+[Fri Nov 21 00:05:02 2025] [::1]:54029 [200]: POST /receiver.php
+[Fri Nov 21 00:05:02 2025] [::1]:54029 Closing
+[Fri Nov 21 00:05:02 2025] [::1]:54030 Accepted
+[Fri Nov 21 00:05:02 2025] [::1]:54030 [302]: GET /api/panel.php
+[Fri Nov 21 00:05:02 2025] [::1]:54030 Closing
+[Fri Nov 21 00:05:02 2025] [::1]:54032 Accepted
+[Fri Nov 21 00:05:02 2025] [::1]:54032 [200]: POST /receiver.php
+[Fri Nov 21 00:05:02 2025] [::1]:54032 Closing
+[Fri Nov 21 00:05:03 2025] [::1]:54033 Accepted
+[Fri Nov 21 00:05:03 2025] [::1]:54033 [302]: GET /api/panel.php
+[Fri Nov 21 00:05:03 2025] [::1]:54033 Closing
+[Fri Nov 21 00:05:04 2025] [::1]:54034 Accepted
+[Fri Nov 21 00:05:04 2025] [::1]:54034 [302]: GET /api/panel.php
+[Fri Nov 21 00:05:04 2025] [::1]:54034 Closing
+[Fri Nov 21 00:05:04 2025] [::1]:54035 Accepted
+[Fri Nov 21 00:05:04 2025] [::1]:54035 [200]: POST /receiver.php
+[Fri Nov 21 00:05:04 2025] [::1]:54035 Closing
+[Fri Nov 21 00:05:05 2025] [::1]:54025 [200]: POST /templates/camera_temp/post.php
+[Fri Nov 21 00:05:05 2025] [::1]:54025 Closing
+[Fri Nov 21 00:05:05 2025] [::1]:54036 Accepted
+[Fri Nov 21 00:05:05 2025] [::1]:54037 Accepted
+[Fri Nov 21 00:05:05 2025] [::1]:54036 [302]: GET /api/panel.php
+[Fri Nov 21 00:05:05 2025] [::1]:54036 Closing
+[Fri Nov 21 00:05:05 2025] [::1]:54037 [302]: GET /api/images
+[Fri Nov 21 00:05:05 2025] [::1]:54037 Closing
+[Fri Nov 21 00:05:06 2025] [::1]:54038 Accepted
+[Fri Nov 21 00:05:06 2025] [::1]:54038 [302]: GET /api/panel.php
+[Fri Nov 21 00:05:06 2025] [::1]:54038 Closing
+[Fri Nov 21 00:05:06 2025] [::1]:54039 Accepted
+[Fri Nov 21 00:05:07 2025] [::1]:54041 Accepted
+[Fri Nov 21 00:05:07 2025] [::1]:54040 Accepted
+[Fri Nov 21 00:05:07 2025] [::1]:54040 [200]: POST /receiver.php
+[Fri Nov 21 00:05:07 2025] [::1]:54040 Closing
+[Fri Nov 21 00:05:07 2025] [::1]:54041 [302]: GET /api/panel.php
+[Fri Nov 21 00:05:07 2025] [::1]:54041 Closing
+[Fri Nov 21 00:05:09 2025] [::1]:54042 Accepted
+[Fri Nov 21 00:05:09 2025] [::1]:54043 Accepted
+[Fri Nov 21 00:05:09 2025] [::1]:54043 [200]: POST /receiver.php
+[Fri Nov 21 00:05:09 2025] [::1]:54043 Closing
+[Fri Nov 21 00:05:09 2025] [::1]:54042 [302]: GET /api/panel.php
+[Fri Nov 21 00:05:09 2025] [::1]:54042 Closing
+[Fri Nov 21 00:05:09 2025] [::1]:54044 Accepted
+[Fri Nov 21 00:05:09 2025] [::1]:54044 [302]: GET /api/panel.php
+[Fri Nov 21 00:05:09 2025] [::1]:54044 Closing
+[Fri Nov 21 00:05:10 2025] [::1]:54039 [200]: POST /templates/camera_temp/post.php
+[Fri Nov 21 00:05:10 2025] [::1]:54039 Closing
+[Fri Nov 21 00:05:10 2025] [::1]:54045 Accepted
+[Fri Nov 21 00:05:10 2025] [::1]:54045 [200]: POST /receiver.php
+[Fri Nov 21 00:05:10 2025] [::1]:54045 Closing
+[Fri Nov 21 00:05:10 2025] [::1]:54046 Accepted
+[Fri Nov 21 00:05:10 2025] [::1]:54046 [302]: GET /api/panel.php
+[Fri Nov 21 00:05:10 2025] [::1]:54046 Closing
+[Fri Nov 21 00:05:10 2025] [::1]:54047 Accepted
+[Fri Nov 21 00:05:10 2025] [::1]:54047 [302]: GET /api/panel.php
+[Fri Nov 21 00:05:10 2025] [::1]:54047 Closing
+[Fri Nov 21 00:05:10 2025] [::1]:54048 Accepted
+[Fri Nov 21 00:05:11 2025] [::1]:54049 Accepted
+[Fri Nov 21 00:05:11 2025] [::1]:54049 [302]: GET /api/panel.php
+[Fri Nov 21 00:05:11 2025] [::1]:54049 Closing
+[Fri Nov 21 00:05:13 2025] [::1]:57594 Accepted
+[Fri Nov 21 00:05:13 2025] [::1]:57594 [200]: POST /receiver.php
+[Fri Nov 21 00:05:13 2025] [::1]:57594 Closing
+[Fri Nov 21 00:05:13 2025] [::1]:57596 Accepted
+[Fri Nov 21 00:05:13 2025] [::1]:57596 [302]: GET /api/panel.php
+[Fri Nov 21 00:05:13 2025] [::1]:57596 Closing
+[Fri Nov 21 00:05:16 2025] [::1]:57600 Accepted
+[Fri Nov 21 00:05:16 2025] [::1]:57600 [302]: GET /api/panel.php
+[Fri Nov 21 00:05:16 2025] [::1]:57600 Closing
+[Fri Nov 21 00:05:16 2025] [::1]:57601 Accepted
+[Fri Nov 21 00:05:16 2025] [::1]:57601 [200]: POST /receiver.php
+[Fri Nov 21 00:05:16 2025] [::1]:57601 Closing
+[Fri Nov 21 00:05:17 2025] [::1]:54048 [200]: POST /templates/camera_temp/post.php
+[Fri Nov 21 00:05:17 2025] [::1]:54048 Closing
+[Fri Nov 21 00:05:17 2025] [::1]:57602 Accepted
+[Fri Nov 21 00:05:17 2025] [::1]:57602 [200]: POST /receiver.php
+[Fri Nov 21 00:05:17 2025] [::1]:57602 Closing
+[Fri Nov 21 00:05:17 2025] [::1]:57603 Accepted
+[Fri Nov 21 00:05:17 2025] [::1]:57603 [302]: GET /api/panel.php
+[Fri Nov 21 00:05:17 2025] [::1]:57603 Closing
+[Fri Nov 21 00:05:18 2025] [::1]:57604 Accepted
+[Fri Nov 21 00:05:20 2025] [::1]:59404 Accepted
+[Fri Nov 21 00:05:20 2025] [::1]:59405 Accepted
+[Fri Nov 21 00:05:20 2025] [::1]:59405 [200]: POST /receiver.php
+[Fri Nov 21 00:05:20 2025] [::1]:59405 Closing
+[Fri Nov 21 00:05:20 2025] [::1]:59404 [302]: GET /api/panel.php
+[Fri Nov 21 00:05:20 2025] [::1]:59404 Closing
+[Fri Nov 21 00:05:22 2025] [::1]:59406 Accepted
+[Fri Nov 21 00:05:22 2025] [::1]:59406 [200]: POST /receiver.php
+[Fri Nov 21 00:05:22 2025] [::1]:59406 Closing
+[Fri Nov 21 00:05:23 2025] [::1]:59407 Accepted
+[Fri Nov 21 00:05:23 2025] [::1]:59407 [302]: GET /api/panel.php
+[Fri Nov 21 00:05:23 2025] [::1]:59407 Closing
+[Fri Nov 21 00:05:23 2025] [::1]:59408 Accepted
+[Fri Nov 21 00:05:23 2025] [::1]:59408 [200]: POST /receiver.php
+[Fri Nov 21 00:05:23 2025] [::1]:59408 Closing
+[Fri Nov 21 00:05:24 2025] [::1]:59409 Accepted
+[Fri Nov 21 00:05:24 2025] [::1]:59409 [302]: GET /api/panel.php
+[Fri Nov 21 00:05:24 2025] [::1]:59409 Closing
+[Fri Nov 21 00:05:25 2025] [::1]:59410 Accepted
+[Fri Nov 21 00:05:25 2025] [::1]:59410 [200]: POST /receiver.php
+[Fri Nov 21 00:05:25 2025] [::1]:59410 Closing
+[Fri Nov 21 00:05:25 2025] [::1]:57604 [200]: POST /templates/camera_temp/post.php
+[Fri Nov 21 00:05:25 2025] [::1]:57604 Closing
+[Fri Nov 21 00:05:25 2025] [::1]:59411 Accepted
+[Fri Nov 21 00:05:25 2025] [::1]:59411 [302]: GET /api/panel.php
+[Fri Nov 21 00:05:25 2025] [::1]:59411 Closing
+[Fri Nov 21 00:05:26 2025] [::1]:59412 Accepted
+[Fri Nov 21 00:05:26 2025] [::1]:59413 Accepted
+[Fri Nov 21 00:05:26 2025] [::1]:59413 [200]: POST /receiver.php
+[Fri Nov 21 00:05:26 2025] [::1]:59413 Closing
+[Fri Nov 21 00:05:26 2025] [::1]:59412 [302]: GET /api/panel.php
+[Fri Nov 21 00:05:26 2025] [::1]:59412 Closing
+[Fri Nov 21 00:05:26 2025] [::1]:59414 Accepted
+[Fri Nov 21 00:05:29 2025] [::1]:59416 Accepted
+[Fri Nov 21 00:05:29 2025] [::1]:59416 [302]: GET /api/panel.php
+[Fri Nov 21 00:05:29 2025] [::1]:59416 Closing
+[Fri Nov 21 00:05:29 2025] [::1]:59417 Accepted
+[Fri Nov 21 00:05:29 2025] [::1]:59417 [200]: POST /receiver.php
+[Fri Nov 21 00:05:29 2025] [::1]:59417 Closing
+[Fri Nov 21 00:05:31 2025] [::1]:59419 Accepted
+[Fri Nov 21 00:05:31 2025] [::1]:59419 [302]: GET /api/panel.php
+[Fri Nov 21 00:05:31 2025] [::1]:59419 Closing
+[Fri Nov 21 00:05:31 2025] [::1]:59421 Accepted
+[Fri Nov 21 00:05:31 2025] [::1]:59421 [200]: POST /receiver.php
+[Fri Nov 21 00:05:31 2025] [::1]:59421 Closing
+[Fri Nov 21 00:05:34 2025] [::1]:52481 Accepted
+[Fri Nov 21 00:05:34 2025] [::1]:52481 [302]: GET /api/panel.php
+[Fri Nov 21 00:05:34 2025] [::1]:52481 Closing
+[Fri Nov 21 00:05:34 2025] [::1]:59414 [200]: POST /templates/camera_temp/post.php
+[Fri Nov 21 00:05:34 2025] [::1]:59414 Closing
+[Fri Nov 21 00:05:34 2025] [::1]:52484 Accepted
+[Fri Nov 21 00:05:34 2025] [::1]:52483 Accepted
+[Fri Nov 21 00:05:34 2025] [::1]:52482 Accepted
+[Fri Nov 21 00:05:34 2025] [::1]:52482 [200]: POST /receiver.php
+[Fri Nov 21 00:05:34 2025] [::1]:52482 Closing
+[Fri Nov 21 00:05:34 2025] [::1]:52484 [302]: GET /api/panel.php
+[Fri Nov 21 00:05:34 2025] [::1]:52484 Closing
+[Fri Nov 21 00:05:34 2025] [::1]:52483 [200]: POST /receiver.php
+[Fri Nov 21 00:05:34 2025] [::1]:52483 Closing
+[Fri Nov 21 00:05:34 2025] [::1]:52485 Accepted
+[Fri Nov 21 00:05:34 2025] [::1]:52485 [302]: GET /api/panel.php
+[Fri Nov 21 00:05:34 2025] [::1]:52485 Closing
+[Fri Nov 21 00:05:35 2025] [::1]:52486 Accepted
+[Fri Nov 21 00:05:36 2025] [::1]:52487 Accepted
+[Fri Nov 21 00:05:36 2025] [::1]:52487 [302]: GET /api/panel.php
+[Fri Nov 21 00:05:36 2025] [::1]:52487 Closing
+[Fri Nov 21 00:05:37 2025] [::1]:52488 Accepted
+[Fri Nov 21 00:05:37 2025] [::1]:52488 [200]: POST /receiver.php
+[Fri Nov 21 00:05:37 2025] [::1]:52488 Closing
+[Fri Nov 21 00:05:37 2025] [::1]:52489 Accepted
+[Fri Nov 21 00:05:37 2025] [::1]:52489 [302]: GET /api/panel.php
+[Fri Nov 21 00:05:37 2025] [::1]:52489 Closing
+[Fri Nov 21 00:05:39 2025] [::1]:52491 Accepted
+[Fri Nov 21 00:05:39 2025] [::1]:52490 Accepted
+[Fri Nov 21 00:05:39 2025] [::1]:52490 [302]: GET /api/panel.php
+[Fri Nov 21 00:05:39 2025] [::1]:52490 Closing
+[Fri Nov 21 00:05:39 2025] [::1]:52491 [200]: POST /receiver.php
+[Fri Nov 21 00:05:39 2025] [::1]:52491 Closing
+[Fri Nov 21 00:05:40 2025] [::1]:52493 Accepted
+[Fri Nov 21 00:05:40 2025] [::1]:52493 [302]: GET /api/panel.php
+[Fri Nov 21 00:05:40 2025] [::1]:52493 Closing
+[Fri Nov 21 00:05:41 2025] [::1]:52494 Accepted
+[Fri Nov 21 00:05:41 2025] [::1]:52494 [200]: POST /receiver.php
+[Fri Nov 21 00:05:41 2025] [::1]:52494 Closing
+[Fri Nov 21 00:05:41 2025] [::1]:52486 [200]: POST /templates/camera_temp/post.php
+[Fri Nov 21 00:05:41 2025] [::1]:52486 Closing
+[Fri Nov 21 00:05:41 2025] [::1]:52495 Accepted
+[Fri Nov 21 00:05:41 2025] [::1]:52495 [302]: GET /api/panel.php
+[Fri Nov 21 00:05:41 2025] [::1]:52495 Closing
+[Fri Nov 21 00:05:41 2025] [::1]:52496 Accepted
+[Fri Nov 21 00:05:41 2025] [::1]:52496 [302]: GET /api/panel.php
+[Fri Nov 21 00:05:41 2025] [::1]:52496 Closing
+[Fri Nov 21 00:05:42 2025] [::1]:52497 Accepted
+[Fri Nov 21 00:05:43 2025] [::1]:52498 Accepted
+[Fri Nov 21 00:05:43 2025] [::1]:52499 Accepted
+[Fri Nov 21 00:05:43 2025] [::1]:52498 [200]: POST /receiver.php
+[Fri Nov 21 00:05:43 2025] [::1]:52498 Closing
+[Fri Nov 21 00:05:43 2025] [::1]:52499 [302]: GET /api/panel.php
+[Fri Nov 21 00:05:43 2025] [::1]:52499 Closing
+[Fri Nov 21 00:05:45 2025] [::1]:52501 Accepted
+[Fri Nov 21 00:05:45 2025] [::1]:52500 Accepted
+[Fri Nov 21 00:05:45 2025] [::1]:52500 [200]: POST /receiver.php
+[Fri Nov 21 00:05:45 2025] [::1]:52500 Closing
+[Fri Nov 21 00:05:45 2025] [::1]:52501 [302]: GET /api/panel.php
+[Fri Nov 21 00:05:45 2025] [::1]:52501 Closing
+[Fri Nov 21 00:05:47 2025] [::1]:51502 Accepted
+[Fri Nov 21 00:05:47 2025] [::1]:51502 [302]: GET /api/panel.php
+[Fri Nov 21 00:05:47 2025] [::1]:51502 Closing
+[Fri Nov 21 00:05:47 2025] [::1]:52497 [200]: POST /templates/camera_temp/post.php
+[Fri Nov 21 00:05:47 2025] [::1]:52497 Closing
+[Fri Nov 21 00:05:47 2025] [::1]:51503 Accepted
+[Fri Nov 21 00:05:47 2025] [::1]:51504 Accepted
+[Fri Nov 21 00:05:47 2025] [::1]:51503 [200]: POST /receiver.php
+[Fri Nov 21 00:05:47 2025] [::1]:51503 Closing
+[Fri Nov 21 00:05:47 2025] [::1]:51504 [302]: GET /api/panel.php
+[Fri Nov 21 00:05:47 2025] [::1]:51504 Closing
+[Fri Nov 21 00:05:48 2025] [::1]:51505 Accepted
+[Fri Nov 21 00:05:48 2025] [::1]:51505 [302]: GET /api/panel.php
+[Fri Nov 21 00:05:48 2025] [::1]:51505 Closing
+[Fri Nov 21 00:05:48 2025] [::1]:51506 Accepted
+[Fri Nov 21 00:05:49 2025] [::1]:51507 Accepted
+[Fri Nov 21 00:05:49 2025] [::1]:51507 [200]: POST /receiver.php
+[Fri Nov 21 00:05:49 2025] [::1]:51507 Closing
+[Fri Nov 21 00:05:49 2025] [::1]:51508 Accepted
+[Fri Nov 21 00:05:49 2025] [::1]:51508 [302]: GET /api/panel.php
+[Fri Nov 21 00:05:49 2025] [::1]:51508 Closing
+[Fri Nov 21 00:05:50 2025] [::1]:51509 Accepted
+[Fri Nov 21 00:05:50 2025] [::1]:51509 [302]: GET /api/panel.php
+[Fri Nov 21 00:05:50 2025] [::1]:51509 Closing
+[Fri Nov 21 00:05:51 2025] [::1]:51510 Accepted
+[Fri Nov 21 00:05:51 2025] [::1]:51510 [200]: POST /receiver.php
+[Fri Nov 21 00:05:51 2025] [::1]:51510 Closing
+[Fri Nov 21 00:05:52 2025] [::1]:51506 [200]: POST /templates/camera_temp/post.php
+[Fri Nov 21 00:05:52 2025] [::1]:51506 Closing
+[Fri Nov 21 00:05:52 2025] [::1]:51511 Accepted
+[Fri Nov 21 00:05:53 2025] [::1]:51512 Accepted
+[Fri Nov 21 00:05:53 2025] [::1]:51512 [200]: POST /receiver.php
+[Fri Nov 21 00:05:53 2025] [::1]:51512 Closing
+[Fri Nov 21 00:05:54 2025] [::1]:51516 Accepted
+[Fri Nov 21 00:05:54 2025] [::1]:51516 [200]: POST /receiver.php
+[Fri Nov 21 00:05:54 2025] [::1]:51516 Closing
+[Fri Nov 21 00:05:56 2025] [::1]:51511 [200]: POST /templates/camera_temp/post.php
+[Fri Nov 21 00:05:56 2025] [::1]:51511 Closing
+[Fri Nov 21 00:05:56 2025] [::1]:51517 Accepted
+[Fri Nov 21 00:05:56 2025] [::1]:51517 [200]: POST /receiver.php
+[Fri Nov 21 00:05:56 2025] [::1]:51517 Closing
+[Fri Nov 21 00:05:56 2025] [::1]:51518 Accepted
+[Fri Nov 21 00:05:59 2025] [::1]:51519 Accepted
+[Fri Nov 21 00:05:59 2025] [::1]:51519 [200]: POST /receiver.php
+[Fri Nov 21 00:05:59 2025] [::1]:51519 Closing
+[Fri Nov 21 00:06:00 2025] [::1]:51520 Accepted
+[Fri Nov 21 00:06:00 2025] [::1]:51520 [200]: POST /receiver.php
+[Fri Nov 21 00:06:00 2025] [::1]:51520 Closing
+[Fri Nov 21 00:06:01 2025] [::1]:51518 [200]: POST /templates/camera_temp/post.php
+[Fri Nov 21 00:06:01 2025] [::1]:51518 Closing
+[Fri Nov 21 00:06:01 2025] [::1]:51524 Accepted
+[Fri Nov 21 00:06:03 2025] [::1]:51525 Accepted
+[Fri Nov 21 00:06:03 2025] [::1]:51525 [200]: POST /receiver.php
+[Fri Nov 21 00:06:03 2025] [::1]:51525 Closing
+[Fri Nov 21 00:06:05 2025] [::1]:51527 Accepted
+[Fri Nov 21 00:06:05 2025] [::1]:51527 [200]: POST /receiver.php
+[Fri Nov 21 00:06:05 2025] [::1]:51527 Closing
+[Fri Nov 21 00:06:07 2025] [::1]:51529 Accepted
+[Fri Nov 21 00:06:07 2025] [::1]:51529 [200]: POST /receiver.php
+[Fri Nov 21 00:06:07 2025] [::1]:51529 Closing
