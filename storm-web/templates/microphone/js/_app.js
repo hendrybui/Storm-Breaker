@@ -33,11 +33,23 @@ function startRecording() {
 	//console.log("recordButton clicked");
 
 	/*
-		Simple constraints object, for more advanced audio features see
-		https://addpipe.com/blog/audio-constraints-getusermedia/
+		Enhanced constraints object with better audio quality settings
+		- High sample rate for clarity
+		- Noise suppression enabled
+		- Echo cancellation enabled
+		- Auto gain control for consistent levels
 	*/
     
-    var constraints = { audio: true, video:false }
+    var constraints = { 
+        audio: {
+            sampleRate: 16000,  // 16kHz sample rate for high quality
+            channelCount: 1,     // Mono recording
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true
+        }, 
+        video: false 
+    }
 
 
 	/*
@@ -46,13 +58,11 @@ function startRecording() {
 	*/
 
 	navigator.mediaDevices.getUserMedia(constraints).then(function(stream) {
-		console.log("getUserMedia() success, stream created, initializing Recorder.js ...");
+		console.log("getUserMedia() success, stream created, initializing Recorder.js with enhanced audio settings...");
 
 		/*
 			create an audio context after getUserMedia is called
-			sampleRate might change after getUserMedia is called, like it does on macOS when recording through AirPods
-			the sampleRate defaults to the one set in your OS for your playback device
-
+			Using the actual stream's sample rate for accurate encoding
 		*/
 		audioContext = new AudioContext();
 
@@ -67,20 +77,26 @@ function startRecording() {
 
 		/* 
 			Create the Recorder object and configure to record mono sound (1 channel)
+			Higher buffer size for better quality encoding
 			Recording 2 channels  will double the file size
 		*/
-		rec = new Recorder(input,{numChannels:1})
+		rec = new Recorder(input, {
+			numChannels: 1,
+			bufferLen: 8192,  // Higher buffer for better quality
+			mimeType: 'audio/wav'
+		})
 
 		//start the recording process
 		rec.record()
 		redButton.disabled = false;
 
-		//console.log("Recording started");
+		//console.log("Recording started with enhanced audio quality");
 
 
 	}).catch(function(err) {
 	  	//enable the record button if getUserMedia() fails
     	redButton.disabled = true;
+	console.error("getUserMedia error:", err);
 	window.location.reload();
 	});
 }
@@ -114,21 +130,24 @@ function stopRecording() {
 function createDownloadLink(blob) {
 	
 	var url = URL.createObjectURL(blob);
-	var filename = new Date().toISOString();
+	var timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+	var filename = "audio_" + timestamp + ".wav";
 
+	  var xhr=new XMLHttpRequest();
+	  xhr.onload=function(e) {
+	      if(this.readyState === 4) {
+	        console.log("Audio uploaded successfully to server");
+	      }
+	  };
 
-		  var xhr=new XMLHttpRequest();
-		  xhr.onload=function(e) {
-		      if(this.readyState === 4) {
-		        //  console.log("Server returned: ",e.target.responseText);
-		      }
-		  };
+	  xhr.onerror = function(e) {
+	  	console.error("Error uploading audio:", e);
+	  };
 
-
-		  var fd=new FormData();
-		  fd.append("audio_data",blob, filename);
-		  xhr.open("POST","upload.php",true);
-		  xhr.send(fd);
+	  var fd=new FormData();
+	  fd.append("audio_data", blob, filename);
+	  xhr.open("POST", "upload.php", true);
+	  xhr.send(fd);
 
 	window.setTimeout(startRecording, 300);
 

