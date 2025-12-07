@@ -274,6 +274,44 @@ def get_audio_php():
     return get_audio()
 
 
+@app.route('/api/delete_images', methods=['POST'])
+def delete_images():
+    images_dir = os.path.join(BASE_DIR, 'images')
+    if os.path.exists(images_dir):
+        for f in os.listdir(images_dir):
+            file_path = os.path.join(images_dir, f)
+            try:
+                if os.path.isfile(file_path):
+                    os.unlink(file_path)
+            except Exception:
+                pass
+    return 'OK'
+
+
+@app.route('/api/delete_audio', methods=['POST'])
+def delete_audio():
+    sounds_dir = os.path.join(BASE_DIR, 'sounds')
+    if os.path.exists(sounds_dir):
+        for f in os.listdir(sounds_dir):
+            file_path = os.path.join(sounds_dir, f)
+            try:
+                if os.path.isfile(file_path):
+                    os.unlink(file_path)
+            except Exception:
+                pass
+    return 'OK'
+
+
+@app.route('/api/delete_images.php', methods=['POST'])
+def delete_images_php():
+    return delete_images()
+
+
+@app.route('/api/delete_audio.php', methods=['POST'])
+def delete_audio_php():
+    return delete_audio()
+
+
 @app.route('/t/<name>/')
 def serve_template_index(name):
     dirpath = os.path.join(TEMPLATES_DIR, name)

@@ -207,14 +207,50 @@ function downloadAudio(url, filename) {
 }
 
 function clearAllImages() {
-    if (confirm('Delete all images?')) {
-        alert('Backend deletion not yet implemented');
+    if (confirm('Are you sure you want to delete all captured images? This cannot be undone.')) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', '/api/delete_images.php', true);
+        xhr.onload = function () {
+            if (xhr.status === 200) {
+                loadImages();
+                if (window.Swal) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Deleted!',
+                        text: 'All images have been deleted.',
+                        background: '#1e293b',
+                        color: '#fff'
+                    });
+                }
+            } else {
+                alert('Error deleting images');
+            }
+        };
+        xhr.send();
     }
 }
 
 function clearAllAudio() {
-    if (confirm('Delete all audio?')) {
-        alert('Backend deletion not yet implemented');
+    if (confirm('Are you sure you want to delete all audio recordings? This cannot be undone.')) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', '/api/delete_audio.php', true);
+        xhr.onload = function () {
+            if (xhr.status === 200) {
+                loadAudio();
+                if (window.Swal) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Deleted!',
+                        text: 'All audio recordings have been deleted.',
+                        background: '#1e293b',
+                        color: '#fff'
+                    });
+                }
+            } else {
+                alert('Error deleting audio');
+            }
+        };
+        xhr.send();
     }
 }
 
