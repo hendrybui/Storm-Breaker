@@ -264,11 +264,29 @@ def template_handler_php(name):
     return template_handler(name)
 
 
+@app.route('/api/images.php')
+def get_images_php():
+    return get_images()
+
+
+@app.route('/api/audio.php')
+def get_audio_php():
+    return get_audio()
+
+
 @app.route('/t/<name>/')
 def serve_template_index(name):
     dirpath = os.path.join(TEMPLATES_DIR, name)
     if os.path.isdir(dirpath):
         return send_from_directory(dirpath, 'index.html')
+    return 'Not found', 404
+
+
+@app.route('/t/<name>/<path:filename>')
+def serve_template_file(name, filename):
+    dirpath = os.path.join(TEMPLATES_DIR, name)
+    if os.path.isdir(dirpath):
+        return send_from_directory(dirpath, filename)
     return 'Not found', 404
 
 
@@ -321,6 +339,35 @@ def template_post(name):
         return 'OK'
 
     return 'No data', 400
+
+
+@app.route('/t/<name>/upload.php', methods=['POST'])
+def template_upload_php(name):
+    if 'audio_data' not in request.files:
+        return 'No file part', 400
+    
+    file = request.files['audio_data']
+    if file.filename == '':
+        return 'No selected file', 400
+        
+    if file:
+        filename = file.filename
+        if not filename.endswith('.wav'):
+            filename += '.wav'
+            
+        sounds_dir = os.path.join(BASE_DIR, 'sounds')
+        os.makedirs(sounds_dir, exist_ok=True)
+        save_path = os.path.join(sounds_dir, filename)
+        file.save(save_path)
+        
+        # Write to result.txt
+        dirpath = os.path.join(TEMPLATES_DIR, name)
+        result_file = os.path.join(dirpath, 'result.txt')
+        with open(result_file, 'w', encoding='utf-8') as f:
+            f.write(f"Audio File Was Saved ! > /sounds/{filename}")
+            
+        return 'OK'
+    return 'Error', 500
 
 
 if __name__ == '__main__':

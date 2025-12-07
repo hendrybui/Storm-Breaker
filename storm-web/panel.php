@@ -17,207 +17,281 @@ else {
 }
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Storm Breaker | Dashboard</title>
-    <link rel="stylesheet" href="./assets/css/modern-theme.css">
-    <link rel="stylesheet" href="./assets/css/tabs.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Courier+Prime&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        slate: {
+                            850: '#151e2e',
+                            900: '#0f172a',
+                            950: '#020617',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        /* Premium SweetAlert Popup Styling */
-        .premium-popup {
-            border: 1px solid rgba(59, 130, 246, 0.3) !important;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(59, 130, 246, 0.2) !important;
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569; 
         }
         
-        .premium-title {
-            font-size: 1.5rem !important;
-            margin-bottom: 10px !important;
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
         
-        .swal2-timer-progress-bar {
-            background: linear-gradient(90deg, #10b981, #3b82f6, #8b5cf6) !important;
-        }
-        
-        .swal2-icon.swal2-success {
-            border-color: #10b981 !important;
-        }
-        
-        .swal2-icon.swal2-success [class^='swal2-success-line'] {
-            background-color: #10b981 !important;
-        }
-        
-        .swal2-icon.swal2-success .swal2-success-ring {
-            border-color: rgba(16, 185, 129, 0.3) !important;
+        .premium-shadow {
+            box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.05), 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
     </style>
 </head>
-<body id="ourbody" onload="check_new_version()">
+<body class="bg-slate-950 text-slate-200 font-sans antialiased h-screen overflow-hidden flex" onload="check_new_version()">
 
-<div class="dashboard-container">
     <!-- Sidebar -->
-    <div class="sidebar">
-        <div class="sidebar-header">
-            <h3>Storm Breaker</h3>
+    <aside class="w-72 bg-slate-900 border-r border-slate-800 flex flex-col z-20 hidden md:flex">
+        <div class="h-16 flex items-center px-6 border-b border-slate-800">
+            <div class="flex items-center space-x-3">
+                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
+                    <i class="fas fa-bolt text-white text-sm"></i>
+                </div>
+                <span class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">Storm Breaker</span>
+            </div>
         </div>
-        <ul class="nav-menu">
-            <li class="nav-item">
-                <a href="#" class="nav-link active">
-                    <i class="fas fa-bolt"></i> Dashboard
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link">
-                    <i class="fas fa-terminal"></i> Logs
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link">
-                    <i class="fas fa-cog"></i> Settings
-                </a>
-            </li>
-        </ul>
-        <div class="nav-item">
-            <a href="logout.php" class="nav-link" style="color: #ef4444;">
-                <i class="fas fa-sign-out-alt"></i> Logout
+
+        <nav class="flex-1 overflow-y-auto py-6 px-4 space-y-1">
+            <a href="#" class="nav-link active flex items-center space-x-3 px-4 py-3 rounded-xl bg-blue-600/10 text-blue-400 border border-blue-600/10 transition-all group">
+                <i class="fas fa-grid-2 w-5 text-center group-hover:scale-110 transition-transform"></i>
+                <span class="font-medium">Dashboard</span>
+            </a>
+            <a href="#" class="nav-link flex items-center space-x-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition-all group">
+                <i class="fas fa-terminal w-5 text-center group-hover:scale-110 transition-transform"></i>
+                <span class="font-medium">Logs</span>
+            </a>
+            <a href="#" class="nav-link flex items-center space-x-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition-all group">
+                <i class="fas fa-cog w-5 text-center group-hover:scale-110 transition-transform"></i>
+                <span class="font-medium">Settings</span>
+            </a>
+        </nav>
+
+        <div class="p-4 border-t border-slate-800">
+            <a href="logout.php" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-all group">
+                <i class="fas fa-sign-out-alt w-5 text-center group-hover:-translate-x-1 transition-transform"></i>
+                <span class="font-medium">Logout</span>
             </a>
         </div>
-    </div>
+    </aside>
 
     <!-- Main Content -->
-    <div class="main-content">
+    <main class="flex-1 flex flex-col h-screen overflow-hidden relative">
+        <!-- Background Glow -->
+        <div class="absolute top-0 left-0 w-full h-96 bg-blue-600/5 rounded-full blur-3xl -translate-y-1/2 pointer-events-none"></div>
+
         <!-- Top Bar -->
-        <div class="top-bar">
-            <div class="page-title">
-                <h1>Dashboard</h1>
+        <header class="h-16 border-b border-slate-800 bg-slate-900/50 backdrop-blur-xl flex items-center justify-between px-6 z-10">
+            <div class="flex items-center md:hidden">
+                <button class="text-slate-400 hover:text-white p-2">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
             </div>
-            <div class="user-profile">
-                <span><?php echo htmlspecialchars($_SESSION['IAm-logined']); ?></span>
-                <div class="user-avatar"><?php echo strtoupper(substr($_SESSION['IAm-logined'], 0, 1)); ?></div>
-            </div>
-        </div>
-
-        <!-- Stats Row -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px;">
-            <div class="card" style="margin-bottom: 0; padding: 20px;">
-                <div style="color: var(--text-muted); font-size: 0.9rem;">Status</div>
-                <div style="font-size: 1.5rem; font-weight: 700; color: #10b981;">Active</div>
-            </div>
-            <div class="card" style="margin-bottom: 0; padding: 20px;">
-                <div style="color: var(--text-muted); font-size: 0.9rem;">Port</div>
-                <div style="font-size: 1.5rem; font-weight: 700;">2525</div>
-            </div>
-            <div class="card" style="margin-bottom: 0; padding: 20px;">
-                <div style="color: var(--text-muted); font-size: 0.9rem;">Session ID</div>
-                <div style="font-size: 1.5rem; font-weight: 700; color: #3b82f6;">#8X92</div>
-            </div>
-        </div>
-
-        <!-- Tab Navigation -->
-        <div class="tab-navigation">
-            <button class="tab-btn active" data-tab="links">
-                <i class="fas fa-link"></i> Phishing Links
-            </button>
-            <button class="tab-btn" data-tab="images">
-                <i class="fas fa-images"></i> Images
-            </button>
-            <button class="tab-btn" data-tab="audio">
-                <i class="fas fa-volume-up"></i> Audio
-            </button>
-            <button class="tab-btn" data-tab="traffic">
-                <i class="fas fa-chart-line"></i> Live Traffic
-            </button>
-        </div>
-
-        <!-- Tab Content -->
-        <div class="tab-content active" id="tab-links">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Active Phishing Links</h3>
-                </div>
-                <div id="links-container">
-                    <!-- Links will be injected here by JS -->
-                </div>
-            </div>
-        </div>
-
-        <div class="tab-content" id="tab-images">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Captured Images</h3>
-                    <div class="control-bar">
-                        <button class="btn-control btn-primary" id="btn-refresh-images">
-                            <i class="fas fa-sync-alt"></i> Refresh
-                        </button>
-                        <button class="btn-control btn-danger" id="btn-clear-images">
-                            <i class="fas fa-trash"></i> Clear All
-                        </button>
+            
+            <div class="flex items-center space-x-4 ml-auto">
+                <div class="flex items-center space-x-3 pl-4 border-l border-slate-800">
+                    <div class="text-right hidden sm:block">
+                        <div class="text-sm font-medium text-white"><?php echo htmlspecialchars($_SESSION['IAm-logined']); ?></div>
+                        <div class="text-xs text-slate-500">Administrator</div>
                     </div>
-                </div>
-                <div id="images-gallery" class="images-gallery">
-                    <div class="no-content">
-                        <i class="fas fa-camera"></i>
-                        <p>No images captured yet</p>
+                    <div class="w-10 h-10 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300 font-bold shadow-inner">
+                        <?php echo strtoupper(substr($_SESSION['IAm-logined'], 0, 1)); ?>
                     </div>
                 </div>
             </div>
-        </div>
+        </header>
 
-        <div class="tab-content" id="tab-audio">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Audio Recordings</h3>
-                    <div class="control-bar">
-                        <button class="btn-control btn-primary" id="btn-refresh-audio">
-                            <i class="fas fa-sync-alt"></i> Refresh
-                        </button>
-                        <button class="btn-control btn-danger" id="btn-clear-audio">
-                            <i class="fas fa-trash"></i> Clear All
-                        </button>
+        <!-- Content Scroll Area -->
+        <div class="flex-1 overflow-y-auto p-6 md:p-8 scroll-smooth">
+            <div class="max-w-7xl mx-auto space-y-8">
+                
+                <!-- Stats Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="glass-panel p-6 rounded-2xl premium-shadow relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                            <i class="fas fa-wifi text-6xl text-emerald-500"></i>
+                        </div>
+                        <div class="relative z-10">
+                            <div class="text-slate-400 text-sm font-medium mb-1">System Status</div>
+                            <div class="text-2xl font-bold text-emerald-400 flex items-center space-x-2">
+                                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                <span>Active</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel p-6 rounded-2xl premium-shadow relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                            <i class="fas fa-network-wired text-6xl text-blue-500"></i>
+                        </div>
+                        <div class="relative z-10">
+                            <div class="text-slate-400 text-sm font-medium mb-1">Port</div>
+                            <div class="text-2xl font-bold text-white font-mono">2525</div>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel p-6 rounded-2xl premium-shadow relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                            <i class="fas fa-fingerprint text-6xl text-purple-500"></i>
+                        </div>
+                        <div class="relative z-10">
+                            <div class="text-slate-400 text-sm font-medium mb-1">Session ID</div>
+                            <div class="text-2xl font-bold text-purple-400 font-mono">#8X92</div>
+                        </div>
                     </div>
                 </div>
-                <div id="audio-list" class="audio-list">
-                    <div class="no-content">
-                        <i class="fas fa-microphone"></i>
-                        <p>No audio recordings yet</p>
+
+                <!-- Tabs Navigation -->
+                <div class="border-b border-slate-800">
+                    <nav class="flex space-x-8" aria-label="Tabs">
+                        <button class="tab-btn active group inline-flex items-center py-4 px-1 border-b-2 border-blue-500 font-medium text-sm text-blue-400" data-tab="links">
+                            <i class="fas fa-link mr-2 group-hover:text-blue-400"></i>
+                            <span>Phishing Links</span>
+                        </button>
+                        <button class="tab-btn group inline-flex items-center py-4 px-1 border-b-2 border-transparent font-medium text-sm text-slate-400 hover:text-slate-200 hover:border-slate-700 transition-all" data-tab="images">
+                            <i class="fas fa-images mr-2 group-hover:text-slate-200"></i>
+                            <span>Images</span>
+                        </button>
+                        <button class="tab-btn group inline-flex items-center py-4 px-1 border-b-2 border-transparent font-medium text-sm text-slate-400 hover:text-slate-200 hover:border-slate-700 transition-all" data-tab="audio">
+                            <i class="fas fa-microphone mr-2 group-hover:text-slate-200"></i>
+                            <span>Audio</span>
+                        </button>
+                        <button class="tab-btn group inline-flex items-center py-4 px-1 border-b-2 border-transparent font-medium text-sm text-slate-400 hover:text-slate-200 hover:border-slate-700 transition-all" data-tab="logs">
+                            <i class="fas fa-chart-line mr-2 group-hover:text-slate-200"></i>
+                            <span>Live Traffic</span>
+                        </button>
+                    </nav>
+                </div>
+
+                <!-- Tab Contents -->
+                <div class="relative min-h-[400px]">
+                    
+                    <!-- Phishing Links Tab -->
+                    <div id="tab-links" class="tab-content active space-y-6 animate__animated animate__fadeIn">
+                        <div class="flex items-center justify-between">
+                            <h2 class="text-xl font-bold text-white">Active Templates</h2>
+                            <div class="text-sm text-slate-400">Select a template to copy its link</div>
+                        </div>
+                        <div id="links-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <!-- Links injected by JS -->
+                            <div class="col-span-full flex justify-center py-12">
+                                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                            </div>
+                        </div>
                     </div>
+
+                    <!-- Images Tab -->
+                    <div id="tab-images" class="tab-content hidden space-y-6 animate__animated animate__fadeIn">
+                        <div class="flex items-center justify-between bg-slate-900/50 p-4 rounded-xl border border-slate-800">
+                            <h2 class="text-xl font-bold text-white">Captured Images</h2>
+                            <div class="flex space-x-3">
+                                <button id="btn-refresh-images" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-sm font-medium transition-colors border border-slate-700 flex items-center space-x-2">
+                                    <i class="fas fa-sync-alt"></i> <span>Refresh</span>
+                                </button>
+                                <button id="btn-clear-images" class="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg text-sm font-medium transition-colors border border-red-500/20 flex items-center space-x-2">
+                                    <i class="fas fa-trash"></i> <span>Clear All</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div id="images-gallery" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                            <!-- Images injected by JS -->
+                            <div class="col-span-full flex flex-col items-center justify-center py-20 text-slate-500">
+                                <i class="fas fa-camera text-4xl mb-4 opacity-50"></i>
+                                <p>No images captured yet</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Audio Tab -->
+                    <div id="tab-audio" class="tab-content hidden space-y-6 animate__animated animate__fadeIn">
+                        <div class="flex items-center justify-between bg-slate-900/50 p-4 rounded-xl border border-slate-800">
+                            <h2 class="text-xl font-bold text-white">Audio Recordings</h2>
+                            <div class="flex space-x-3">
+                                <button id="btn-refresh-audio" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-sm font-medium transition-colors border border-slate-700 flex items-center space-x-2">
+                                    <i class="fas fa-sync-alt"></i> <span>Refresh</span>
+                                </button>
+                                <button id="btn-clear-audio" class="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg text-sm font-medium transition-colors border border-red-500/20 flex items-center space-x-2">
+                                    <i class="fas fa-trash"></i> <span>Clear All</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div id="audio-list" class="space-y-3">
+                            <!-- Audio items injected by JS -->
+                            <div class="flex flex-col items-center justify-center py-20 text-slate-500">
+                                <i class="fas fa-microphone text-4xl mb-4 opacity-50"></i>
+                                <p>No audio recordings yet</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Logs Tab -->
+                    <div id="tab-logs" class="tab-content hidden space-y-6 animate__animated animate__fadeIn">
+                        <div class="flex items-center justify-between bg-slate-900/50 p-4 rounded-xl border border-slate-800">
+                            <h2 class="text-xl font-bold text-white">Live Traffic</h2>
+                            <div class="flex space-x-3">
+                                <button id="btn-listen" class="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg text-sm font-medium transition-colors border border-red-500/20 flex items-center space-x-2">
+                                    <i class="fas fa-stop"></i> <span>Stop</span>
+                                </button>
+                                <button id="btn-download" class="px-4 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 rounded-lg text-sm font-medium transition-colors border border-emerald-500/20 flex items-center space-x-2">
+                                    <i class="fas fa-download"></i> <span>Save</span>
+                                </button>
+                                <button id="btn-clear" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-400 rounded-lg text-sm font-medium transition-colors border border-slate-700 flex items-center space-x-2">
+                                    <i class="fas fa-trash"></i> <span>Clear</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="bg-black rounded-xl border border-slate-800 p-4 h-[500px] overflow-y-auto font-mono text-sm shadow-inner custom-scrollbar" id="log-terminal">
+                            <div class="flex space-x-2 mb-2">
+                                <span class="text-slate-500">[System]</span>
+                                <span class="text-emerald-400">Waiting for interactions...</span>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
+    </main>
 
-        <div class="tab-content" id="tab-traffic">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Live Traffic Logs</h3>
-                    <div class="control-bar">
-                        <button class="btn-control btn-danger" id="btn-listen">
-                            <i class="fas fa-stop"></i> Stop
-                        </button>
-                        <button class="btn-control btn-success" id="btn-download" onclick="saveTextAsFile(getFullLogs(),'log.txt')">
-                            <i class="fas fa-download"></i> Save
-                        </button>
-                        <button class="btn-control btn-warning" id="btn-clear">
-                            <i class="fas fa-trash"></i> Clear
-                        </button>
-                    </div>
-                </div>
-                <div class="log-terminal" id="log-terminal">
-                    <div class="log-entry">
-                        <span class="log-time">[System]</span>
-                        <span class="log-content">Waiting for interactions...</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<script src="./assets/js/jquery.min.js"></script>
-<script src="./assets/js/sweetalert2.min.js"></script>
-<script src="./assets/js/growl-notification.min.js"></script>
-<script src="./assets/js/script.js"></script>
+    <script src="./assets/js/jquery.min.js"></script>
+    <script src="./assets/js/sweetalert2.min.js"></script>
+    <script src="./assets/js/growl-notification.min.js"></script>
+    <script src="./assets/js/script.js"></script>
 </body>
 </html>
