@@ -80,7 +80,7 @@ else{
                         <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">
                             <i class="fas fa-user"></i>
                         </span>
-                        <input type="text" name="username" required autofocus 
+                        <input type="text" name="username" required autofocus value="admin"
                             class="w-full bg-slate-800/50 border border-slate-700 rounded-xl py-3 pl-10 pr-4 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all"
                             placeholder="Enter your username">
                     </div>
@@ -92,7 +92,7 @@ else{
                         <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">
                             <i class="fas fa-lock"></i>
                         </span>
-                        <input type="password" name="password" required 
+                        <input type="password" name="password" required value="admin"
                             class="w-full bg-slate-800/50 border border-slate-700 rounded-xl py-3 pl-10 pr-4 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all"
                             placeholder="Enter your password">
                     </div>
