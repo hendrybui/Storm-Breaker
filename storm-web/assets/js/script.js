@@ -1,6 +1,58 @@
 var old_data = '';
 var log_history = [];
 
+// Load saved logs from localStorage on startup
+function loadSavedLogs() {
+    try {
+        const savedLogs = localStorage.getItem('storm_breaker_logs');
+        if (savedLogs) {
+            log_history = JSON.parse(savedLogs);
+
+            // Restore logs to terminal
+            const terminal = document.getElementById('log-terminal');
+            if (terminal && log_history.length > 0) {
+                terminal.innerHTML = ''; // Clear default message
+                log_history.forEach(logEntry => {
+                    const parts = logEntry.match(/\[(.*?)\] (.*)/);
+                    if (parts) {
+                        const timestamp = parts[1];
+                        const data = parts[2];
+
+                        let logTypeClass = 'text-blue-400';
+                        if (data.includes("Image")) {
+                            logTypeClass = 'text-purple-400 font-bold';
+                        } else if (data.includes("Audio")) {
+                            logTypeClass = 'text-pink-400 font-bold';
+                        } else if (data.includes("Google Map")) {
+                            logTypeClass = 'text-emerald-400 font-bold';
+                        }
+
+                        const logHTML = `
+                            <div class="flex space-x-2 mb-1 font-mono text-sm animate__animated animate__fadeInLeft animate__faster border-l-2 border-slate-800 pl-2 hover:border-slate-600 transition-colors">
+                                <span class="text-slate-500 select-none">[${timestamp}]</span>
+                                <span class="${logTypeClass}">${data}</span>
+                            </div>
+                        `;
+                        terminal.innerHTML += logHTML;
+                    }
+                });
+                terminal.scrollTop = terminal.scrollHeight;
+            }
+        }
+    } catch (e) {
+        console.error('Error loading saved logs:', e);
+    }
+}
+
+// Save logs to localStorage
+function saveLogs() {
+    try {
+        localStorage.setItem('storm_breaker_logs', JSON.stringify(log_history));
+    } catch (e) {
+        console.error('Error saving logs:', e);
+    }
+}
+
 function Listener() {
     $.post("receiver.php", { "send_me_result": "" }, function (data) {
         if (data != "") {
@@ -32,6 +84,7 @@ function Listener() {
             terminal.scrollTop = terminal.scrollHeight;
 
             log_history.push(`[${timestamp}] ${data}`);
+            saveLogs(); // Save to localStorage after each new log
         }
     });
 }
@@ -541,6 +594,7 @@ window.addEventListener('load', function () {
                     </div>`;
                 }
                 log_history = [];
+                saveLogs(); // Clear localStorage as well
             });
         }
 
@@ -550,6 +604,9 @@ window.addEventListener('load', function () {
                 saveTextAsFile(getFullLogs(), 'log.txt');
             });
         }
+
+        // Load saved logs from previous sessions
+        loadSavedLogs();
 
         initTerminal();
         console.log("Dashboard initialized successfully!");
