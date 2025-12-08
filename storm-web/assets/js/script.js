@@ -164,6 +164,8 @@ function loadAudio() {
                         <div class="flex items-center space-x-4 w-full md:w-auto justify-between md:justify-end">
                             <audio controls class="h-8 w-full md:w-48 opacity-70 hover:opacity-100 transition-opacity">
                                 <source src="${audio.url}" type="audio/wav">
+                                <source src="${audio.url}" type="audio/mpeg">
+                                <source src="${audio.url}" type="audio/webm">
                                 Your browser does not support audio.
                             </audio>
                             <button onclick="downloadAudio('${audio.url}', '${audio.name}')" class="p-2 text-slate-400 hover:text-white transition-colors shrink-0">
@@ -344,6 +346,73 @@ function copyToClipboard(btn, url) {
 }
 
 
+
+function initTerminal() {
+    var input = document.getElementById('sys-cmd-input');
+    var output = document.getElementById('sys-terminal-output');
+    var prompt = document.getElementById('sys-prompt');
+
+    if (!input || !output) return;
+
+    input.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') {
+            var cmd = this.value;
+            var cmdLine = document.createElement('div');
+            cmdLine.innerHTML = `<span class="text-emerald-500 font-bold mr-2">${prompt.innerText}</span><span class="text-white">${cmd}</span>`;
+            output.appendChild(cmdLine);
+
+            this.value = '';
+            this.disabled = true;
+            output.scrollTop = output.scrollHeight;
+
+            if (!cmd.trim()) {
+                this.disabled = false;
+                this.focus();
+                return;
+            }
+
+            fetch('/api/terminal', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ cmd: cmd })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.output) {
+                        var outDiv = document.createElement('div');
+                        outDiv.className = "text-slate-300 whitespace-pre-wrap mb-2";
+                        outDiv.textContent = data.output;
+                        output.appendChild(outDiv);
+                    }
+                    if (data.cwd) {
+                        var path = data.cwd.replace(/\\/g, '/');
+                        var folder = path.split('/').pop();
+                        if (!folder && path.includes(':')) folder = path;
+                        prompt.innerText = `admin@${folder}:~$`;
+                        prompt.title = data.cwd;
+                    }
+                    if (data.error) {
+                        var errDiv = document.createElement('div');
+                        errDiv.className = "text-red-400 mb-2";
+                        errDiv.textContent = data.error;
+                        output.appendChild(errDiv);
+                    }
+                })
+                .catch(err => {
+                    var errDiv = document.createElement('div');
+                    errDiv.className = "text-red-400 mb-2";
+                    errDiv.textContent = "Error: " + err;
+                    output.appendChild(errDiv);
+                })
+                .finally(() => {
+                    this.disabled = false;
+                    this.focus();
+                    output.scrollTop = output.scrollHeight;
+                });
+        }
+    });
+}
+
 window.addEventListener('load', function () {
     console.log("Dashboard loading...");
 
@@ -482,6 +551,7 @@ window.addEventListener('load', function () {
             });
         }
 
+        initTerminal();
         console.log("Dashboard initialized successfully!");
     }, 100);
 });

