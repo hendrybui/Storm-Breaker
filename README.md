@@ -1198,6 +1198,36 @@ The panel (`GET /panel`) renders `flask_templates/panel.html` — a single-page 
 
 ---
 
+## Audit Harness
+
+`audit/audit_storm_breaker.py` verifies that every feature is reachable and functional,
+not just that the server boots. It reads the admin password from `storm-web/config.php`,
+so it always matches the running configuration.
+
+```bash
+# start the panel on localhost
+python3 run_localhost.py
+
+# in another shell
+python3 audit/audit_storm_breaker.py            # exit 0 only if every check passes
+python3 audit/audit_storm_breaker.py --url http://127.0.0.1:2525
+```
+
+| Check | What it proves |
+|---|---|
+| 1. Route mapping | every API endpoint referenced by the frontend JS and templates resolves to a real Flask route |
+| 2. Operator API | 105 operator endpoints answer 200 with a valid session |
+| 3. Victim API | 20 victim-facing capture endpoints answer 200 **without** a session — these must never be auth-gated |
+| 4. UID validation | registration without a uid is rejected, so one malformed row cannot break the client list |
+| 5. Cleanup | every synthetic row and capture file the run created is removed, and the database is VACUUMed so the tracked file does not drift |
+
+The harness also backs off and retries through the panel's own brute-force lockout
+(HTTP 429), and prints a hint if `config.php` was edited after the last server start.
+
+Scope: it exercises route liveness and payload handling only. It never sends a phishing
+link, never tunnels, and never contacts an external target.
+
+
 ## Phishing Templates
 
 Located in `storm-web/templates/`, each directory contains an `index.html` that serves as the phishing page. Accessed via `GET /t/<template_name>/`.
