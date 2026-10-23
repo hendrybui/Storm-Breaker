@@ -18,10 +18,12 @@ keystrokes/
 sessions/
 images/
 sounds/
+videos/
 
 # Config files with sensitive data
 Settings.json
 check-c.json
+secret_key.bin
 
 # IDE
 .vscode/

@@ -980,6 +980,14 @@
                                     </div>
                                 </div>
 
+                                <!-- Full Command Palette (populated by mobile_control.js) -->
+                                <div class="bg-slate-900 rounded-xl border border-slate-800 p-4">
+                                    <h3 class="text-sm font-bold text-slate-400 mb-3">
+                                        <i class="fas fa-layer-group"></i> Full Command Palette
+                                    </h3>
+                                    <div id="mobile-command-panel"></div>
+                                </div>
+
                                 <!-- Custom Command -->
                                 <div class="bg-slate-900 rounded-xl border border-slate-800 p-4">
                                     <h3 class="text-sm font-bold text-slate-400 mb-3">Custom JavaScript</h3>
@@ -1000,6 +1008,24 @@
                                     id="mobile-output">
                                     <div class="text-emerald-500">[Mobile Console] Ready. Select a device and send
                                         commands.</div>
+                                </div>
+
+                                <!-- Captured Media Gallery -->
+                                <div class="bg-slate-900 rounded-xl border border-slate-800 p-4">
+                                    <div class="flex items-center justify-between mb-3">
+                                        <h3 class="text-sm font-bold text-slate-400">
+                                            <i class="fas fa-images"></i> Captured Media
+                                        </h3>
+                                        <button onclick="refreshMobileCaptures()"
+                                            class="px-2 py-1 bg-slate-800 text-slate-400 rounded hover:bg-slate-700 text-xs">
+                                            <i class="fas fa-sync-alt"></i> Refresh
+                                        </button>
+                                    </div>
+                                    <div id="mobile-captures"
+                                        class="grid grid-cols-2 md:grid-cols-4 gap-3 max-h-[320px] overflow-y-auto">
+                                        <div class="col-span-full text-center text-slate-600 py-4 text-xs">No
+                                            captures yet</div>
+                                    </div>
                                 </div>
                             </div>
                         </div>

