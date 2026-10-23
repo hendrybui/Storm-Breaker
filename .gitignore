@@ -5,3 +5,4 @@ ngrok.tgz
 ngrok
 module/__pycache__/
 .venv/
+__pycache__/

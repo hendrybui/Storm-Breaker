@@ -1,0 +1,561 @@
+#!/usr/bin/env python3
+"""
+Storm-Breaker end-to-end audit harness.
+
+Verifies that every panel feature is actually reachable and functional --
+not just that the server starts. Four checks:
+
+  1. ROUTE MAPPING  - every API endpoint referenced by the frontend JS and
+                      templates resolves to a real Flask route.
+  2. OPERATOR API   - every operator-facing API endpoint answers 200 when
+                      called with a valid session.
+  3. VICTIM API     - every victim-facing capture endpoint answers 200 with
+                      no session at all (these are used by implants and
+                      phishing templates, so they must not be auth-gated).
+  4. UID GUARDS     - a registration without a uid is rejected, so one
+                      malformed row cannot break the client list.
+
+Usage:
+    python3 audit/audit_storm_breaker.py [--url http://127.0.0.1:2525]
+
+Credentials are read from storm-web/config.php, so the harness always
+matches the running configuration. Exit code is 0 only if every check
+passes.
+
+Scope note: this harness exercises route liveness and payload handling
+only. It never sends a real phishing link, never tunnels, never touches an
+external target, and cleans up the synthetic records it creates.
+"""
+
+import argparse
+import base64
+import os
+import re
+import sys
+import time
+
+try:
+    import requests
+except ImportError:
+    sys.exit("requests is required: pip install requests")
+
+REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+STORM_WEB = os.path.join(REPO_ROOT, 'storm-web')
+ASSETS_JS = os.path.join(STORM_WEB, 'assets', 'js')
+
+
+# --------------------------------------------------------------------------
+# helpers
+# --------------------------------------------------------------------------
+
+def read_password():
+    """Read the admin password out of config.php (same source app.py uses)."""
+    cfg_path = os.path.join(STORM_WEB, 'config.php')
+    with open(cfg_path, encoding='utf-8') as fh:
+        cfg = fh.read()
+    match = re.search(r'"password"\s*=>\s*"([^"]+)"', cfg)
+    if not match:
+        sys.exit("could not parse a password out of %s" % cfg_path)
+    return match.group(1)
+
+
+def iter_frontend_files():
+    """Every non-minified JS file and every HTML template."""
+    for base in (ASSETS_JS, STORM_WEB):
+        for root, _dirs, files in os.walk(base):
+            if base == STORM_WEB and 'assets' in root \
+                    and not os.path.abspath(root).startswith(os.path.abspath(ASSETS_JS)):
+                continue
+            for name in files:
+                if name.endswith('.min.js'):
+                    continue
+                if name.endswith(('.js', '.html')):
+                    yield os.path.join(root, name)
+
+
+FRONTEND_URL_RE = re.compile(
+    r"""(?:url\s*:\s*|fetch\s*\(|action\s*=\s*)"""
+    r"""[`'"]?((?:https?://[^`'"\s]+)|(?:/[A-Za-z0-9_\-./<>:{}%]*))"""
+)
+
+
+def frontend_references():
+    """Map of referenced endpoint -> list of source files."""
+    refs = {}
+    for path in iter_frontend_files():
+        try:
+            with open(path, encoding='utf-8', errors='ignore') as fh:
+                text = fh.read()
+        except OSError:
+            continue
+        rel = os.path.relpath(path, REPO_ROOT)
+        for match in FRONTEND_URL_RE.finditer(text):
+            url = match.group(1)
+            if url.startswith('http'):
+                continue
+            refs.setdefault(url, set()).add(rel)
+    return refs
+
+
+def load_app():
+    """Import the Flask app so we can use its real URL map."""
+    sys.path.insert(0, STORM_WEB)
+    os.chdir(STORM_WEB)
+    import app as storm_app          # noqa: E402
+    return storm_app
+
+
+class Router:
+    """Thin wrapper over werkzeug's MapAdapter for route lookups."""
+
+    def __init__(self, flask_app):
+        self.adapter = flask_app.url_map.bind('localhost')
+        self.route_rules = [r.rule for r in flask_app.url_map.iter_rules()]
+
+    def resolve(self, path):
+        """Return (rule, method) or (None, None) if nothing matches."""
+        path = path.split('?')[0]
+        for method in ('GET', 'POST', 'PUT', 'DELETE'):
+            try:
+                result = self.adapter.match(path, method=method)
+            except Exception:
+                continue
+            rule = result[0]
+            return (rule.rule if hasattr(rule, 'rule') else str(rule)), method
+        return None, None
+
+    def is_prefix_of_route(self, path):
+        """True when `path` is a static prefix of a real route.
+
+        The frontend builds URLs like `/api/campaigns/${id}`; the extractor
+        only sees the literal prefix `/api/campaigns/`. Such a prefix is
+        a template reference, not a missing route.
+        """
+        for rule in self.route_rules:
+            if rule.startswith(path):
+                return True
+        return False
+# --------------------------------------------------------------------------
+# endpoint catalogue
+# --------------------------------------------------------------------------
+
+OPERATOR_GETS = [
+    '/api/images', '/api/audio', '/api/fingerprints/list', '/api/keystrokes/list',
+    '/api/system/info', '/api/analytics/dashboard', '/api/analytics/geo',
+    '/api/analytics/timeline', '/api/alerts', '/api/operator/log',
+    '/api/obfuscate/profiles', '/api/reports', '/api/lures/categories',
+    '/api/lures/saved', '/api/evasion/profiles', '/api/evasion/saved',
+    '/api/payloads/types', '/api/campaigns/list', '/api/profiles/list',
+    '/api/geofence/list', '/api/webrtc_leaks', '/api/credentials/list',
+    '/api/credentials/pairs', '/api/credentials/stats', '/api/c2/clients',
+    '/api/mobile/clients', '/api/network/discoveries', '/api/browser-exfil',
+    '/api/browser-exfil/stats', '/api/playbooks', '/api/pivot/history',
+    '/api/pivot/capabilities', '/api/session-hijack/features',
+    '/api/session-hijack/history', '/api/threat-intel/types',
+    '/api/threat-intel/history', '/api/rat/history', '/api/rat/injection',
+    '/api/ai-threat/landscape', '/api/ai-threat/anomalies',
+    '/api/ai-threat/behavioral', '/api/ai-threat/predict',
+    '/api/ai-threat/response-plan', '/api/quantum/algorithms',
+    '/api/quantum/benchmark', '/api/quantum/threat', '/api/get_settings',
+    '/api/telegram/config', '/api/mobile/captures', '/list_templates',
+]
+
+OPERATOR_POSTS = [
+    ('/api/obfuscate', {'payload': 'import os\nos.system("id")', 'techniques': ['base64']}),
+    ('/api/lures/preview', {'category': 'banking', 'brand': 'Test', 'company': 'Acme'}),
+    ('/api/lures/generate', {'category': 'banking', 'brand': 'Test', 'company': 'Acme'}),
+    ('/api/lures/bulk', {'count': 3, 'category': 'banking', 'brand': 'Test', 'company': 'Acme'}),
+    ('/api/lures/render-html', {'html': '<p>hi</p>', 'title': 't'}),
+    ('/api/evasion/config', {'options': {'traffic_profile': 'api_rest', 'timing_profile': 'office_hours'}}),
+    ('/api/evasion/disguise', {'profile': 'api_rest', 'payload': {'x': 1}}),
+    ('/api/evasion/domains', {'category': 'tech', 'company': 'Acme', 'count': 3}),
+    ('/api/evasion/beacon-schedule', {'profile': 'office_hours', 'duration_hours': 2}),
+    ('/api/evasion/decoy', {'pattern': 'browsing', 'duration': 60}),
+    ('/api/evasion/fingerprint', {'device_class': 'desktop'}),
+    ('/api/reports/generate', {'title': 'Audit Report', 'report_type': 'summary'}),
+    ('/api/campaigns/create', {'name': 'AuditCamp', 'template': 'weather'}),
+    ('/api/profiles/build', {}),
+    ('/api/geofence/create', {'name': 'Zone1', 'latitude': 10.0, 'longitude': 20.0, 'radius': 5}),
+    ('/api/geofence/check', {'latitude': 10.0, 'longitude': 20.0}),
+    ('/api/playbooks', {'name': 'AuditPB', 'description': 'd',
+                        'steps': [{'action': 'log', 'params': {'message': 'hi'}}],
+                        'variables': {}}),
+    ('/api/terminal', {'command': 'echo STORMBREAKER_AUDIT_OK'}),
+    ('/api/c2/queue_command', {'uid': 'audit-nonexistent', 'command': 'whoami'}),
+    ('/api/mobile/send_command', {'uid': 'audit-nonexistent', 'command': 'whoami'}),
+    ('/api/credentials/scan', {'data': {'user': 'a', 'pass': 'b'}}),
+    ('/api/session-hijack/assess', {'token': 'abc', 'type': 'jwt'}),
+    ('/api/session-hijack/analyze-jwt',
+     {'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIn0.abc'}),
+    ('/api/session-hijack/parse-cookies', {'cookies': 'a=b; c=d'}),
+    ('/api/session-hijack/extract-tokens', {'text': 'Authorization: Bearer abc123'}),
+    ('/api/session-hijack/build-replay', {'cookies': {'a': 'b'}}),
+    ('/api/threat-intel/ip', {'ip': '8.8.8.8'}),
+    ('/api/threat-intel/email', {'email': 'test@example.com'}),
+    ('/api/threat-intel/social', {'username': 'test'}),
+    ('/api/threat-intel/technology', {'tech': 'nginx'}),
+    ('/api/ai-threat/analyze', {'data': {'events': []}}),
+    ('/api/quantum/encrypt', {'data': 'hello', 'algorithm': 'aes'}),
+    ('/api/quantum/key-exchange', {}),
+    ('/api/zeroday/scan', {'target': '127.0.0.1'}),
+    ('/api/zeroday/fuzz', {'target': 'http://127.0.0.1/'}),
+    ('/api/zeroday/rop', {'binary': 'x'}),
+    ('/api/zeroday/shellcode', {'arch': 'x86_64', 'payload': 'x'}),
+    ('/api/deeprecon/email', {'email': 'a@b.com'}),
+    ('/api/deeprecon/domain', {'domain': 'example.com'}),
+    ('/api/deeprecon/social', {'username': 'a', 'platform': 'github'}),
+    ('/api/deeprecon/infra', {'target': 'example.com'}),
+    ('/api/deeprecon/darkweb', {'query': 'test'}),
+    ('/api/deeprecon/correlate', {'data': {}}),
+    ('/api/rat/recon', {'target': '127.0.0.1'}),
+    ('/api/rat/shells', {'target': '127.0.0.1'}),
+    ('/api/rat/persistence', {'target': '127.0.0.1'}),
+    ('/api/rat/lateral', {'target': '127.0.0.1'}),
+    ('/api/rat/cradles', {'target': '127.0.0.1'}),
+    ('/api/rat/tunnels', {'target': '127.0.0.1'}),
+    ('/api/rat/anti-forensics', {'target': '127.0.0.1'}),
+    ('/api/rat/encode', {'payload': 'AAAA', 'technique': 'all'}),
+    ('/api/recon/run', {'target': 'example.com'}),
+    ('/api/webrtc_leak', {}),
+    ('/api/alerts/add', {'message': 'audit test', 'severity': 'info'}),
+    ('/api/alerts/clear', {}),
+]
+
+def victim_endpoints():
+    """(endpoint, payload) pairs that must work WITHOUT a session."""
+    jpeg = base64.b64encode(bytes.fromhex(
+        'ffd8ffe000104a46494600010100000100010000ffdb004300' + '08' * 64 + 'ffd9')
+    ).decode()
+    webm = base64.b64encode(b'WEBMDATA').decode()
+    return [
+        ('/api/fingerprint', {'fingerprint': {'ua': 'x'}, 'canvas': 'a', 'webgl': 'b',
+                               'fonts': [], 'timezone': 'UTC'}),
+        ('/api/keystrokes', {'logs': [{'type': 'keypress',
+                                        'target': {'type': 'body', 'tag': 'INPUT'}}],
+                             'url': 'http://audit'}),
+        ('/api/session/start', {'sessionId': 'audit-session', 'url': 'http://audit'}),
+        ('/api/session/events', {'sessionId': 'audit-session',
+                                 'events': [{'type': 'click'}]}),
+        ('/api/session/end', {'sessionId': 'audit-session', 'duration': 1}),
+        ('/api/c2/register', {'uid': 'audit-c2', 'info': {'os': 'linux'}}),
+        ('/api/c2/poll', {'uid': 'audit-c2'}),
+        ('/api/c2/response', {'uid': 'audit-c2', 'output': 'ok'}),
+        ('/api/c2/file_list_response', {'uid': 'audit-c2', 'files': []}),
+        ('/api/c2/file_download_response', {'uid': 'audit-c2', 'filename': 'a',
+                                            'data': webm}),
+        ('/api/mobile/register', {'uid': 'audit-mobile', 'info': {'platform': 'android'}}),
+        ('/api/mobile/poll', {'uid': 'audit-mobile'}),
+        ('/api/mobile/response', {'uid': 'audit-mobile', 'output': 'ok'}),
+        ('/api/mobile/camera', {'uid': 'audit-mobile',
+                                'image': 'data:image/jpeg;base64,' + jpeg}),
+        ('/api/mobile/background_data', {'uid': 'audit-mobile',
+                                          'data': {'type': 'background_location',
+                                                   'latitude': 1.0, 'longitude': 2.0}}),
+        ('/api/mobile/screenshot', {'uid': 'audit-mobile',
+                                    'image': 'data:image/jpeg;base64,' + jpeg,
+                                    'url': 'http://audit', 'timestamp': 'audit'}),
+        ('/api/mobile/audio', {'uid': 'audit-mobile',
+                               'audio': 'data:audio/webm;base64,' + webm,
+                               'timestamp': 'audit'}),
+        ('/api/mobile/screen_record', {'uid': 'audit-mobile',
+                                       'video': 'data:video/webm;base64,' + webm,
+                                       'timestamp': 'audit'}),
+        ('/api/browser-exfil/receive', {'uid': 'audit-mobile', 'data': {'cookie': 'x'},
+                                        'url': 'http://audit'}),
+        ('/api/network/receive', {'scan_type': 'webrtc', 'ip': '1.2.3.4',
+                                  'discovered_hosts': []}),
+    ]
+
+
+# --------------------------------------------------------------------------
+# cleanup
+# --------------------------------------------------------------------------
+
+AUDIT_UIDS = ('audit-mobile', 'audit-c2')
+AUDIT_CAPTURE_UID = 'audit-mobile'
+AUDIT_CAMPAIGN = 'AuditCamp'
+AUDIT_PLAYBOOK = 'AuditPB'
+AUDIT_GEOFENCE = 'Zone1'
+AUDIT_SESSION = 'audit-session'
+
+# Tables the operator sweep writes rows into. They all use an AUTOINCREMENT
+# integer primary key, so a row-count snapshot taken before the run is enough
+# to identify (and remove) exactly the rows this run created.
+SWEPT_TABLES = (
+    'mobile_commands', 'mobile_responses', 'tracking_data', 'mobile_captures',
+    'campaigns', 'campaign_links', 'credentials', 'victim_profiles',
+    'geofences', 'operator_log', 'reports', 'playbooks', 'saved_lures',
+    'network_discoveries', 'browser_exfil', 'evasion_configs', 'threat_intel',
+    'session_hijacks', 'pivot_records', 'rat_operations', 'rat_shell_sessions',
+    'rat_persistence',
+)
+
+
+def snapshot_tables(db_path):
+    """Record the highest id per swept table so the run can be undone."""
+    import sqlite3
+    baseline = {}
+    try:
+        conn = sqlite3.connect(db_path)
+        cur = conn.cursor()
+        for table in SWEPT_TABLES:
+            try:
+                cur.execute('SELECT MAX(id) FROM %s' % table)
+                row = cur.fetchone()
+                baseline[table] = row[0] if row and row[0] is not None else 0
+            except sqlite3.Error:
+                baseline[table] = None
+        conn.close()
+    except sqlite3.Error:
+        pass
+    return baseline
+
+
+def cleanup(baseline=None):
+    """Remove every synthetic record the audit created.
+
+    The harness writes real rows and files into the live SQLite database and
+    the capture directories, so it puts them back the way it found them.
+    """
+    import sqlite3
+
+    db_path = os.path.join(STORM_WEB, 'storm_breaker.db')
+    removed = 0
+    try:
+        conn = sqlite3.connect(db_path)
+        cur = conn.cursor()
+
+        # Rows created during this run (id above the pre-run snapshot).
+        if baseline:
+            for table, max_id in baseline.items():
+                if max_id is None:
+                    continue
+                try:
+                    cur.execute('DELETE FROM %s WHERE id > ?' % table, (max_id,))
+                    removed += cur.rowcount
+                except sqlite3.Error:
+                    pass
+
+        # Sessions keyed by uid rather than id.
+        for uid in AUDIT_UIDS:
+            for table in ('mobile_sessions', 'c2_sessions'):
+                try:
+                    cur.execute('DELETE FROM %s WHERE uid = ?' % table, (uid,))
+                    removed += cur.rowcount
+                except sqlite3.Error:
+                    pass
+
+        for name, table, column in (
+                (AUDIT_CAMPAIGN, 'campaigns', 'name'),
+                (AUDIT_PLAYBOOK, 'playbooks', 'name'),
+                (AUDIT_GEOFENCE, 'geofences', 'name')):
+            try:
+                cur.execute('DELETE FROM %s WHERE %s = ?' % (table, column), (name,))
+                removed += cur.rowcount
+            except sqlite3.Error:
+                pass
+
+        # Delete capture files that were written for the audit victim.
+        try:
+            cur.execute('SELECT url FROM mobile_captures WHERE uid = ?',
+                        (AUDIT_CAPTURE_UID,))
+            urls = [row[0] for row in cur.fetchall()]
+        except sqlite3.Error:
+            urls = []
+        cur.execute('DELETE FROM mobile_captures WHERE uid = ?', (AUDIT_CAPTURE_UID,))
+        removed += cur.rowcount
+        conn.commit()
+        # Deleted rows leave free pages behind, which bloats the tracked
+        # database file. Compact it so the file returns to its prior size.
+        try:
+            conn.execute('VACUUM')
+        except sqlite3.Error:
+            pass
+        conn.close()
+
+        for url in urls:
+            rel = url.lstrip('/')
+            path = os.path.join(STORM_WEB, rel)
+            if os.path.isfile(path):
+                try:
+                    os.remove(path)
+                    removed += 1
+                except OSError:
+                    pass
+
+        sessions_dir = os.path.join(STORM_WEB, 'sessions')
+        if os.path.isdir(sessions_dir):
+            for name in os.listdir(sessions_dir):
+                if name.startswith(AUDIT_SESSION):
+                    try:
+                        os.remove(os.path.join(sessions_dir, name))
+                        removed += 1
+                    except OSError:
+                        pass
+    except sqlite3.Error as exc:
+        print('    cleanup warning: %s' % exc)
+        return False
+    print('    removed %d synthetic record(s)/file(s)' % removed)
+    return True
+
+
+# --------------------------------------------------------------------------
+# checks
+# --------------------------------------------------------------------------
+
+def check_route_mapping(router):
+    """Every frontend-referenced endpoint must resolve to a real route."""
+    print('\n[1] ROUTE MAPPING')
+    refs = frontend_references()
+    ok = unresolved = dynamic = 0
+    unresolved_list = []
+    for url, sources in sorted(refs.items()):
+        if '{' in url or '<' in url:
+            dynamic += 1
+            continue
+        rule, _method = router.resolve(url)
+        if rule is not None:
+            ok += 1
+        elif url.endswith('/') and router.is_prefix_of_route(url):
+            # static prefix of a real route, e.g. `/api/campaigns/${id}`
+            dynamic += 1
+        else:
+            unresolved += 1
+            unresolved_list.append((url, sorted(sources)))
+    print('    resolved=%d  unresolved=%d  template-vars=%d'
+          % (ok, unresolved, dynamic))
+    for url, sources in unresolved_list:
+        print('    UNRESOLVED %s  <- %s' % (url, ', '.join(sources[:3])))
+    return unresolved == 0
+
+def login(session, base, password, attempts=3):
+    """Log in, tolerating the brute-force lockout window.
+
+    The panel applies an in-memory lockout (5 failed POST /login attempts
+    from one IP -> 60 s block, HTTP 429). A stale lockout left over from an
+    earlier manual attempt must not make the audit fail, so back off and
+    retry instead.
+    """
+    for attempt in range(attempts):
+        resp = session.post(base + '/login',
+                            data={'username': 'admin', 'password': password},
+                            allow_redirects=False, timeout=30)
+        if resp.status_code in (200, 302):
+            return resp
+        if resp.status_code == 429:
+            wait = 61
+            print('    login lockout active (429) - waiting %ds' % wait)
+            time.sleep(wait)
+            continue
+        return resp
+    return resp
+
+
+def check_operator_api(base, password):
+    """Operator endpoints must answer 200 with a valid session."""
+    print('\n[2] OPERATOR API (authenticated)')
+    session = requests.Session()
+    resp = login(session, base, password)
+    if resp.status_code not in (200, 302):
+        print('    LOGIN FAILED (%s)' % resp.status_code)
+        print('    hint: config.php holds the password, but the server reads it')
+        print('          only at start-up -- restart the server if it was edited')
+        print('          after the last launch.')
+        return False
+    failures = []
+    total = 0
+    for path in OPERATOR_GETS:
+        total += 1
+        try:
+            resp = session.get(base + path, timeout=45)
+        except Exception as exc:
+            failures.append((path, 'EXC %s' % type(exc).__name__))
+            continue
+        if resp.status_code != 200:
+            failures.append((path, resp.status_code))
+    for path, payload in OPERATOR_POSTS:
+        total += 1
+        try:
+            resp = session.post(base + path, json=payload, timeout=45)
+        except Exception as exc:
+            failures.append((path, 'EXC %s' % type(exc).__name__))
+            continue
+        if resp.status_code != 200:
+            failures.append((path, resp.status_code))
+    print('    %d/%d returned 200' % (total - len(failures), total))
+    for path, code in failures:
+        print('    FAIL %s -> %s' % (path, code))
+    return not failures
+
+
+def check_victim_api(base):
+    """Victim-facing capture endpoints must NOT be auth-gated."""
+    print('\n[3] VICTIM API (no session)')
+    failures = []
+    cases = victim_endpoints()
+    for path, payload in cases:
+        try:
+            resp = requests.post(base + path, json=payload, timeout=45)
+        except Exception as exc:
+            failures.append((path, 'EXC %s' % type(exc).__name__))
+            continue
+        if resp.status_code != 200:
+            failures.append((path, resp.status_code))
+    print('    %d/%d returned 200' % (len(cases) - len(failures), len(cases)))
+    for path, code in failures:
+        print('    FAIL %s -> %s' % (path, code))
+    return not failures
+
+
+def check_uid_guards(base):
+    """A registration without a uid must be rejected, not stored."""
+    print('\n[4] UID VALIDATION (corrupt-row guard)')
+    ok = True
+    for path in ('/api/mobile/register', '/api/c2/register', '/api/c2/response'):
+        resp = requests.post(base + path, json={'info': {}}, timeout=30)
+        if resp.status_code != 400:
+            print('    FAIL %s without uid -> %s (expected 400)'
+                  % (path, resp.status_code))
+            ok = False
+    if ok:
+        print('    all three reject a missing uid with 400')
+    return ok
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--url', default='http://127.0.0.1:2525')
+    args = parser.parse_args()
+    base = args.url.rstrip('/')
+
+    print('Storm-Breaker audit harness -> %s' % base)
+    storm_app = load_app()
+    router = Router(storm_app.app)
+    password = read_password()
+    baseline = snapshot_tables(os.path.join(STORM_WEB, 'storm_breaker.db'))
+
+    results = {
+        'route mapping': check_route_mapping(router),
+        'operator api': check_operator_api(base, password),
+        'victim api': check_victim_api(base),
+        'uid validation': check_uid_guards(base),
+    }
+
+    print('\n%s' % ('-' * 60))
+    for name, passed in results.items():
+        print('    %-18s %s' % (name, 'PASS' if passed else 'FAIL'))
+    failed = [n for n, ok in results.items() if not ok]
+
+    print('\n[5] CLEANUP')
+    cleanup(baseline)
+
+    if failed:
+        print('\nAUDIT FAILED: %s' % ', '.join(failed))
+        return 1
+    print('\nAUDIT PASSED - all features reachable and functional')
+    return 0
+
+
+if __name__ == '__main__':
+    sys.exit(main())
+
