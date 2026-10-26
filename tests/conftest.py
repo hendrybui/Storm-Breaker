@@ -150,16 +150,28 @@ def admin_session(live_server: str) -> Iterator[requests.Session]:
 def storm_app(live_server: str):
     """Import the live Flask *instance* so route-inventory can walk url_map.
 
-    The audit harness imports the same module; we mirror it here.  We
-    return the Flask object (``app.app``) rather than the module so the
-    tests can introspect ``url_map`` directly.
+    P2 introduced a sibling ``storm-web/app`` package alongside the file
+    ``storm-web/app.py``; Python's finder picks the package for the bare
+    name ``app``. To still trigger route-registration on the Flask
+    instance the file ``storm-web/app.py`` builds, we load it directly
+    via ``importlib.util`` (bypassing the package-name shadowing). The
+    file's ``import database`` etc. rely on ``storm-web/`` being on
+    ``sys.path``, so we stage it for the duration of the exec.
     """
+    import importlib.util
     sys.path.insert(0, str(STORM_WEB))
     try:
-        from app import app as _flask_app  # type: ignore  # noqa: WPS433
+        spec = importlib.util.spec_from_file_location(
+            "storm_web_app_file", str(STORM_WEB / "app.py")
+        )
+        if spec is None or spec.loader is None:
+            raise RuntimeError(f"could not load storm-web/app.py as a module spec")
+        _module = importlib.util.module_from_spec(spec)
+        sys.modules["storm_web_app_file"] = _module
+        spec.loader.exec_module(_module)  # runs app.py -> registers 204 routes
+        return _module.app
     finally:
         try:
             sys.path.remove(str(STORM_WEB))
         except ValueError:
             pass
-    return _flask_app

@@ -98,11 +98,32 @@ def frontend_references():
 
 
 def load_app():
-    """Import the Flask app so we can use its real URL map."""
+    """Import the Flask app so we can use its real URL map.
+
+    P2 introduced a sibling ``storm-web/app`` package alongside the file
+    ``storm-web/app.py``; Python's finder picks the package for the bare
+    name ``app``. To still trigger route-registration on the Flask
+    instance the file builds, we load it directly via ``importlib.util``
+    (bypassing the package-name shadowing). The file's ``import
+    database`` etc. rely on ``storm-web`` being on ``sys.path``, so we
+    stage it for the duration of the exec.
+    """
+    import importlib.util
     sys.path.insert(0, STORM_WEB)
     os.chdir(STORM_WEB)
-    import app as storm_app          # noqa: E402
-    return storm_app
+    try:
+        spec = importlib.util.spec_from_file_location(
+            "storm_audit_app_file", os.path.join(STORM_WEB, "app.py")
+        )
+        storm_app = importlib.util.module_from_spec(spec)
+        sys.modules["storm_audit_app_file"] = storm_app
+        spec.loader.exec_module(storm_app)
+        return storm_app
+    finally:
+        try:
+            sys.path.remove(STORM_WEB)
+        except ValueError:
+            pass
 
 
 class Router:
