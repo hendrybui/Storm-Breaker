@@ -13,6 +13,7 @@ from datetime import datetime
 from flask import Blueprint, jsonify, request
 
 from app.state import BASE_DIR, send_notification
+from app.services import capture as capturesvc
 
 
 bp = Blueprint("capture_sessions", __name__,
@@ -26,19 +27,7 @@ def session_start():
         data = request.json
         if not data or 'sessionId' not in data:
             return jsonify({'error': 'No session ID provided'}), 400
-        sessions_dir = os.path.join(BASE_DIR, 'sessions')
-        os.makedirs(sessions_dir, exist_ok=True)
-        session_id = data.get('sessionId')
-        filepath = os.path.join(sessions_dir, f'{session_id}_meta.json')
-        with open(filepath, 'w') as f:
-            json.dump(data, f, indent=2)
-        send_notification({
-            "type": "Session Recording Started",
-            "sessionId": session_id,
-            "url": data.get('url', 'Unknown'),
-            "timestamp": datetime.now().isoformat()
-        })
-        return jsonify({'status': 'success', 'sessionId': session_id})
+        return jsonify(capturesvc.session_start(data))
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
@@ -50,14 +39,7 @@ def session_events():
         data = request.json
         if not data or 'sessionId' not in data or 'events' not in data:
             return jsonify({'error': 'Invalid data'}), 400
-        sessions_dir = os.path.join(BASE_DIR, 'sessions')
-        os.makedirs(sessions_dir, exist_ok=True)
-        session_id = data.get('sessionId')
-        filepath = os.path.join(sessions_dir, f'{session_id}_events.jsonl')
-        with open(filepath, 'a') as f:
-            for event in data.get('events', []):
-                f.write(json.dumps(event) + '\n')
-        return jsonify({'status': 'success', 'count': len(data.get('events', []))})
+        return jsonify(capturesvc.session_events(data))
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
@@ -69,22 +51,6 @@ def session_end():
         data = request.json
         if not data or 'sessionId' not in data:
             return jsonify({'error': 'No session ID provided'}), 400
-        session_id = data.get('sessionId')
-        sessions_dir = os.path.join(BASE_DIR, 'sessions')
-        meta_filepath = os.path.join(sessions_dir, f'{session_id}_meta.json')
-        if os.path.exists(meta_filepath):
-            with open(meta_filepath, 'r') as f:
-                meta = json.load(f)
-            meta['endTime'] = data.get('timestamp')
-            meta['duration'] = data.get('duration', 0)
-            with open(meta_filepath, 'w') as f:
-                json.dump(meta, f, indent=2)
-        send_notification({
-            "type": "Session Recording Ended",
-            "sessionId": session_id,
-            "duration": data.get('duration', 0),
-            "timestamp": datetime.now().isoformat()
-        })
-        return jsonify({'status': 'success'})
+        return jsonify(capturesvc.session_end(data))
     except Exception as e:
         return jsonify({'error': str(e)}), 500
