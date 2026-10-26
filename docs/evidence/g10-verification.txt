@@ -1,0 +1,38 @@
+G10 / Track 5 (P14.1-P14.2) verification — exec+verify organ is ADDITIVE
+Date: 2026-10-27   Branch: feat/t1-skeleton @ a7f542e   Tag: p14-base
+Goal: prove the new organ does NOT weaken any existing ability (NR-1..NR-8 held).
+
+1. Full test suite
+   $ python3 -m pytest -q
+   => 227 passed   (211 baseline + 16 new effect tests)
+
+2. Frozen modules + database.py vs pre-upgrade
+   $ git diff --stat pre-upgrade..HEAD -- <15 modules> storm-web/database.py
+   => EMPTY  (credential_parser, payload_generator, obfuscation_engine, report_generator,
+      lure_generator, telegram_bot, evasion_framework, threat_intel, session_hijacker,
+      pivot_engine, rat_controller, ai_threat_analyzer, zeroday_lab, quantum_crypto,
+      deep_recon, database.py — all byte-identical)
+
+3. Route map vs frozen contract (tests/_frozen/route_inventory/url_map.json)
+   live unique rules = 201 ; frozen unique rules = 201
+   LOST = []   GAINED = []
+
+4. Live audit harness
+   $ bash audit/run_audit.sh
+   => route mapping 59 resolved / 0 unresolved ; operator 105/105 200 ;
+      victim 20/20 200 (no session) ; uid guard rejects missing uid with 400 ;
+      cleanup 45 records ; "AUDIT PASSED" ; exit=0
+
+5. P14 commit scope
+   $ git show --name-status a7f542e
+   => A storm-web/app/exec/{__init__,runner,verify}.py
+      A tests/unit/test_exec_{runner,verify}.py
+      A scripts/demo_firepower.py ; A docs/FIREPOWER.md ; M docs/{TODO,PROGRESS}.md
+      ZERO pre-existing source file edited.
+
+6. Demo (act -> verify)
+   $ python3 scripts/demo_firepower.py
+   => execute generated payload OK ; file-effect verify OK ; callback wait 0.00s OK
+
+VERDICT: the organ is purely additive. No route, module, table, or victim endpoint changed.
+No ability weakened. Non-regression contract intact.
