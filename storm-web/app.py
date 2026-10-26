@@ -24,22 +24,14 @@ FLASK_TEMPLATES_DIR = os.path.join(BASE_DIR, 'flask_templates')
 CHECK_C_PATH = os.path.join(BASE_DIR, 'check-c.json')
 PHP_CONFIG_PATH = os.path.join(BASE_DIR, 'config.php')
 
-app = Flask(__name__, static_folder=os.path.join(BASE_DIR, 'assets'), template_folder=FLASK_TEMPLATES_DIR)
-# secret key: persisted random value (fix: hardcoded public key allowed session forging)
-import os as _os, secrets as _secrets
-_KEYFILE = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), 'secret_key.bin')
-try:
-    with open(_KEYFILE) as _f:
-        _SK = _f.read().strip()
-    if not _SK:
-        raise IOError('empty')
-except IOError:
-    _SK = _secrets.token_hex(32)
-    with open(_KEYFILE, 'w') as _f:
-        _f.write(_SK)
-app.secret_key = _SK
-# Disable upload size limit completely
-app.config['MAX_CONTENT_LENGTH'] = None
+# === Flask construction delegated to app.create_app() (HANDOFF plan §P2.4) ===
+# The factory in storm-web/app/__init__.py now owns the Flask instance,
+# the persisted secret_key, and the MAX_CONTENT_LENGTH override that this
+# module used to do inline.  See app/__init__.py for the verbatim behaviour
+# re-implementation.  Route definitions, module-level globals, and the
+# @app.before_request hooks below remain untouched (NR-2 ADD-only).
+from app import create_app
+app = create_app()
 
 # ===== GLOBAL AUTH GATE (fix for vuln dc999286: unauth read APIs on public URL) =====
 _VICTIM_PUBLIC_PATHS = {
