@@ -1,8 +1,24 @@
+# --- OS / editor junk ---------------------------------------------------------
 **/.DS_Store
 **/*.swp
+.vscode/
+.idea/
+
+# --- Python artifacts ----------------------------------------------------------
+**/__pycache__/
+*.pyc
+
+# --- virtualenvs ----------------------------------------------------------------
+.venv/
+venv/
+
+# --- packaging artifacts ----------------------------------------------------------
 ngrok.zip
 ngrok.tgz
 ngrok
-module/__pycache__/
-.venv/
-__pycache__/
+
+# --- environment-specific ops scripts (never portable; keep local) ---------------
+audit/restart_after_reboot.sh
+
+# --- ephemeral recon / working data ------------------------------------------------
+storm-web/crtsh.txt

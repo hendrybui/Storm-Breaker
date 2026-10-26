@@ -25,7 +25,8 @@ Settings.json
 check-c.json
 secret_key.bin
 
-# SQLite WAL sidecars (journal_mode=WAL, P5.6)
+# Live database + SQLite WAL sidecars (runtime state; backups/ is the archive)
+storm_breaker.db
 storm_breaker.db-wal
 storm_breaker.db-shm
 storm_breaker.db-journal
