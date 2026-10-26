@@ -43,6 +43,17 @@ git diff tests/_frozen/route_inventory/ | grep -E '^-"path"'   # MUST be empty
 
 Any removed path = you broke the contract → revert.
 
+## Building the Tauri v2 app (deterministic)
+
+```
+bash scripts/build_app.sh        # forces ~/.cargo/bin first, then `tauri build`
+```
+
+Never rely on bare `cargo` from a non-login shell: `/usr/bin/cargo` is 1.75.0 (too old for
+Tauri v2, which needs rustc >= 1.85). The rustup stable toolchain (1.99.1) is the correct one,
+reachable via `source ~/.cargo/env`. `src-tauri/rust-toolchain.toml` pins the channel; the build
+script prepends `~/.cargo/bin` so the ambient PATH can't select the system cargo.
+
 ## Where things live
 
 | What | Where |

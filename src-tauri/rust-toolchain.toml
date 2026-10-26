@@ -1,0 +1,9 @@
+# Pin the toolchain for the Tauri v2 shell.
+#
+# Why: in a non-login shell PATH lacks ~/.cargo/bin, so bare `cargo` falls back to
+# /usr/bin/cargo (1.75.0) which is below the Tauri v2 floor. This file makes rustup
+# select the pinned channel whenever the rustup-managed cargo is used.
+#
+# Tauri 2.12.x needs rustc >= 1.85; verified building on stable 1.99.1.
+[toolchain]
+channel = "stable"

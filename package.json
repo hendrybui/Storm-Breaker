@@ -1,0 +1,13 @@
+{
+  "name": "storm-breaker",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Build tooling for the Storm-Breaker Tauri v2 operator shell (backend ships as a PyInstaller sidecar).",
+  "scripts": {
+    "tauri": "tauri",
+    "build:app": "bash scripts/build_app.sh"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2"
+  }
+}

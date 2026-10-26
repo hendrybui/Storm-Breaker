@@ -23,6 +23,9 @@ audit/restart_after_reboot.sh
 # --- ephemeral recon / working data ------------------------------------------------
 storm-web/crtsh.txt
 
+# --- node tooling (pinned @tauri-apps/cli; package-lock.json IS tracked) ----------
+node_modules/
+
 # --- P9 packaging: binary payloads & build outputs (rebuild via scripts/) ----------
 src-tauri/target/
 src-tauri/sidecar/
