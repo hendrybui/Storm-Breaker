@@ -166,6 +166,54 @@ def test_login_fail_lifecycle(store):
     assert store.login_fail_get('3.3.3.3') is None
 
 
+# -- P5.3: DB import merge / single response pop / tracking lists -----------
+class TestP53Semantics:
+    def test_c2_sessions_import_never_overwrites(self, store):
+        store.c2_session_set('u1', {'v': 'mem'}, '1.1.1.1')
+        store.c2_sessions_import({
+            'u1': {'last_seen': 'OLD', 'info': {'v': 'db'}, 'ip': '9.9.9.9'},
+            'u2': {'last_seen': 'OLD', 'info': {}, 'ip': '9.9.9.9'},
+            '': {'corrupt': True},  # legacy skipped falsy uids
+        })
+        assert store.c2_session_get('u1')['info'] == {'v': 'mem'}
+        assert store.c2_session_get('u2')['ip'] == '9.9.9.9'
+        assert '' not in store.c2_all_sessions()
+
+    def test_mobile_sessions_import_merge(self, store):
+        store.mobile_session_set('m1', {}, '1.1.1.1', 'R')
+        store.mobile_sessions_import({
+            'm1': {'last_seen': 'OLD', 'info': {'v': 'db'},
+                   'ip': '9.9.9.9', 'registered_at': 'R0'},
+            'm2': {'last_seen': 'OLD', 'info': {}, 'ip': '8.8.8.8'},
+        })
+        assert store.mobile_session_get('m1')['registered_at'] == 'R'
+        assert store.mobile_session_get('m2')['ip'] == '8.8.8.8'
+
+    def test_mobile_response_pop_single_fifo(self, store):
+        assert store.mobile_response_pop('m1') is None
+        store.mobile_response_append('m1', 'out1', 'T1')
+        store.mobile_response_append('m1', 'out2', 'T2')
+        first = store.mobile_response_pop('m1')
+        assert first == {'output': 'out1', 'timestamp': 'T1'}
+        assert store.mobile_response_pop('m1') == \
+            {'output': 'out2', 'timestamp': 'T2'}
+        assert store.mobile_response_pop('m1') is None
+
+    def test_mobile_tracking_append_trims_at_100(self, store):
+        for i in range(105):
+            store.mobile_tracking_append('m1', {'i': i})
+        got = store.mobile_tracking_all('m1')
+        assert len(got) == 100
+        assert got[0] == {'i': 5}          # oldest trimmed
+        assert got[-1] == {'i': 104}       # newest kept
+        assert store.mobile_tracking_all('unknown') == []
+
+    def test_shared_store_singleton_type(self):
+        from app.state import STORE
+        from app.core.state import MemoryStore
+        assert isinstance(STORE, MemoryStore)
+
+
 def test_close_is_noop(store):
     assert store.close() is None
 
