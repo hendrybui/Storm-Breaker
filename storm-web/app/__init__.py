@@ -86,9 +86,11 @@ def create_app() -> Flask:
     from app.blueprints import auth  # noqa: F401  -- P3.1
     from app.blueprints import capture_rx          # noqa: F401  -- P3.2
     from app.blueprints import capture_sessions    # noqa: F401  -- P3.2
+    from app.blueprints import capture_c2          # noqa: F401  -- P3.3
     app.register_blueprint(auth.bp)
     app.register_blueprint(capture_rx.bp)
     app.register_blueprint(capture_sessions.bp)
+    app.register_blueprint(capture_c2.bp)
 
     return app
 

