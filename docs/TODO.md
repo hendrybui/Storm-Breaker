@@ -80,13 +80,13 @@ Each task: move only, no logic change; run char suite after each.
 - [ ] P3.24 char suite + audit green → **G2 route parity**
 
 ### P4 Service extraction
-- [ ] P4.1 `services/capture.py` (ingest image/audio/keystroke/fingerprint/geo)
-- [ ] P4.2 `services/c2.py`
-- [ ] P4.3 `services/mobile.py`
+- [x] P4.1 `services/capture.py` (ingest image/audio/keystroke/fingerprint/geo)
+- [x] P4.2 `services/c2.py`
+- [x] P4.3 `services/mobile.py`
 - [ ] P4.4 `services/intel.py` (profiles, credentials, webrtc)
 - [ ] P4.5 `services/artifacts.py` (reports, lures, payloads)
 - [ ] P4.6 `services/osint.py` (threat-intel, deeprecon, pivot, session-hijack)
-- [ ] P4.7 char suite green
+- [x] P4.7 char suite green
 
 ### P5 Core (state / db / migrations)
 - [x] P5.1 `core/state.py` StateStore interface
