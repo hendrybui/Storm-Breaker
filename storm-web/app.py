@@ -24,6 +24,22 @@ FLASK_TEMPLATES_DIR = os.path.join(BASE_DIR, 'flask_templates')
 CHECK_C_PATH = os.path.join(BASE_DIR, 'check-c.json')
 PHP_CONFIG_PATH = os.path.join(BASE_DIR, 'config.php')
 
+# Shared state (moved from app.py module level into storm-web/app/state.py so
+# blueprints can import verbatim; HANDOFF plan section P3).  Object identity
+# is preserved -- every reference in app.py / blueprints resolves to the same
+# dict / function in app.state.
+from app.state import (
+    CONFIG,
+    LOGIN_FAILS as _LOGIN_FAILS,
+    ANALYTICS,
+    load_php_config,
+    load_check_c,
+    save_check_c,
+    generate_token,
+    change_token,
+    track_event,
+)
+
 # === Flask construction delegated to app.create_app() (HANDOFF plan §P2.4) ===
 # The factory in storm-web/app/__init__.py now owns the Flask instance,
 # the persisted secret_key, and the MAX_CONTENT_LENGTH override that this
@@ -63,7 +79,8 @@ def _auth_gate():
 
 # ===== login brute-force lockout (fix: public URL + default creds) =====
 import time as _time
-_LOGIN_FAILS = {}
+# _LOGIN_FAILS now imported from app.state (above). Keep local name for the
+# decorator bodies below verbatim.
 
 @app.before_request
 def _login_throttle():
@@ -89,44 +106,9 @@ def _login_throttle_track(resp):
 
 
 # ===== ANALYTICS ENGINE =====
-ANALYTICS = {
-    'total_visits': 0,
-    'total_captures': 0,
-    'total_images': 0,
-    'total_audio': 0,
-    'total_locations': 0,
-    'total_fingerprints': 0,
-    'total_keystrokes': 0,
-    'start_time': datetime.now().isoformat(),
-    'events': [],           # Last 500 events
-    'geo_data': [],         # Location captures for map
-    'hourly_activity': defaultdict(int),
-    'template_stats': defaultdict(int),
-    'browser_stats': defaultdict(int),
-    'os_stats': defaultdict(int),
-    'ip_addresses': set(),
-    'active_alerts': [],
-}
-
-def track_event(event_type, details=None, ip=None):
-    """Central analytics tracker"""
-    event = {
-        'type': event_type,
-        'timestamp': datetime.now().isoformat(),
-        'details': details or {},
-        'ip': ip or request.remote_addr if request else 'system'
-    }
-    ANALYTICS['events'].append(event)
-    if len(ANALYTICS['events']) > 500:
-        ANALYTICS['events'] = ANALYTICS['events'][-500:]
-    
-    hour = datetime.now().strftime('%Y-%m-%d %H:00')
-    ANALYTICS['hourly_activity'][hour] += 1
-    
-    if ip:
-        ANALYTICS['ip_addresses'].add(ip)
-    
-    ANALYTICS['total_visits'] += 1
+# ANALYTICS dict, track_event, load_check_c, save_check_c,
+# generate_token, change_token have moved to app.state (HANDOFF plan §P3).
+# Object identity preserved -- every reference below hits app.state.*
 
 
 # Keep legacy asset path used by the original PHP templates (../../assets/...)
@@ -135,52 +117,6 @@ def legacy_assets(filename):
     return send_from_directory(os.path.join(BASE_DIR, 'assets'), filename)
 
 
-def load_check_c():
-    try:
-        with open(CHECK_C_PATH, 'r') as f:
-            return json.load(f)
-    except Exception:
-        return {"token": "", "expired": "yes"}
-
-
-def save_check_c(data):
-    with open(CHECK_C_PATH, 'w') as f:
-        json.dump(data, f)
-
-
-def generate_token():
-    import uuid
-    uniqid = uuid.uuid4().hex
-    api_key = '-'.join([uniqid[i:i+5] for i in range(0, len(uniqid), 5)])
-    return api_key
-
-
-def change_token(token):
-    key = load_check_c()
-    key['token'] = token
-    key['expired'] = 'no'
-    save_check_c(key)
-
-
-def load_php_config(path=PHP_CONFIG_PATH):
-    # Naive parser for the simple config.php used in this project
-    try:
-        text = open(path, 'r').read()
-    except Exception:
-        return {}
-
-    pattern = re.compile(r'"([^\"]+)"\s*=>\s*\[([^\]]+)\]', re.DOTALL)
-    users = {}
-    for m in pattern.finditer(text):
-        username = m.group(1)
-        block = m.group(2)
-        pwd_m = re.search(r'"password"\s*=>\s*"([^\"]+)"', block)
-        if pwd_m:
-            users[username] = {'password': pwd_m.group(1)}
-    return users
-
-
-CONFIG = load_php_config()
 
 # Global C2 State (In-memory for simplicity)
 C2_SESSIONS = {}
