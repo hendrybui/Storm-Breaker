@@ -232,3 +232,14 @@ def template_upload_php(name):
         })
         return 'OK'
     return 'Error', 500
+
+
+# ---------------------------------------------------------------------------
+# P3.23: legacy .php aliases moved verbatim from app.py
+# ---------------------------------------------------------------------------
+@bp.route('/t/<name>/post.php', methods=['POST'])
+def template_post_php(name):
+    return template_post(name)
+@bp.route('/t/<name>/handler.php', methods=['POST'])
+def template_handler_php(name):
+    return template_handler(name)

