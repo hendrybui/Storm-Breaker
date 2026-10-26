@@ -158,6 +158,15 @@ def test_webrtc_leak_roundtrip(store):
     assert store.webrtc_leaks_get() == [{'ip': 'leak'}]
 
 
+def test_webrtc_leaks_trim_at_500(store):
+    for i in range(505):
+        store.webrtc_leak_append({'i': i})
+    got = store.webrtc_leaks_get()
+    assert len(got) == 500
+    assert got[0] == {'i': 5}      # oldest trimmed (legacy pop(0) semantics)
+    assert got[-1] == {'i': 504}   # newest kept
+
+
 def test_login_fail_lifecycle(store):
     assert store.login_fail_get('3.3.3.3') is None
     store.login_fail_set('3.3.3.3', 2, 12345.0)

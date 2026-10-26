@@ -1232,7 +1232,7 @@ def webrtc_leak():
 
 @app.route('/api/webrtc_leaks')
 def webrtc_leaks_list():
-    return jsonify({'leaks': WEBRTC_LEAKS[-100:]})
+    return jsonify({'leaks': STORE.webrtc_leaks_get()[-100:]})
 
 
 # ===== AUTO-RECON API =====

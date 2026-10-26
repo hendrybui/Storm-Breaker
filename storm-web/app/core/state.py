@@ -372,9 +372,13 @@ class MemoryStore(StateStore):
             self._recon_config.update(data)
 
     # -- WebRTC leaks -------------------------------------------------------
-    def webrtc_leak_append(self, leak: dict) -> None:
+    def webrtc_leak_append(self, leak: dict, keep_last: int = 500) -> None:
+        """Append one leak, keeping only the last ``keep_last`` entries
+        (legacy ``if len > 500: WEBRTC_LEAKS.pop(0)`` semantics)."""
         with self._lock:
             self._webrtc_leaks.append(leak)
+            if len(self._webrtc_leaks) > keep_last:
+                del self._webrtc_leaks[:-keep_last]
 
     def webrtc_leaks_get(self) -> List[dict]:
         with self._lock:
