@@ -124,35 +124,9 @@ C2_COMMANDS = {}
 C2_RESPONSES = {}
 
 
-@app.route('/')
-def index():
-    key = load_check_c()
-    cookie = request.cookies.get('logindata')
-    if cookie and cookie == key.get('token') and key.get('expired') == 'no':
-        return redirect(url_for('panel'))
-    elif session.get('IAm-logined'):
-        return redirect(url_for('panel'))
-    else:
-        return redirect(url_for('login'))
+# P3.1: moved to app.blueprints.auth -> @index ('/')
 
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    error = None
-    if session.get('IAm-logined'):
-        return redirect(url_for('panel'))
-
-    if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
-        if username in CONFIG and CONFIG[username]['password'] == password:
-            session['IAm-logined'] = username
-            return redirect(url_for('panel'))
-        else:
-            error = 'Invalid username or password'
-
-    return render_template('login.html', error=error)
-
+# P3.1: moved to app.blueprints.auth -> @login ('/login')
 
 @app.route('/panel')
 def panel():
@@ -184,13 +158,7 @@ def mobile_control():
     return render_template('mobile_control.html')
 
 
-@app.route('/logout')
-def logout():
-    session.clear()
-    resp = redirect(url_for('login'))
-    resp.set_cookie('logindata', '', expires=0, path='/')
-    return resp
-
+# P3.1: moved to app.blueprints.auth -> @logout ('/logout')
 
 @app.route('/receiver', methods=['POST'])
 def receiver():
@@ -298,20 +266,11 @@ def receiver_php():
     return receiver()
 
 
-@app.route('/logout.php')
-def logout_php():
-    return logout()
+# P3.1: moved to app.blueprints.auth -> @logout_php ('/logout.php')
 
+# P3.1: moved to app.blueprints.auth -> @index_php ('/index.php')
 
-@app.route('/index.php')
-def index_php():
-    return index()
-
-
-@app.route('/login.php', methods=['GET', 'POST'])
-def login_php():
-    return login()
-
+# P3.1: moved to app.blueprints.auth -> @login_php ('/login.php')
 
 @app.route('/panel.php')
 def panel_php():

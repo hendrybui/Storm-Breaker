@@ -66,8 +66,9 @@ def _load_or_create_secret_key() -> str:
 def create_app() -> Flask:
     """Instantiate the Storm-Breaker Flask app, identically to app.py 0.X.X.
 
-    Returns the configured app with secret_key + content-length disabled.
-    No routes, hooks, or globals are touched here.
+    Returns the configured app with secret_key + content-length disabled,
+    plus every ``app.blueprints.*`` Blueprint registered (P3.x extracts
+    share this single factory call).
     """
     app = Flask(__name__, static_folder=STATIC_FOLDER,
                 template_folder=TEMPLATE_FOLDER)
@@ -76,6 +77,15 @@ def create_app() -> Flask:
     app.config["MAX_CONTENT_LENGTH"] = None
     app.config["PORT"] = int(os.environ.get("STORM_WEB_PORT", DEFAULT_PORT))
     app.config["HOST"] = os.environ.get("STORM_WEB_HOST", DEFAULT_HOST)
+
+    # ----------------------------------------------------------------------------
+    # Blueprint registration (P3.x).  Each import triggers the verb-module-level
+    # decorators to run, attaching routes to their Blueprint objects.  Order is
+    # irrelevant because each Blueprint owns a disjoint URL set.
+    # ----------------------------------------------------------------------------
+    from app.blueprints import auth  # noqa: F401  -- P3.1
+    app.register_blueprint(auth.bp)
+
     return app
 
 
