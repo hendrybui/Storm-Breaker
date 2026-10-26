@@ -25,6 +25,11 @@ Settings.json
 check-c.json
 secret_key.bin
 
+# SQLite WAL sidecars (journal_mode=WAL, P5.6)
+storm_breaker.db-wal
+storm_breaker.db-shm
+storm_breaker.db-journal
+
 # IDE
 .vscode/
 .idea/

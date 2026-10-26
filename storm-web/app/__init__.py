@@ -132,6 +132,19 @@ def create_app() -> Flask:
     app.register_blueprint(system.bp)
     from app.blueprints import templates  # noqa: F401  -- P3
     app.register_blueprint(templates.bp)
+
+    # ----------------------------------------------------------------------------
+    # Core migrations (P5.5/P5.6): idempotent baseline + WAL + hot-path indexes.
+    # Failure-tolerant on purpose: a read-only FS must not stop the panel from
+    # booting (mirrors _load_or_create_secret_key's defensive style).
+    # ----------------------------------------------------------------------------
+    try:
+        from app.core.migrations.runner import migrate
+        _mig = migrate()
+        app.config["SCHEMA_VERSION"] = _mig.get("schema_version", 1)
+    except Exception:  # pragma: no cover -- degraded (read-only FS) startup
+        app.config["SCHEMA_VERSION"] = None
+
     return app
 
 
