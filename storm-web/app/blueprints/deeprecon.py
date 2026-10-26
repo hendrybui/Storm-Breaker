@@ -1,4 +1,8 @@
-"""deeprecon blueprint (P3 batch extract)."""
+"""deeprecon blueprint (P3 batch extract; thinned to HTTP adapter at P4.6).
+
+Business logic lives in ``app/services/osint.py`` (DeepReconOSINT).
+Response shapes are frozen and enforced by tests/char.
+"""
 from __future__ import annotations
 
 import os, json, base64
@@ -9,8 +13,8 @@ from flask import (Blueprint, request, jsonify, redirect, url_for, render_templa
 from app.state import *  # noqa: F401,F403  -- P3
 from app.state import BASE_DIR, CONFIG, _decode_data_url, _save_mobile_capture
 import database as db
+from app.services import osint as osintsvc
 
-from deep_recon import DeepReconOSINT
 bp = Blueprint("deeprecon", __name__,
                template_folder=os.path.join(BASE_DIR, "flask_templates"))
 
@@ -19,36 +23,31 @@ bp = Blueprint("deeprecon", __name__,
 
 def api_deeprecon_domain():
     domain = request.form.get('domain', '')
-    result = DeepReconOSINT.domain_recon(domain)
-    return jsonify({'success': True, 'result': result})
+    return jsonify({'success': True, 'result': osintsvc.deeprecon_domain(domain)})
 
 @bp.route('/api/deeprecon/social', methods=['POST'])
 
 def api_deeprecon_social():
     username = request.form.get('username', '')
-    result = DeepReconOSINT.social_profile_search(username)
-    return jsonify({'success': True, 'result': result})
+    return jsonify({'success': True, 'result': osintsvc.deeprecon_social(username)})
 
 @bp.route('/api/deeprecon/darkweb', methods=['POST'])
 
 def api_deeprecon_darkweb():
     query = request.form.get('query', '')
-    result = DeepReconOSINT.dark_web_scan(query)
-    return jsonify({'success': True, 'result': result})
+    return jsonify({'success': True, 'result': osintsvc.deeprecon_darkweb(query)})
 
 @bp.route('/api/deeprecon/email', methods=['POST'])
 
 def api_deeprecon_email():
     email = request.form.get('email', '')
-    result = DeepReconOSINT.email_intelligence(email)
-    return jsonify({'success': True, 'result': result})
+    return jsonify({'success': True, 'result': osintsvc.deeprecon_email(email)})
 
 @bp.route('/api/deeprecon/infra', methods=['POST'])
 
 def api_deeprecon_infra():
     target = request.form.get('target', '')
-    result = DeepReconOSINT.infrastructure_map(target)
-    return jsonify({'success': True, 'result': result})
+    return jsonify({'success': True, 'result': osintsvc.deeprecon_infra(target)})
 
 @bp.route('/api/deeprecon/correlate', methods=['POST'])
 
@@ -58,8 +57,7 @@ def api_deeprecon_correlate():
         entities = json.loads(entities_raw)
     except json.JSONDecodeError:
         entities = [e.strip() for e in entities_raw.split(',') if e.strip()]
-    result = DeepReconOSINT.correlate_data(entities)
-    return jsonify({'success': True, 'result': result})
+    return jsonify({'success': True, 'result': osintsvc.deeprecon_correlate(entities)})
 
 
 if __name__ == '__main__':
