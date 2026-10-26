@@ -1,12 +1,18 @@
 {
-  "expected_count": 134,
   "rules": [
     {
-      "endpoint": "index",
+      "endpoint": "auth.index",
       "methods": [
         "GET"
       ],
       "rule": "/"
+    },
+    {
+      "endpoint": "ai_threat.api_ai_threat_analyze",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/ai-threat/analyze"
     },
     {
       "endpoint": "api_ai_threat_analyze",
@@ -16,11 +22,25 @@
       "rule": "/api/ai-threat/analyze"
     },
     {
+      "endpoint": "ai_threat.api_ai_threat_anomalies",
+      "methods": [
+        "GET"
+      ],
+      "rule": "/api/ai-threat/anomalies"
+    },
+    {
       "endpoint": "api_ai_threat_anomalies",
       "methods": [
         "GET"
       ],
       "rule": "/api/ai-threat/anomalies"
+    },
+    {
+      "endpoint": "ai_threat.api_ai_threat_behavioral",
+      "methods": [
+        "GET"
+      ],
+      "rule": "/api/ai-threat/behavioral"
     },
     {
       "endpoint": "api_ai_threat_behavioral",
@@ -30,11 +50,25 @@
       "rule": "/api/ai-threat/behavioral"
     },
     {
+      "endpoint": "ai_threat.api_ai_threat_landscape",
+      "methods": [
+        "GET"
+      ],
+      "rule": "/api/ai-threat/landscape"
+    },
+    {
       "endpoint": "api_ai_threat_landscape",
       "methods": [
         "GET"
       ],
       "rule": "/api/ai-threat/landscape"
+    },
+    {
+      "endpoint": "ai_threat.api_ai_threat_predict",
+      "methods": [
+        "GET"
+      ],
+      "rule": "/api/ai-threat/predict"
     },
     {
       "endpoint": "api_ai_threat_predict",
@@ -44,11 +78,25 @@
       "rule": "/api/ai-threat/predict"
     },
     {
+      "endpoint": "ai_threat.api_ai_threat_response_plan",
+      "methods": [
+        "GET"
+      ],
+      "rule": "/api/ai-threat/response-plan"
+    },
+    {
       "endpoint": "api_ai_threat_response_plan",
       "methods": [
         "GET"
       ],
       "rule": "/api/ai-threat/response-plan"
+    },
+    {
+      "endpoint": "system.get_alerts",
+      "methods": [
+        "GET"
+      ],
+      "rule": "/api/alerts"
     },
     {
       "endpoint": "get_alerts",
@@ -58,11 +106,25 @@
       "rule": "/api/alerts"
     },
     {
+      "endpoint": "system.add_alert",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/alerts/add"
+    },
+    {
       "endpoint": "add_alert",
       "methods": [
         "POST"
       ],
       "rule": "/api/alerts/add"
+    },
+    {
+      "endpoint": "system.clear_alerts",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/alerts/clear"
     },
     {
       "endpoint": "clear_alerts",
@@ -72,11 +134,25 @@
       "rule": "/api/alerts/clear"
     },
     {
+      "endpoint": "system.analytics_dashboard",
+      "methods": [
+        "GET"
+      ],
+      "rule": "/api/analytics/dashboard"
+    },
+    {
       "endpoint": "analytics_dashboard",
       "methods": [
         "GET"
       ],
       "rule": "/api/analytics/dashboard"
+    },
+    {
+      "endpoint": "system.analytics_geo",
+      "methods": [
+        "GET"
+      ],
+      "rule": "/api/analytics/geo"
     },
     {
       "endpoint": "analytics_geo",
@@ -86,11 +162,25 @@
       "rule": "/api/analytics/geo"
     },
     {
+      "endpoint": "system.analytics_timeline",
+      "methods": [
+        "GET"
+      ],
+      "rule": "/api/analytics/timeline"
+    },
+    {
       "endpoint": "analytics_timeline",
       "methods": [
         "GET"
       ],
       "rule": "/api/analytics/timeline"
+    },
+    {
+      "endpoint": "system.get_audio",
+      "methods": [
+        "GET"
+      ],
+      "rule": "/api/audio"
     },
     {
       "endpoint": "get_audio",
@@ -114,11 +204,25 @@
       "rule": "/api/browser-exfil"
     },
     {
+      "endpoint": "browser_exfil.api_browser_exfil_receive",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/browser-exfil/receive"
+    },
+    {
       "endpoint": "api_browser_exfil_receive",
       "methods": [
         "POST"
       ],
       "rule": "/api/browser-exfil/receive"
+    },
+    {
+      "endpoint": "browser_exfil.api_browser_exfil_stats",
+      "methods": [
+        "GET"
+      ],
+      "rule": "/api/browser-exfil/stats"
     },
     {
       "endpoint": "api_browser_exfil_stats",
@@ -128,79 +232,93 @@
       "rule": "/api/browser-exfil/stats"
     },
     {
-      "endpoint": "c2_list_clients",
+      "endpoint": "capture_c2.c2_list_clients",
       "methods": [
         "GET"
       ],
       "rule": "/api/c2/clients"
     },
     {
-      "endpoint": "c2_file_download_response",
+      "endpoint": "capture_c2.c2_file_download_response",
       "methods": [
         "POST"
       ],
       "rule": "/api/c2/file_download_response"
     },
     {
-      "endpoint": "c2_file_list_response",
+      "endpoint": "capture_c2.c2_file_list_response",
       "methods": [
         "POST"
       ],
       "rule": "/api/c2/file_list_response"
     },
     {
-      "endpoint": "c2_get_download",
+      "endpoint": "capture_c2.c2_get_download",
       "methods": [
         "GET"
       ],
       "rule": "/api/c2/get_download/<uid>"
     },
     {
-      "endpoint": "c2_get_file_list",
+      "endpoint": "capture_c2.c2_get_file_list",
       "methods": [
         "GET"
       ],
       "rule": "/api/c2/get_file_list/<uid>"
     },
     {
-      "endpoint": "c2_get_responses",
+      "endpoint": "capture_c2.c2_get_responses",
       "methods": [
         "GET"
       ],
       "rule": "/api/c2/get_responses/<uid>"
     },
     {
-      "endpoint": "c2_poll",
+      "endpoint": "capture_c2.c2_poll",
       "methods": [
         "POST"
       ],
       "rule": "/api/c2/poll"
     },
     {
-      "endpoint": "c2_queue_command",
+      "endpoint": "capture_c2.c2_queue_command",
       "methods": [
         "POST"
       ],
       "rule": "/api/c2/queue_command"
     },
     {
-      "endpoint": "c2_register",
+      "endpoint": "capture_c2.c2_register",
       "methods": [
         "POST"
       ],
       "rule": "/api/c2/register"
     },
     {
-      "endpoint": "c2_response",
+      "endpoint": "capture_c2.c2_response",
       "methods": [
         "POST"
       ],
       "rule": "/api/c2/response"
     },
     {
+      "endpoint": "campaigns.campaigns_delete",
+      "methods": [
+        "DELETE"
+      ],
+      "rule": "/api/campaigns/<int:campaign_id>"
+    },
+    {
       "endpoint": "campaigns_delete",
       "methods": [
         "DELETE"
+      ],
+      "rule": "/api/campaigns/<int:campaign_id>"
+    },
+    {
+      "endpoint": "campaigns.campaigns_get",
+      "methods": [
+        "GET"
       ],
       "rule": "/api/campaigns/<int:campaign_id>"
     },
@@ -212,11 +330,25 @@
       "rule": "/api/campaigns/<int:campaign_id>"
     },
     {
+      "endpoint": "campaigns.campaigns_add_link",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/campaigns/<int:campaign_id>/add_link"
+    },
+    {
       "endpoint": "campaigns_add_link",
       "methods": [
         "POST"
       ],
       "rule": "/api/campaigns/<int:campaign_id>/add_link"
+    },
+    {
+      "endpoint": "campaigns.campaigns_create",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/campaigns/create"
     },
     {
       "endpoint": "campaigns_create",
@@ -226,11 +358,25 @@
       "rule": "/api/campaigns/create"
     },
     {
+      "endpoint": "campaigns.campaigns_list",
+      "methods": [
+        "GET"
+      ],
+      "rule": "/api/campaigns/list"
+    },
+    {
       "endpoint": "campaigns_list",
       "methods": [
         "GET"
       ],
       "rule": "/api/campaigns/list"
+    },
+    {
+      "endpoint": "credentials.credentials_delete",
+      "methods": [
+        "DELETE"
+      ],
+      "rule": "/api/credentials/delete/<int:cred_id>"
     },
     {
       "endpoint": "credentials_delete",
@@ -240,11 +386,25 @@
       "rule": "/api/credentials/delete/<int:cred_id>"
     },
     {
+      "endpoint": "credentials.credentials_list",
+      "methods": [
+        "GET"
+      ],
+      "rule": "/api/credentials/list"
+    },
+    {
       "endpoint": "credentials_list",
       "methods": [
         "GET"
       ],
       "rule": "/api/credentials/list"
+    },
+    {
+      "endpoint": "credentials.credentials_pairs",
+      "methods": [
+        "GET"
+      ],
+      "rule": "/api/credentials/pairs"
     },
     {
       "endpoint": "credentials_pairs",
@@ -254,11 +414,32 @@
       "rule": "/api/credentials/pairs"
     },
     {
+      "endpoint": "credentials.credentials_scan",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/credentials/scan"
+    },
+    {
       "endpoint": "credentials_scan",
       "methods": [
         "POST"
       ],
       "rule": "/api/credentials/scan"
+    },
+    {
+      "endpoint": "jobs.api_credentials_scan_async",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/credentials/scan-async"
+    },
+    {
+      "endpoint": "credentials.credentials_stats",
+      "methods": [
+        "GET"
+      ],
+      "rule": "/api/credentials/stats"
     },
     {
       "endpoint": "credentials_stats",
@@ -268,11 +449,25 @@
       "rule": "/api/credentials/stats"
     },
     {
+      "endpoint": "deeprecon.api_deeprecon_correlate",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/deeprecon/correlate"
+    },
+    {
       "endpoint": "api_deeprecon_correlate",
       "methods": [
         "POST"
       ],
       "rule": "/api/deeprecon/correlate"
+    },
+    {
+      "endpoint": "deeprecon.api_deeprecon_darkweb",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/deeprecon/darkweb"
     },
     {
       "endpoint": "api_deeprecon_darkweb",
@@ -282,11 +477,25 @@
       "rule": "/api/deeprecon/darkweb"
     },
     {
+      "endpoint": "deeprecon.api_deeprecon_domain",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/deeprecon/domain"
+    },
+    {
       "endpoint": "api_deeprecon_domain",
       "methods": [
         "POST"
       ],
       "rule": "/api/deeprecon/domain"
+    },
+    {
+      "endpoint": "deeprecon.api_deeprecon_email",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/deeprecon/email"
     },
     {
       "endpoint": "api_deeprecon_email",
@@ -296,6 +505,13 @@
       "rule": "/api/deeprecon/email"
     },
     {
+      "endpoint": "deeprecon.api_deeprecon_infra",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/deeprecon/infra"
+    },
+    {
       "endpoint": "api_deeprecon_infra",
       "methods": [
         "POST"
@@ -303,11 +519,25 @@
       "rule": "/api/deeprecon/infra"
     },
     {
+      "endpoint": "deeprecon.api_deeprecon_social",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/deeprecon/social"
+    },
+    {
       "endpoint": "api_deeprecon_social",
       "methods": [
         "POST"
       ],
       "rule": "/api/deeprecon/social"
+    },
+    {
+      "endpoint": "system.delete_audio",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/delete_audio"
     },
     {
       "endpoint": "delete_audio",
@@ -324,6 +554,13 @@
       "rule": "/api/delete_audio.php"
     },
     {
+      "endpoint": "system.delete_images",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/delete_images"
+    },
+    {
       "endpoint": "delete_images",
       "methods": [
         "POST"
@@ -338,11 +575,25 @@
       "rule": "/api/delete_images.php"
     },
     {
+      "endpoint": "evasion.api_evasion_beacon",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/evasion/beacon-schedule"
+    },
+    {
       "endpoint": "api_evasion_beacon",
       "methods": [
         "POST"
       ],
       "rule": "/api/evasion/beacon-schedule"
+    },
+    {
+      "endpoint": "evasion.api_evasion_config",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/evasion/config"
     },
     {
       "endpoint": "api_evasion_config",
@@ -352,11 +603,25 @@
       "rule": "/api/evasion/config"
     },
     {
+      "endpoint": "evasion.api_evasion_decoy",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/evasion/decoy"
+    },
+    {
       "endpoint": "api_evasion_decoy",
       "methods": [
         "POST"
       ],
       "rule": "/api/evasion/decoy"
+    },
+    {
+      "endpoint": "evasion.api_evasion_disguise",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/evasion/disguise"
     },
     {
       "endpoint": "api_evasion_disguise",
@@ -366,11 +631,25 @@
       "rule": "/api/evasion/disguise"
     },
     {
+      "endpoint": "evasion.api_evasion_domains",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/evasion/domains"
+    },
+    {
       "endpoint": "api_evasion_domains",
       "methods": [
         "POST"
       ],
       "rule": "/api/evasion/domains"
+    },
+    {
+      "endpoint": "evasion.api_evasion_fingerprint",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/evasion/fingerprint"
     },
     {
       "endpoint": "api_evasion_fingerprint",
@@ -380,6 +659,13 @@
       "rule": "/api/evasion/fingerprint"
     },
     {
+      "endpoint": "evasion.api_evasion_profiles",
+      "methods": [
+        "GET"
+      ],
+      "rule": "/api/evasion/profiles"
+    },
+    {
       "endpoint": "api_evasion_profiles",
       "methods": [
         "GET"
@@ -387,11 +673,25 @@
       "rule": "/api/evasion/profiles"
     },
     {
+      "endpoint": "evasion.api_evasion_saved",
+      "methods": [
+        "GET"
+      ],
+      "rule": "/api/evasion/saved"
+    },
+    {
       "endpoint": "api_evasion_saved",
       "methods": [
         "GET"
       ],
       "rule": "/api/evasion/saved"
+    },
+    {
+      "endpoint": "evasion.api_evasion_delete",
+      "methods": [
+        "DELETE"
+      ],
+      "rule": "/api/evasion/saved/<int:config_id>"
     },
     {
       "endpoint": "api_evasion_delete",
@@ -408,11 +708,18 @@
       "rule": "/api/export/all"
     },
     {
-      "endpoint": "save_fingerprint",
+      "endpoint": "capture_rx.save_fingerprint",
       "methods": [
         "POST"
       ],
       "rule": "/api/fingerprint"
+    },
+    {
+      "endpoint": "intel.list_fingerprints",
+      "methods": [
+        "GET"
+      ],
+      "rule": "/api/fingerprints/list"
     },
     {
       "endpoint": "list_fingerprints",
@@ -422,11 +729,25 @@
       "rule": "/api/fingerprints/list"
     },
     {
+      "endpoint": "campaigns.geofence_delete",
+      "methods": [
+        "DELETE"
+      ],
+      "rule": "/api/geofence/<int:fence_id>"
+    },
+    {
       "endpoint": "geofence_delete",
       "methods": [
         "DELETE"
       ],
       "rule": "/api/geofence/<int:fence_id>"
+    },
+    {
+      "endpoint": "campaigns.geofence_check",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/geofence/check"
     },
     {
       "endpoint": "geofence_check",
@@ -436,11 +757,25 @@
       "rule": "/api/geofence/check"
     },
     {
+      "endpoint": "campaigns.geofence_create",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/geofence/create"
+    },
+    {
       "endpoint": "geofence_create",
       "methods": [
         "POST"
       ],
       "rule": "/api/geofence/create"
+    },
+    {
+      "endpoint": "campaigns.geofence_list",
+      "methods": [
+        "GET"
+      ],
+      "rule": "/api/geofence/list"
     },
     {
       "endpoint": "geofence_list",
@@ -450,11 +785,18 @@
       "rule": "/api/geofence/list"
     },
     {
-      "endpoint": "get_settings",
+      "endpoint": "templates.get_settings",
       "methods": [
         "GET"
       ],
       "rule": "/api/get_settings"
+    },
+    {
+      "endpoint": "system.get_images",
+      "methods": [
+        "GET"
+      ],
+      "rule": "/api/images"
     },
     {
       "endpoint": "get_images",
@@ -471,11 +813,25 @@
       "rule": "/api/images.php"
     },
     {
-      "endpoint": "save_keystrokes",
+      "endpoint": "jobs.api_job_status",
+      "methods": [
+        "GET"
+      ],
+      "rule": "/api/jobs/<job_id>"
+    },
+    {
+      "endpoint": "capture_rx.save_keystrokes",
       "methods": [
         "POST"
       ],
       "rule": "/api/keystrokes"
+    },
+    {
+      "endpoint": "intel.list_keystrokes",
+      "methods": [
+        "GET"
+      ],
+      "rule": "/api/keystrokes/list"
     },
     {
       "endpoint": "list_keystrokes",
@@ -485,11 +841,25 @@
       "rule": "/api/keystrokes/list"
     },
     {
+      "endpoint": "intel.view_keystroke_file",
+      "methods": [
+        "GET"
+      ],
+      "rule": "/api/keystrokes/view/<filename>"
+    },
+    {
       "endpoint": "view_keystroke_file",
       "methods": [
         "GET"
       ],
       "rule": "/api/keystrokes/view/<filename>"
+    },
+    {
+      "endpoint": "lures.api_lure_bulk",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/lures/bulk"
     },
     {
       "endpoint": "api_lure_bulk",
@@ -499,11 +869,25 @@
       "rule": "/api/lures/bulk"
     },
     {
+      "endpoint": "lures.api_lure_categories",
+      "methods": [
+        "GET"
+      ],
+      "rule": "/api/lures/categories"
+    },
+    {
       "endpoint": "api_lure_categories",
       "methods": [
         "GET"
       ],
       "rule": "/api/lures/categories"
+    },
+    {
+      "endpoint": "lures.api_lure_generate",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/lures/generate"
     },
     {
       "endpoint": "api_lure_generate",
@@ -513,11 +897,25 @@
       "rule": "/api/lures/generate"
     },
     {
+      "endpoint": "lures.api_lure_preview",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/lures/preview"
+    },
+    {
       "endpoint": "api_lure_preview",
       "methods": [
         "POST"
       ],
       "rule": "/api/lures/preview"
+    },
+    {
+      "endpoint": "lures.api_lure_render_html",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/lures/render-html"
     },
     {
       "endpoint": "api_lure_render_html",
@@ -527,11 +925,25 @@
       "rule": "/api/lures/render-html"
     },
     {
+      "endpoint": "lures.api_save_lure",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/lures/save"
+    },
+    {
       "endpoint": "api_save_lure",
       "methods": [
         "POST"
       ],
       "rule": "/api/lures/save"
+    },
+    {
+      "endpoint": "lures.api_saved_lures",
+      "methods": [
+        "GET"
+      ],
+      "rule": "/api/lures/saved"
     },
     {
       "endpoint": "api_saved_lures",
@@ -541,6 +953,13 @@
       "rule": "/api/lures/saved"
     },
     {
+      "endpoint": "lures.api_delete_lure",
+      "methods": [
+        "DELETE"
+      ],
+      "rule": "/api/lures/saved/<int:lure_id>"
+    },
+    {
       "endpoint": "api_delete_lure",
       "methods": [
         "DELETE"
@@ -548,91 +967,91 @@
       "rule": "/api/lures/saved/<int:lure_id>"
     },
     {
-      "endpoint": "mobile_audio",
+      "endpoint": "capture_mobile.mobile_audio",
       "methods": [
         "POST"
       ],
       "rule": "/api/mobile/audio"
     },
     {
-      "endpoint": "mobile_background_data",
+      "endpoint": "capture_mobile.mobile_background_data",
       "methods": [
         "POST"
       ],
       "rule": "/api/mobile/background_data"
     },
     {
-      "endpoint": "mobile_camera",
+      "endpoint": "capture_mobile.mobile_camera",
       "methods": [
         "POST"
       ],
       "rule": "/api/mobile/camera"
     },
     {
-      "endpoint": "mobile_captures",
+      "endpoint": "capture_mobile.mobile_captures",
       "methods": [
         "GET"
       ],
       "rule": "/api/mobile/captures"
     },
     {
-      "endpoint": "mobile_clients",
+      "endpoint": "capture_mobile.mobile_clients",
       "methods": [
         "GET"
       ],
       "rule": "/api/mobile/clients"
     },
     {
-      "endpoint": "mobile_get_response",
+      "endpoint": "capture_mobile.mobile_get_response",
       "methods": [
         "GET"
       ],
       "rule": "/api/mobile/get_response/<uid>"
     },
     {
-      "endpoint": "mobile_poll",
+      "endpoint": "capture_mobile.mobile_poll",
       "methods": [
         "POST"
       ],
       "rule": "/api/mobile/poll"
     },
     {
-      "endpoint": "mobile_register",
+      "endpoint": "capture_mobile.mobile_register",
       "methods": [
         "POST"
       ],
       "rule": "/api/mobile/register"
     },
     {
-      "endpoint": "mobile_response",
+      "endpoint": "capture_mobile.mobile_response",
       "methods": [
         "POST"
       ],
       "rule": "/api/mobile/response"
     },
     {
-      "endpoint": "mobile_screen_record",
+      "endpoint": "capture_mobile.mobile_screen_record",
       "methods": [
         "POST"
       ],
       "rule": "/api/mobile/screen_record"
     },
     {
-      "endpoint": "mobile_screenshot",
+      "endpoint": "capture_mobile.mobile_screenshot",
       "methods": [
         "POST"
       ],
       "rule": "/api/mobile/screenshot"
     },
     {
-      "endpoint": "mobile_send_command",
+      "endpoint": "capture_mobile.mobile_send_command",
       "methods": [
         "POST"
       ],
       "rule": "/api/mobile/send_command"
     },
     {
-      "endpoint": "mobile_get_tracking_data",
+      "endpoint": "capture_mobile.mobile_get_tracking_data",
       "methods": [
         "GET"
       ],
@@ -653,11 +1072,25 @@
       "rule": "/api/network/receive"
     },
     {
+      "endpoint": "system.nuke_all_data",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/nuke"
+    },
+    {
       "endpoint": "nuke_all_data",
       "methods": [
         "POST"
       ],
       "rule": "/api/nuke"
+    },
+    {
+      "endpoint": "obfuscation.api_obfuscate",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/obfuscate"
     },
     {
       "endpoint": "api_obfuscate",
@@ -667,6 +1100,13 @@
       "rule": "/api/obfuscate"
     },
     {
+      "endpoint": "obfuscation.api_obfuscate_profiles",
+      "methods": [
+        "GET"
+      ],
+      "rule": "/api/obfuscate/profiles"
+    },
+    {
       "endpoint": "api_obfuscate_profiles",
       "methods": [
         "GET"
@@ -674,9 +1114,23 @@
       "rule": "/api/obfuscate/profiles"
     },
     {
+      "endpoint": "system.operator_log",
+      "methods": [
+        "GET"
+      ],
+      "rule": "/api/operator/log"
+    },
+    {
       "endpoint": "operator_log",
       "methods": [
         "GET"
+      ],
+      "rule": "/api/operator/log"
+    },
+    {
+      "endpoint": "system.operator_log_add",
+      "methods": [
+        "POST"
       ],
       "rule": "/api/operator/log"
     },
@@ -688,11 +1142,25 @@
       "rule": "/api/operator/log"
     },
     {
+      "endpoint": "payloads.payloads_generate",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/payloads/generate"
+    },
+    {
       "endpoint": "payloads_generate",
       "methods": [
         "POST"
       ],
       "rule": "/api/payloads/generate"
+    },
+    {
+      "endpoint": "payloads.payloads_types",
+      "methods": [
+        "GET"
+      ],
+      "rule": "/api/payloads/types"
     },
     {
       "endpoint": "payloads_types",
@@ -702,11 +1170,25 @@
       "rule": "/api/payloads/types"
     },
     {
+      "endpoint": "pivot.api_pivot_delete",
+      "methods": [
+        "DELETE"
+      ],
+      "rule": "/api/pivot/<int:record_id>"
+    },
+    {
       "endpoint": "api_pivot_delete",
       "methods": [
         "DELETE"
       ],
       "rule": "/api/pivot/<int:record_id>"
+    },
+    {
+      "endpoint": "pivot.api_pivot_graph",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/pivot/attack-graph"
     },
     {
       "endpoint": "api_pivot_graph",
@@ -716,11 +1198,25 @@
       "rule": "/api/pivot/attack-graph"
     },
     {
+      "endpoint": "pivot.api_pivot_surface",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/pivot/attack-surface"
+    },
+    {
       "endpoint": "api_pivot_surface",
       "methods": [
         "POST"
       ],
       "rule": "/api/pivot/attack-surface"
+    },
+    {
+      "endpoint": "pivot.api_pivot_caps",
+      "methods": [
+        "GET"
+      ],
+      "rule": "/api/pivot/capabilities"
     },
     {
       "endpoint": "api_pivot_caps",
@@ -730,11 +1226,25 @@
       "rule": "/api/pivot/capabilities"
     },
     {
+      "endpoint": "pivot.api_pivot_cred_reuse",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/pivot/credential-reuse"
+    },
+    {
       "endpoint": "api_pivot_cred_reuse",
       "methods": [
         "POST"
       ],
       "rule": "/api/pivot/credential-reuse"
+    },
+    {
+      "endpoint": "pivot.api_pivot_history",
+      "methods": [
+        "GET"
+      ],
+      "rule": "/api/pivot/history"
     },
     {
       "endpoint": "api_pivot_history",
@@ -744,11 +1254,25 @@
       "rule": "/api/pivot/history"
     },
     {
+      "endpoint": "pivot.api_pivot_killchain",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/pivot/kill-chain"
+    },
+    {
       "endpoint": "api_pivot_killchain",
       "methods": [
         "POST"
       ],
       "rule": "/api/pivot/kill-chain"
+    },
+    {
+      "endpoint": "pivot.api_pivot_privesc",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/pivot/privesc"
     },
     {
       "endpoint": "api_pivot_privesc",
@@ -800,11 +1324,25 @@
       "rule": "/api/playbooks/<int:pb_id>/execute"
     },
     {
+      "endpoint": "campaigns.profiles_get",
+      "methods": [
+        "GET"
+      ],
+      "rule": "/api/profiles/<int:profile_id>"
+    },
+    {
       "endpoint": "profiles_get",
       "methods": [
         "GET"
       ],
       "rule": "/api/profiles/<int:profile_id>"
+    },
+    {
+      "endpoint": "campaigns.profiles_notes",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/profiles/<int:profile_id>/notes"
     },
     {
       "endpoint": "profiles_notes",
@@ -814,11 +1352,25 @@
       "rule": "/api/profiles/<int:profile_id>/notes"
     },
     {
+      "endpoint": "campaigns.profiles_risk",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/profiles/<int:profile_id>/risk"
+    },
+    {
       "endpoint": "profiles_risk",
       "methods": [
         "POST"
       ],
       "rule": "/api/profiles/<int:profile_id>/risk"
+    },
+    {
+      "endpoint": "campaigns.profiles_tag",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/profiles/<int:profile_id>/tag"
     },
     {
       "endpoint": "profiles_tag",
@@ -828,11 +1380,25 @@
       "rule": "/api/profiles/<int:profile_id>/tag"
     },
     {
+      "endpoint": "campaigns.profiles_build",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/profiles/build"
+    },
+    {
       "endpoint": "profiles_build",
       "methods": [
         "POST"
       ],
       "rule": "/api/profiles/build"
+    },
+    {
+      "endpoint": "campaigns.profiles_list",
+      "methods": [
+        "GET"
+      ],
+      "rule": "/api/profiles/list"
     },
     {
       "endpoint": "profiles_list",
@@ -842,11 +1408,25 @@
       "rule": "/api/profiles/list"
     },
     {
+      "endpoint": "quantum.api_quantum_algorithms",
+      "methods": [
+        "GET"
+      ],
+      "rule": "/api/quantum/algorithms"
+    },
+    {
       "endpoint": "api_quantum_algorithms",
       "methods": [
         "GET"
       ],
       "rule": "/api/quantum/algorithms"
+    },
+    {
+      "endpoint": "quantum.api_quantum_benchmark",
+      "methods": [
+        "GET"
+      ],
+      "rule": "/api/quantum/benchmark"
     },
     {
       "endpoint": "api_quantum_benchmark",
@@ -856,11 +1436,25 @@
       "rule": "/api/quantum/benchmark"
     },
     {
+      "endpoint": "quantum.api_quantum_encrypt",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/quantum/encrypt"
+    },
+    {
       "endpoint": "api_quantum_encrypt",
       "methods": [
         "POST"
       ],
       "rule": "/api/quantum/encrypt"
+    },
+    {
+      "endpoint": "quantum.api_quantum_entropy",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/quantum/entropy"
     },
     {
       "endpoint": "api_quantum_entropy",
@@ -870,11 +1464,25 @@
       "rule": "/api/quantum/entropy"
     },
     {
+      "endpoint": "quantum.api_quantum_key_exchange",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/quantum/key-exchange"
+    },
+    {
       "endpoint": "api_quantum_key_exchange",
       "methods": [
         "POST"
       ],
       "rule": "/api/quantum/key-exchange"
+    },
+    {
+      "endpoint": "quantum.api_quantum_threat",
+      "methods": [
+        "GET"
+      ],
+      "rule": "/api/quantum/threat"
     },
     {
       "endpoint": "api_quantum_threat",
@@ -884,11 +1492,25 @@
       "rule": "/api/quantum/threat"
     },
     {
+      "endpoint": "rat.api_rat_delete",
+      "methods": [
+        "DELETE"
+      ],
+      "rule": "/api/rat/<int:record_id>"
+    },
+    {
       "endpoint": "api_rat_delete",
       "methods": [
         "DELETE"
       ],
       "rule": "/api/rat/<int:record_id>"
+    },
+    {
+      "endpoint": "rat.api_rat_antiforensics",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/rat/anti-forensics"
     },
     {
       "endpoint": "api_rat_antiforensics",
@@ -898,11 +1520,25 @@
       "rule": "/api/rat/anti-forensics"
     },
     {
+      "endpoint": "rat.api_rat_c2_config",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/rat/c2-config"
+    },
+    {
       "endpoint": "api_rat_c2_config",
       "methods": [
         "POST"
       ],
       "rule": "/api/rat/c2-config"
+    },
+    {
+      "endpoint": "rat.api_rat_cradles",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/rat/cradles"
     },
     {
       "endpoint": "api_rat_cradles",
@@ -912,11 +1548,25 @@
       "rule": "/api/rat/cradles"
     },
     {
+      "endpoint": "rat.api_rat_cred_targets",
+      "methods": [
+        "GET"
+      ],
+      "rule": "/api/rat/credentials/targets"
+    },
+    {
       "endpoint": "api_rat_cred_targets",
       "methods": [
         "GET"
       ],
       "rule": "/api/rat/credentials/targets"
+    },
+    {
+      "endpoint": "rat.api_rat_encode",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/rat/encode"
     },
     {
       "endpoint": "api_rat_encode",
@@ -926,11 +1576,25 @@
       "rule": "/api/rat/encode"
     },
     {
+      "endpoint": "rat.api_rat_history",
+      "methods": [
+        "GET"
+      ],
+      "rule": "/api/rat/history"
+    },
+    {
       "endpoint": "api_rat_history",
       "methods": [
         "GET"
       ],
       "rule": "/api/rat/history"
+    },
+    {
+      "endpoint": "rat.api_rat_injection",
+      "methods": [
+        "GET"
+      ],
+      "rule": "/api/rat/injection"
     },
     {
       "endpoint": "api_rat_injection",
@@ -940,11 +1604,25 @@
       "rule": "/api/rat/injection"
     },
     {
+      "endpoint": "rat.api_rat_lateral",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/rat/lateral"
+    },
+    {
       "endpoint": "api_rat_lateral",
       "methods": [
         "POST"
       ],
       "rule": "/api/rat/lateral"
+    },
+    {
+      "endpoint": "rat.api_rat_persistence",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/rat/persistence"
     },
     {
       "endpoint": "api_rat_persistence",
@@ -954,11 +1632,25 @@
       "rule": "/api/rat/persistence"
     },
     {
+      "endpoint": "rat.api_rat_recon",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/rat/recon"
+    },
+    {
       "endpoint": "api_rat_recon",
       "methods": [
         "POST"
       ],
       "rule": "/api/rat/recon"
+    },
+    {
+      "endpoint": "rat.api_rat_shells",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/rat/shells"
     },
     {
       "endpoint": "api_rat_shells",
@@ -968,11 +1660,26 @@
       "rule": "/api/rat/shells"
     },
     {
+      "endpoint": "rat.api_rat_tunnels",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/rat/tunnels"
+    },
+    {
       "endpoint": "api_rat_tunnels",
       "methods": [
         "POST"
       ],
       "rule": "/api/rat/tunnels"
+    },
+    {
+      "endpoint": "system.recon_config",
+      "methods": [
+        "GET",
+        "POST"
+      ],
+      "rule": "/api/recon/config"
     },
     {
       "endpoint": "recon_config",
@@ -983,11 +1690,25 @@
       "rule": "/api/recon/config"
     },
     {
+      "endpoint": "system.recon_run",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/recon/run"
+    },
+    {
       "endpoint": "recon_run",
       "methods": [
         "POST"
       ],
       "rule": "/api/recon/run"
+    },
+    {
+      "endpoint": "reports.api_list_reports",
+      "methods": [
+        "GET"
+      ],
+      "rule": "/api/reports"
     },
     {
       "endpoint": "api_list_reports",
@@ -997,9 +1718,23 @@
       "rule": "/api/reports"
     },
     {
+      "endpoint": "reports.api_delete_report",
+      "methods": [
+        "DELETE"
+      ],
+      "rule": "/api/reports/<int:report_id>"
+    },
+    {
       "endpoint": "api_delete_report",
       "methods": [
         "DELETE"
+      ],
+      "rule": "/api/reports/<int:report_id>"
+    },
+    {
+      "endpoint": "reports.api_get_report",
+      "methods": [
+        "GET"
       ],
       "rule": "/api/reports/<int:report_id>"
     },
@@ -1011,11 +1746,25 @@
       "rule": "/api/reports/<int:report_id>"
     },
     {
+      "endpoint": "reports.api_view_report",
+      "methods": [
+        "GET"
+      ],
+      "rule": "/api/reports/<int:report_id>/view"
+    },
+    {
       "endpoint": "api_view_report",
       "methods": [
         "GET"
       ],
       "rule": "/api/reports/<int:report_id>/view"
+    },
+    {
+      "endpoint": "reports.api_generate_report",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/reports/generate"
     },
     {
       "endpoint": "api_generate_report",
@@ -1025,11 +1774,25 @@
       "rule": "/api/reports/generate"
     },
     {
-      "endpoint": "save_settings",
+      "endpoint": "jobs.api_report_generate_async",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/reports/generate-async"
+    },
+    {
+      "endpoint": "templates.save_settings",
       "methods": [
         "POST"
       ],
       "rule": "/api/save_settings"
+    },
+    {
+      "endpoint": "session_hijack.api_hijack_delete",
+      "methods": [
+        "DELETE"
+      ],
+      "rule": "/api/session-hijack/<int:hijack_id>"
     },
     {
       "endpoint": "api_hijack_delete",
@@ -1039,11 +1802,25 @@
       "rule": "/api/session-hijack/<int:hijack_id>"
     },
     {
+      "endpoint": "session_hijack.api_hijack_jwt",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/session-hijack/analyze-jwt"
+    },
+    {
       "endpoint": "api_hijack_jwt",
       "methods": [
         "POST"
       ],
       "rule": "/api/session-hijack/analyze-jwt"
+    },
+    {
+      "endpoint": "session_hijack.api_hijack_assess",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/session-hijack/assess"
     },
     {
       "endpoint": "api_hijack_assess",
@@ -1053,11 +1830,25 @@
       "rule": "/api/session-hijack/assess"
     },
     {
+      "endpoint": "session_hijack.api_hijack_replay",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/session-hijack/build-replay"
+    },
+    {
       "endpoint": "api_hijack_replay",
       "methods": [
         "POST"
       ],
       "rule": "/api/session-hijack/build-replay"
+    },
+    {
+      "endpoint": "session_hijack.api_hijack_extract",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/session-hijack/extract-tokens"
     },
     {
       "endpoint": "api_hijack_extract",
@@ -1067,11 +1858,25 @@
       "rule": "/api/session-hijack/extract-tokens"
     },
     {
+      "endpoint": "session_hijack.api_hijack_features",
+      "methods": [
+        "GET"
+      ],
+      "rule": "/api/session-hijack/features"
+    },
+    {
       "endpoint": "api_hijack_features",
       "methods": [
         "GET"
       ],
       "rule": "/api/session-hijack/features"
+    },
+    {
+      "endpoint": "session_hijack.api_hijack_history",
+      "methods": [
+        "GET"
+      ],
+      "rule": "/api/session-hijack/history"
     },
     {
       "endpoint": "api_hijack_history",
@@ -1081,6 +1886,13 @@
       "rule": "/api/session-hijack/history"
     },
     {
+      "endpoint": "session_hijack.api_hijack_cookies",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/session-hijack/parse-cookies"
+    },
+    {
       "endpoint": "api_hijack_cookies",
       "methods": [
         "POST"
@@ -1088,25 +1900,32 @@
       "rule": "/api/session-hijack/parse-cookies"
     },
     {
-      "endpoint": "session_end",
+      "endpoint": "capture_sessions.session_end",
       "methods": [
         "POST"
       ],
       "rule": "/api/session/end"
     },
     {
-      "endpoint": "session_events",
+      "endpoint": "capture_sessions.session_events",
       "methods": [
         "POST"
       ],
       "rule": "/api/session/events"
     },
     {
-      "endpoint": "session_start",
+      "endpoint": "capture_sessions.session_start",
       "methods": [
         "POST"
       ],
       "rule": "/api/session/start"
+    },
+    {
+      "endpoint": "system.system_info",
+      "methods": [
+        "GET"
+      ],
+      "rule": "/api/system/info"
     },
     {
       "endpoint": "system_info",
@@ -1145,11 +1964,25 @@
       "rule": "/api/telegram/test"
     },
     {
+      "endpoint": "system.terminal_exec",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/terminal"
+    },
+    {
       "endpoint": "terminal_exec",
       "methods": [
         "POST"
       ],
       "rule": "/api/terminal"
+    },
+    {
+      "endpoint": "threat_intel.api_threat_delete",
+      "methods": [
+        "DELETE"
+      ],
+      "rule": "/api/threat-intel/<int:intel_id>"
     },
     {
       "endpoint": "api_threat_delete",
@@ -1159,11 +1992,25 @@
       "rule": "/api/threat-intel/<int:intel_id>"
     },
     {
+      "endpoint": "threat_intel.api_threat_email",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/threat-intel/email"
+    },
+    {
       "endpoint": "api_threat_email",
       "methods": [
         "POST"
       ],
       "rule": "/api/threat-intel/email"
+    },
+    {
+      "endpoint": "threat_intel.api_threat_history",
+      "methods": [
+        "GET"
+      ],
+      "rule": "/api/threat-intel/history"
     },
     {
       "endpoint": "api_threat_history",
@@ -1173,11 +2020,25 @@
       "rule": "/api/threat-intel/history"
     },
     {
+      "endpoint": "threat_intel.api_threat_ip",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/threat-intel/ip"
+    },
+    {
       "endpoint": "api_threat_ip",
       "methods": [
         "POST"
       ],
       "rule": "/api/threat-intel/ip"
+    },
+    {
+      "endpoint": "threat_intel.api_threat_report",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/threat-intel/report"
     },
     {
       "endpoint": "api_threat_report",
@@ -1187,11 +2048,25 @@
       "rule": "/api/threat-intel/report"
     },
     {
+      "endpoint": "threat_intel.api_threat_social",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/threat-intel/social"
+    },
+    {
       "endpoint": "api_threat_social",
       "methods": [
         "POST"
       ],
       "rule": "/api/threat-intel/social"
+    },
+    {
+      "endpoint": "threat_intel.api_threat_tech",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/threat-intel/technology"
     },
     {
       "endpoint": "api_threat_tech",
@@ -1201,11 +2076,25 @@
       "rule": "/api/threat-intel/technology"
     },
     {
+      "endpoint": "threat_intel.api_threat_types",
+      "methods": [
+        "GET"
+      ],
+      "rule": "/api/threat-intel/types"
+    },
+    {
       "endpoint": "api_threat_types",
       "methods": [
         "GET"
       ],
       "rule": "/api/threat-intel/types"
+    },
+    {
+      "endpoint": "intel.webrtc_leak",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/webrtc_leak"
     },
     {
       "endpoint": "webrtc_leak",
@@ -1222,11 +2111,25 @@
       "rule": "/api/webrtc_leaks"
     },
     {
+      "endpoint": "zeroday.api_zeroday_cves",
+      "methods": [
+        "GET"
+      ],
+      "rule": "/api/zeroday/cves"
+    },
+    {
       "endpoint": "api_zeroday_cves",
       "methods": [
         "GET"
       ],
       "rule": "/api/zeroday/cves"
+    },
+    {
+      "endpoint": "zeroday.api_zeroday_fuzz",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/zeroday/fuzz"
     },
     {
       "endpoint": "api_zeroday_fuzz",
@@ -1236,11 +2139,25 @@
       "rule": "/api/zeroday/fuzz"
     },
     {
+      "endpoint": "zeroday.api_zeroday_rop",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/zeroday/rop"
+    },
+    {
       "endpoint": "api_zeroday_rop",
       "methods": [
         "POST"
       ],
       "rule": "/api/zeroday/rop"
+    },
+    {
+      "endpoint": "zeroday.api_zeroday_scan",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/zeroday/scan"
     },
     {
       "endpoint": "api_zeroday_scan",
@@ -1250,11 +2167,25 @@
       "rule": "/api/zeroday/scan"
     },
     {
+      "endpoint": "zeroday.api_zeroday_shellcode",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/zeroday/shellcode"
+    },
+    {
       "endpoint": "api_zeroday_shellcode",
       "methods": [
         "POST"
       ],
       "rule": "/api/zeroday/shellcode"
+    },
+    {
+      "endpoint": "zeroday.api_zeroday_shellcode_types",
+      "methods": [
+        "GET"
+      ],
+      "rule": "/api/zeroday/shellcode-types"
     },
     {
       "endpoint": "api_zeroday_shellcode_types",
@@ -1278,11 +2209,25 @@
       "rule": "/assets/<path:filename>"
     },
     {
+      "endpoint": "campaigns.campaign_redirect",
+      "methods": [
+        "GET"
+      ],
+      "rule": "/c/<link_code>"
+    },
+    {
       "endpoint": "campaign_redirect",
       "methods": [
         "GET"
       ],
       "rule": "/c/<link_code>"
+    },
+    {
+      "endpoint": "system.serve_image",
+      "methods": [
+        "GET"
+      ],
+      "rule": "/images/<filename>"
     },
     {
       "endpoint": "serve_image",
@@ -1292,21 +2237,21 @@
       "rule": "/images/<filename>"
     },
     {
-      "endpoint": "index_php",
+      "endpoint": "auth.index_php",
       "methods": [
         "GET"
       ],
       "rule": "/index.php"
     },
     {
-      "endpoint": "list_templates",
+      "endpoint": "templates.list_templates",
       "methods": [
         "GET"
       ],
       "rule": "/list_templates"
     },
     {
-      "endpoint": "list_templates_php",
+      "endpoint": "templates.list_templates_php",
       "methods": [
         "GET",
         "POST"
@@ -1314,7 +2259,7 @@
       "rule": "/list_templates.php"
     },
     {
-      "endpoint": "login",
+      "endpoint": "auth.login",
       "methods": [
         "GET",
         "POST"
@@ -1322,7 +2267,7 @@
       "rule": "/login"
     },
     {
-      "endpoint": "login_php",
+      "endpoint": "auth.login_php",
       "methods": [
         "GET",
         "POST"
@@ -1330,14 +2275,14 @@
       "rule": "/login.php"
     },
     {
-      "endpoint": "logout",
+      "endpoint": "auth.logout",
       "methods": [
         "GET"
       ],
       "rule": "/logout"
     },
     {
-      "endpoint": "logout_php",
+      "endpoint": "auth.logout_php",
       "methods": [
         "GET"
       ],
@@ -1365,18 +2310,25 @@
       "rule": "/panel.php"
     },
     {
-      "endpoint": "receiver",
+      "endpoint": "capture_rx.receiver",
       "methods": [
         "POST"
       ],
       "rule": "/receiver"
     },
     {
-      "endpoint": "receiver_php",
+      "endpoint": "capture_rx.receiver_php",
       "methods": [
         "POST"
       ],
       "rule": "/receiver.php"
+    },
+    {
+      "endpoint": "system.serve_sound",
+      "methods": [
+        "GET"
+      ],
+      "rule": "/sounds/<filename>"
     },
     {
       "endpoint": "serve_sound",
@@ -1386,14 +2338,14 @@
       "rule": "/sounds/<filename>"
     },
     {
-      "endpoint": "serve_template_index",
+      "endpoint": "templates.serve_template_index",
       "methods": [
         "GET"
       ],
       "rule": "/t/<name>/"
     },
     {
-      "endpoint": "serve_template_file",
+      "endpoint": "templates.serve_template_file",
       "methods": [
         "GET",
         "POST"
@@ -1401,7 +2353,7 @@
       "rule": "/t/<name>/<path:filename>"
     },
     {
-      "endpoint": "template_handler",
+      "endpoint": "templates.template_handler",
       "methods": [
         "POST"
       ],
@@ -1415,7 +2367,7 @@
       "rule": "/t/<name>/handler.php"
     },
     {
-      "endpoint": "template_post",
+      "endpoint": "templates.template_post",
       "methods": [
         "POST"
       ],
@@ -1429,11 +2381,18 @@
       "rule": "/t/<name>/post.php"
     },
     {
-      "endpoint": "template_upload_php",
+      "endpoint": "templates.template_upload_php",
       "methods": [
         "POST"
       ],
       "rule": "/t/<name>/upload.php"
+    },
+    {
+      "endpoint": "system.serve_video",
+      "methods": [
+        "GET"
+      ],
+      "rule": "/videos/<filename>"
     },
     {
       "endpoint": "serve_video",

@@ -173,7 +173,12 @@ STORE = MemoryStore()
 
 # === Notification fan-out (verbatim from app.py:344-353) ====================
 def send_notification(message_data: Dict[str, Any]) -> None:
-    """Best-effort generic-webhook delivery if Settings.json has a URL."""
+    """Best-effort generic-webhook delivery if Settings.json has a URL.
+
+    P6.3: when the background job worker is running, delivery is queued
+    (non-blocking for the request path); otherwise it falls back to the
+    legacy inline POST.  Delivery itself is unchanged.
+    """
     try:
         import requests as _requests
         if os.path.exists('Settings.json'):
@@ -181,7 +186,13 @@ def send_notification(message_data: Dict[str, Any]) -> None:
                 settings = json.load(f)
             webhook_url = settings.get('generic_webhook')
             if webhook_url:
-                _requests.post(webhook_url, json=message_data)
+                from app.core.jobs import get_queue  # lazy: avoid import cycle
+                _queue_ = get_queue()
+                if _queue_.running:
+                    _queue_.enqueue(_requests.post, webhook_url,
+                                    json=message_data)
+                else:
+                    _requests.post(webhook_url, json=message_data)
     except Exception:
         pass
 
