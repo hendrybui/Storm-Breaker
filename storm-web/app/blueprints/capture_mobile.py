@@ -10,6 +10,7 @@ from app.state import *  # noqa: F401,F403  -- P3
 from app.state import BASE_DIR, CONFIG, _decode_data_url, _save_mobile_capture
 import database as db  # legacy sibling module
 
+import platform
 bp = Blueprint("capture_mobile", __name__,
                template_folder=os.path.join(BASE_DIR, "flask_templates"))
 

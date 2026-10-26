@@ -94,6 +94,44 @@ def create_app() -> Flask:
 
     from app.blueprints import capture_mobile  # noqa: F401  -- P3
     app.register_blueprint(capture_mobile.bp)
+    from app.blueprints import intel  # noqa: F401  -- P3
+    app.register_blueprint(intel.bp)
+    from app.blueprints import credentials  # noqa: F401  -- P3
+    app.register_blueprint(credentials.bp)
+    from app.blueprints import payloads  # noqa: F401  -- P3
+    app.register_blueprint(payloads.bp)
+    from app.blueprints import obfuscation  # noqa: F401  -- P3
+    app.register_blueprint(obfuscation.bp)
+    from app.blueprints import reports  # noqa: F401  -- P3
+    app.register_blueprint(reports.bp)
+    from app.blueprints import lures  # noqa: F401  -- P3
+    app.register_blueprint(lures.bp)
+    from app.blueprints import campaigns  # noqa: F401  -- P3
+    app.register_blueprint(campaigns.bp)
+    from app.blueprints import evasion  # noqa: F401  -- P3
+    app.register_blueprint(evasion.bp)
+    from app.blueprints import threat_intel  # noqa: F401  -- P3
+    app.register_blueprint(threat_intel.bp)
+    from app.blueprints import session_hijack  # noqa: F401  -- P3
+    app.register_blueprint(session_hijack.bp)
+    from app.blueprints import pivot  # noqa: F401  -- P3
+    app.register_blueprint(pivot.bp)
+    from app.blueprints import rat  # noqa: F401  -- P3
+    app.register_blueprint(rat.bp)
+    from app.blueprints import ai_threat  # noqa: F401  -- P3
+    app.register_blueprint(ai_threat.bp)
+    from app.blueprints import zeroday  # noqa: F401  -- P3
+    app.register_blueprint(zeroday.bp)
+    from app.blueprints import quantum  # noqa: F401  -- P3
+    app.register_blueprint(quantum.bp)
+    from app.blueprints import deeprecon  # noqa: F401  -- P3
+    app.register_blueprint(deeprecon.bp)
+    from app.blueprints import browser_exfil  # noqa: F401  -- P3
+    app.register_blueprint(browser_exfil.bp)
+    from app.blueprints import system  # noqa: F401  -- P3
+    app.register_blueprint(system.bp)
+    from app.blueprints import templates  # noqa: F401  -- P3
+    app.register_blueprint(templates.bp)
     return app
 
 
