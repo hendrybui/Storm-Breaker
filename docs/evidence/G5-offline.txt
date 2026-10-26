@@ -1,0 +1,5 @@
+GET /panel -> 200
+external refs: NONE
+local asset refs: 37 | failed: NONE
+OFFLINE RENDER CHECK: PASS
+OFFLINE_EXIT=0

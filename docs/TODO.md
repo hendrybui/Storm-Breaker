@@ -124,10 +124,10 @@ Each task: move only, no logic change; run char suite after each.
 ## TRACK 3 — Delivery
 
 ### P8 Offline frontend
-- [ ] P8.1 generate design tokens (`assets/css/tokens.css`)
-- [ ] P8.2 vendor CDN assets (chart.js, leaflet, tailwind, fontawesome, fonts) → `/assets/vendor/`
-- [ ] P8.3 cache-busting on static refs
-- [ ] P8.4 panel renders with network disabled → **G5** — rollback: restore CDN links
+- [x] P8.1 generate design tokens (`assets/css/tokens.css`)
+- [x] P8.2 vendor CDN assets (chart.js, leaflet, tailwind, fontawesome, fonts) → `/assets/vendor/`
+- [x] P8.3 cache-busting on static refs
+- [x] P8.4 panel renders with network disabled → **G5** — rollback: restore CDN links
 
 ### P9 Tauri shell
 - [ ] P9.1 scaffold `src-tauri/` (Tauri v2) — rollback: delete dir

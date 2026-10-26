@@ -1,0 +1,44 @@
+/* ============================================================
+   Storm-Breaker design tokens (P8.1)
+   Single source of truth for the operator UI palette + type.
+   Values mirror the Tailwind classes the legacy panel uses so
+   progressive adoption never changes rendered appearance.
+   Consumed via CSS custom properties; Tailwind classes remain
+   authoritative until the P11 UI_V2 migration.
+   ============================================================ */
+:root {
+  /* type */
+  --sb-font: 'Outfit', ui-sans-serif, system-ui, sans-serif;
+
+  /* surfaces (tailwind slate/gray dark scale) */
+  --sb-bg: #0a0e17;            /* page background           */
+  --sb-surface: #111827;       /* gray-900  cards / panels  */
+  --sb-surface-2: #1f2937;     /* gray-800  raised / inputs */
+  --sb-border: #374151;        /* gray-700  borders         */
+
+  /* text */
+  --sb-text: #f9fafb;          /* gray-50   primary         */
+  --sb-text-dim: #9ca3af;      /* gray-400  secondary       */
+  --sb-text-faint: #6b7280;    /* gray-500  disabled        */
+
+  /* accents */
+  --sb-accent: #06b6d4;        /* cyan-500  primary action  */
+  --sb-accent-strong: #0891b2; /* cyan-600  hover           */
+  --sb-danger: #ef4444;        /* red-500   destructive     */
+  --sb-danger-strong: #dc2626; /* red-600                   */
+  --sb-warn: #f59e0b;          /* amber-500  warning        */
+  --sb-ok: #10b981;            /* emerald-500 success       */
+  --sb-purple: #8b5cf6;        /* violet-500 intel accents  */
+
+  /* layout */
+  --sb-radius: 0.5rem;
+  --sb-radius-lg: 0.75rem;
+  --sb-sidebar-w: 15rem;
+
+  /* motion */
+  --sb-transition: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body {
+  font-family: var(--sb-font);
+}
