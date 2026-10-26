@@ -1,0 +1,18 @@
+{
+  "body_kind": "json",
+  "content_type": "application/json",
+  "shape": {
+    "key_count": 7,
+    "keys": [
+      "categories",
+      "derived_usernames",
+      "generated_at",
+      "note",
+      "primary_username",
+      "profiles",
+      "total_platforms"
+    ],
+    "type": "object"
+  },
+  "status": 200
+}

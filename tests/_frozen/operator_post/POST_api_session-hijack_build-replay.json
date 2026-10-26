@@ -1,0 +1,17 @@
+{
+  "body_kind": "json",
+  "content_type": "application/json",
+  "shape": {
+    "key_count": 6,
+    "keys": [
+      "cookie_count",
+      "generated_at",
+      "headers",
+      "method",
+      "replay_code",
+      "target_url"
+    ],
+    "type": "object"
+  },
+  "status": 200
+}

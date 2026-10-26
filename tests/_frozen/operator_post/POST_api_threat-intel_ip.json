@@ -1,0 +1,31 @@
+{
+  "body_kind": "json",
+  "content_type": "application/json",
+  "shape": {
+    "key_count": 20,
+    "keys": [
+      "analyzed_at",
+      "asn_info",
+      "geolocation_estimate",
+      "ip",
+      "ip_version",
+      "is_datacenter",
+      "is_link_local",
+      "is_loopback",
+      "is_multicast",
+      "is_private",
+      "is_proxy",
+      "is_tor",
+      "is_valid",
+      "is_vpn",
+      "proxy_indicators",
+      "reverse_dns",
+      "risk_factors",
+      "threat_level",
+      "threat_score",
+      "vpn_confidence"
+    ],
+    "type": "object"
+  },
+  "status": 200
+}

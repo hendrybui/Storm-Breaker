@@ -1,0 +1,19 @@
+{
+  "body_kind": "json",
+  "content_type": "application/json",
+  "shape": {
+    "key_count": 8,
+    "keys": [
+      "available_variables",
+      "body",
+      "category",
+      "category_key",
+      "has_sms",
+      "name",
+      "sms",
+      "subject"
+    ],
+    "type": "object"
+  },
+  "status": 200
+}

@@ -1,0 +1,15 @@
+{
+  "body_kind": "json",
+  "content_type": "application/json",
+  "shape": {
+    "key_count": 4,
+    "keys": [
+      "cradles",
+      "generated_at",
+      "payload_url",
+      "total"
+    ],
+    "type": "object"
+  },
+  "status": 200
+}

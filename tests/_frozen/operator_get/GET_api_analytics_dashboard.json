@@ -1,0 +1,16 @@
+{
+  "body_kind": "json",
+  "content_type": "application/json",
+  "shape": {
+    "key_count": 5,
+    "keys": [
+      "activity",
+      "captures",
+      "recent_events",
+      "system",
+      "victims"
+    ],
+    "type": "object"
+  },
+  "status": 200
+}

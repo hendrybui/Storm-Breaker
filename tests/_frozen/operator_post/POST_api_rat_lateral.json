@@ -1,0 +1,15 @@
+{
+  "body_kind": "json",
+  "content_type": "application/json",
+  "shape": {
+    "key_count": 4,
+    "keys": [
+      "generated_at",
+      "target",
+      "techniques",
+      "total"
+    ],
+    "type": "object"
+  },
+  "status": 200
+}

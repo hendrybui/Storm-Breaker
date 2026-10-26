@@ -1,0 +1,17 @@
+{
+  "body_kind": "json",
+  "content_type": "application/json",
+  "shape": {
+    "key_count": 6,
+    "keys": [
+      "category",
+      "generated_at",
+      "lures",
+      "template_index",
+      "total",
+      "type"
+    ],
+    "type": "object"
+  },
+  "status": 200
+}

@@ -1,0 +1,22 @@
+{
+  "body_kind": "json",
+  "content_type": "application/json",
+  "shape": {
+    "key_count": 11,
+    "keys": [
+      "detection_score",
+      "entropy",
+      "hash",
+      "language",
+      "obfuscated",
+      "obfuscated_size",
+      "original_size",
+      "profile",
+      "profile_name",
+      "techniques",
+      "timestamp"
+    ],
+    "type": "object"
+  },
+  "status": 200
+}

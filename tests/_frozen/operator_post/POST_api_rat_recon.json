@@ -1,0 +1,20 @@
+{
+  "body_kind": "json",
+  "content_type": "application/json",
+  "shape": {
+    "key_count": 9,
+    "keys": [
+      "drives",
+      "environment",
+      "network",
+      "os",
+      "processes",
+      "python",
+      "security",
+      "timestamp",
+      "users"
+    ],
+    "type": "object"
+  },
+  "status": 200
+}

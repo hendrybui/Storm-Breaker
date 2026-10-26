@@ -1,0 +1,20 @@
+{
+  "body_kind": "json",
+  "content_type": "application/json",
+  "shape": {
+    "key_count": 9,
+    "keys": [
+      "body",
+      "category",
+      "char_count",
+      "generated_at",
+      "sms_segments",
+      "subject",
+      "template",
+      "type",
+      "variables_used"
+    ],
+    "type": "object"
+  },
+  "status": 200
+}

@@ -1,0 +1,17 @@
+{
+  "body_kind": "json",
+  "content_type": "application/json",
+  "shape": {
+    "key_count": 6,
+    "keys": [
+      "analyzed_at",
+      "critical_count",
+      "high_count",
+      "jwt_count",
+      "tokens",
+      "total"
+    ],
+    "type": "object"
+  },
+  "status": 200
+}

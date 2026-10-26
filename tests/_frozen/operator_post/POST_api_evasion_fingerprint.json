@@ -1,0 +1,36 @@
+{
+  "body_kind": "json",
+  "content_type": "application/json",
+  "shape": {
+    "key_count": 25,
+    "keys": [
+      "audio_context_hash",
+      "canvas_hash",
+      "color_depth",
+      "consistency_score",
+      "cookies_enabled",
+      "cpu_cores",
+      "device_class",
+      "device_memory",
+      "do_not_track",
+      "font_count",
+      "fonts_detected",
+      "language",
+      "languages",
+      "max_touch_points",
+      "os_family",
+      "pixel_ratio",
+      "platform",
+      "screen_height",
+      "screen_width",
+      "timezone",
+      "timezone_offset",
+      "touch_support",
+      "user_agent",
+      "webgl_renderer",
+      "webgl_vendor"
+    ],
+    "type": "object"
+  },
+  "status": 200
+}

@@ -1,0 +1,16 @@
+{
+  "body_kind": "json",
+  "content_type": "application/json",
+  "shape": {
+    "key_count": 5,
+    "keys": [
+      "cookie_parser",
+      "jwt_analyzer",
+      "replay_builder",
+      "session_assessment",
+      "token_extractor"
+    ],
+    "type": "object"
+  },
+  "status": 200
+}

@@ -1,0 +1,18 @@
+{
+  "body_kind": "json",
+  "content_type": "application/json",
+  "shape": {
+    "key_count": 7,
+    "keys": [
+      "assessed_at",
+      "attack_vectors",
+      "hijack_feasibility",
+      "recommendations",
+      "risk_score",
+      "session_strength",
+      "token_inventory"
+    ],
+    "type": "object"
+  },
+  "status": 200
+}

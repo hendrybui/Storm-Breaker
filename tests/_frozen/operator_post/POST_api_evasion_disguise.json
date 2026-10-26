@@ -1,0 +1,22 @@
+{
+  "body_kind": "json",
+  "content_type": "application/json",
+  "shape": {
+    "key_count": 11,
+    "keys": [
+      "body",
+      "content_type",
+      "encoding",
+      "headers",
+      "jitter_seconds",
+      "method",
+      "profile",
+      "request_hash",
+      "stealth_rating",
+      "timestamp",
+      "url"
+    ],
+    "type": "object"
+  },
+  "status": 200
+}

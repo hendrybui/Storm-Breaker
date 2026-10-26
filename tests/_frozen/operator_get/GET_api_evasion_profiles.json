@@ -1,0 +1,16 @@
+{
+  "body_kind": "json",
+  "content_type": "application/json",
+  "shape": {
+    "key_count": 5,
+    "keys": [
+      "decoy_patterns",
+      "domain_categories",
+      "ja3_profiles",
+      "timing_profiles",
+      "traffic_profiles"
+    ],
+    "type": "object"
+  },
+  "status": 200
+}

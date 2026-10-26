@@ -1,0 +1,16 @@
+{
+  "body_kind": "json",
+  "content_type": "application/json",
+  "shape": {
+    "key_count": 5,
+    "keys": [
+      "attack_graph",
+      "attack_surface",
+      "credential_reuse",
+      "kill_chain",
+      "privesc"
+    ],
+    "type": "object"
+  },
+  "status": 200
+}

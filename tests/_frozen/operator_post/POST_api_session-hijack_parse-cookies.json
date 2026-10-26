@@ -1,0 +1,18 @@
+{
+  "body_kind": "json",
+  "content_type": "application/json",
+  "shape": {
+    "key_count": 7,
+    "keys": [
+      "analyzed_at",
+      "category_summary",
+      "cookies",
+      "high_value_count",
+      "platform_hints",
+      "risk_summary",
+      "total"
+    ],
+    "type": "object"
+  },
+  "status": 200
+}

@@ -1,0 +1,25 @@
+{
+  "body_kind": "json",
+  "content_type": "application/json",
+  "shape": {
+    "key_count": 14,
+    "keys": [
+      "analyzed_at",
+      "breach_estimate",
+      "corporate_domain",
+      "domain",
+      "email",
+      "intelligence_score",
+      "is_corporate",
+      "is_disposable",
+      "is_privacy_provider",
+      "is_valid_format",
+      "local_part",
+      "pattern_analysis",
+      "provider_info",
+      "risk_factors"
+    ],
+    "type": "object"
+  },
+  "status": 200
+}

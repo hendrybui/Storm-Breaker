@@ -1,0 +1,16 @@
+{
+  "body_kind": "json",
+  "content_type": "application/json",
+  "shape": {
+    "key_count": 5,
+    "keys": [
+      "analyzed_at",
+      "categories",
+      "detected_technologies",
+      "security_posture",
+      "total_detected"
+    ],
+    "type": "object"
+  },
+  "status": 200
+}

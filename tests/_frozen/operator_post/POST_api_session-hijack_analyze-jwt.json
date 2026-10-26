@@ -1,0 +1,26 @@
+{
+  "body_kind": "json",
+  "content_type": "application/json",
+  "shape": {
+    "key_count": 15,
+    "keys": [
+      "algorithm",
+      "algorithm_info",
+      "analyzed_at",
+      "claims",
+      "expiry",
+      "header",
+      "hijack_value",
+      "is_expired",
+      "is_valid_jwt",
+      "issued_at",
+      "payload",
+      "raw_token",
+      "signature_present",
+      "token_length",
+      "vulnerabilities"
+    ],
+    "type": "object"
+  },
+  "status": 200
+}

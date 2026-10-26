@@ -1,0 +1,14 @@
+{
+  "body_kind": "json",
+  "content_type": "application/json",
+  "shape": {
+    "key_count": 3,
+    "keys": [
+      "id",
+      "link_code",
+      "status"
+    ],
+    "type": "object"
+  },
+  "status": 200
+}

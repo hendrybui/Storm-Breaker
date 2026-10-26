@@ -1,0 +1,14 @@
+{
+  "body_kind": "json",
+  "content_type": "application/json",
+  "shape": {
+    "key_count": 3,
+    "keys": [
+      "generated_at",
+      "total",
+      "tunnels"
+    ],
+    "type": "object"
+  },
+  "status": 200
+}

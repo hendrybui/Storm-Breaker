@@ -1,0 +1,19 @@
+{
+  "body_kind": "json",
+  "content_type": "application/json",
+  "shape": {
+    "key_count": 8,
+    "keys": [
+      "config_hash",
+      "created_at",
+      "fingerprint",
+      "ja3",
+      "overall_stealth_score",
+      "stealth_grade",
+      "timing",
+      "traffic"
+    ],
+    "type": "object"
+  },
+  "status": 200
+}

@@ -1,0 +1,16 @@
+{
+  "body_kind": "json",
+  "content_type": "application/json",
+  "shape": {
+    "key_count": 5,
+    "keys": [
+      "avg_interval_seconds",
+      "duration_minutes",
+      "pattern",
+      "requests",
+      "total_requests"
+    ],
+    "type": "object"
+  },
+  "status": 200
+}
