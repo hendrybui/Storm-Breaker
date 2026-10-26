@@ -112,12 +112,12 @@ Each task: move only, no logic change; run char suite after each.
 
 ## TRACK 2 — Hardening
 
-- [ ] P7.1 hashed operator password (+verify shim for `config.php`) — rollback: revert
-- [ ] P7.2 CSRF on mutating operator routes only (victims exempt)
-- [ ] P7.3 persist login lockout (survives restart)
-- [ ] P7.4 upload caps + per-type limits
-- [ ] P7.5 retention/rotation job for capture dirs
-- [ ] P7.6 auth/caps tests + audit green → **G4**
+- [x] P7.1 hashed operator password (+verify shim for `config.php`) — rollback: revert
+- [x] P7.2 CSRF on mutating operator routes only (victims exempt)
+- [x] P7.3 persist login lockout (survives restart)
+- [x] P7.4 upload caps + per-type limits
+- [x] P7.5 retention/rotation job for capture dirs
+- [x] P7.6 auth/caps tests + audit green → **G4**
 
 ---
 
