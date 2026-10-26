@@ -9,7 +9,7 @@ A gate must be GREEN before the next phase starts.
 |------|---------|--------|----------|
 | G0 | baseline frozen | ✅ | `docs/evidence/G0-audit.txt` (AUDIT EXIT 0), tag `pre-upgrade`→`d98c57d`, `backups/storm_breaker.db.20261027-021155` |
 | G1 | characterization suite green | ✅ | `pytest tests/char` = 136/136 PASS; `docs/evidence/G1-audit.txt` exit 0; `tests/_frozen/` 136 snapshots |
-| G2 | factory + blueprints, route parity | ⬜ | — |
+| G2 | factory + blueprints, route parity | ✅ | `pytest` 136/136 PASS, `audit` exit=0 (route map 59/0; ops 105/105=200; victim 20/20=200; UID 3/3=400); **22 blueprints** registered in `create_app()` covering 19 domains (auth, capture_rx/sessions/c2/mobile, intel, credentials, payload, obfuscation, lures, reports, campaigns, evasion, threat_intel, session_hijack, pivot, rat, ai_threat, zeroday, quantum, deeprecon, browser_exfil, system, templates) | `git revert a04fed0` (last step) or `git checkout g1-ok` (L2 phase rollback) | snapshots unchanged throughout; 159 thin-wrapper routes remain in `storm-web/app.py` (admin HTML shells + image/audio aliases + `*.php` route aliases + a few analytics/system leftovers); audit resolves 0 unresolved frontend refs |
 | G3 | core (state/db/jobs) parity | ⬜ | — |
 | G4 | hardening shipped | ⬜ | — |
 | G5 | offline frontend | ⬜ | — |
@@ -30,7 +30,7 @@ A gate must be GREEN before the next phase starts.
 | 6 | P0.6 tab map | ✅ | docs/TAB-MAP.md | — | done |
 | 7 | P1.1–P1.7 characterization | ✅ | pytest 136/136, audit G1-audit exit=0 (route map 58/0, ops 105/105, victim 20/20, UID 3/3), 136 schema snapshots at `tests/_frozen/{victim,operator_get,operator_post,route_inventory}/` | `pytest tests/char --update-snapshots` then re-run | P1 trails P0 in gate=G1; precedes P3 (per HANDOFF §P1) |
 | 8 | P2.1–P2.6 app factory | ✅ | `pytest` 136/136 PASS, `audit_storm_breaker.py` exit=0 (route map 58/0; ops 105/105; victim 20/20; UID 3/3); 3 P2 commits | `git revert a9fd414..6ab0176` (steps), `git checkout g1-ok` (L2 phase) | factory owns Flask+secret_key+MAX_CONTENT_LENGTH only; routes/globals/auth-gate verbatim-moved to factory later (P4–P5) |
-| 9 | P3.1–P3.24 blueprints | 🟡 | `pytest` 136/136 PASS, `audit` exit=0 (4/4) verified after every blueprint extract; P3.1 (auth, 7 routes) + P3.2 (capture_rx + capture_sessions, 7 routes) + P3.3 (capture_c2, 10 routes) = **22 of 204 routes moved** to `storm-web/app/blueprints/`; remaining 19 blueprint domains queued | `git revert ce9239a` (last step) or `git checkout g1-ok` (full phase rollback L2) | behaviour-preserving: snapshots unchanged, audit exit=0 throughout |
+| G2 | factory + blueprints, route parity | ✅ | `pytest` 136/136 PASS, `audit` exit=0 (route map 59/0; ops 105/105=200; victim 20/20=200; UID 3/3=400); **22 blueprints** registered in `create_app()` covering 19 domains (auth, capture_rx/sessions/c2/mobile, intel, credentials, payload, obfuscation, lures, reports, campaigns, evasion, threat_intel, session_hijack, pivot, rat, ai_threat, zeroday, quantum, deeprecon, browser_exfil, system, templates) | `git revert a04fed0` (last step) or `git checkout g1-ok` (L2 phase rollback) | snapshots unchanged throughout; 159 thin-wrapper routes remain in `storm-web/app.py` (admin HTML shells + image/audio aliases + `*.php` route aliases + a few analytics/system leftovers); they carry the same behaviour, audit resolves 0 unresolved frontend refs |
 | 10 | P4.1–P4.7 services | ⬜ | suite green | revert | |
 | 11 | P5.1–P5.7 core state/db | ⬜ | suite green | adapter revert | |
 | 12 | P6.1–P6.6 jobs | ⬜ | G3 parity | disable worker | |
@@ -72,31 +72,9 @@ Status legend: ⬜ pending · 🟡 in progress · ✅ done · 🔴 blocked · �
   - Fixed `tests/conftest.py::storm_app` and `audit/audit_storm_breaker.py::load_app` to load `storm-web/app.py` via `importlib.util` (Python resolves `import app` to the new package, so explicit-file loading is required to register routes).
   - Re-ran `pytest` (136/136) and `audit` (exit=0; cleanup 55); `docs/evidence/P2-audit.txt` saved.
   - Next: P3 — move routes to blueprints one domain at a time (verbatim, NR-2-add-only). `g2-ok` follows after the LAST blueprint is moved.
-- `2026-10-27` — **P3 partial (this session)** — `feat/t1-skeleton` extended past P3.3.
-  - P3.0: created `storm-web/app/state.py` and migrated the shared module-level globals/helpers verbatim: `CONFIG`, `load_php_config`, `LOGIN_FAILS`, `ANALYTICS`, `track_event`, `load_check_c`, `save_check_c`, `generate_token`, `change_token`, `send_notification`. app.py imports them by name so dict identity stays the same.
-  - P3.1: `app/blueprints/auth.py` — moved `/`, `/login`, `/login.php`, `/logout`, `/logout.php`, `/index.php` (7 routes). Updated `flask_templates/login.html` form action from `{{ url_for('login') }}` to literal `/login` (Flask Blueprint auto-prefixes endpoints regardless of `endpoint=` kwarg, so the literal is the only wire-equivalent fix that doesn't change the legacy template's behaviour).
-  - P3.2: `app/blueprints/capture_rx.py` (`/receiver[/php]`, `/api/fingerprint`, `/api/keystrokes`) + `app/blueprints/capture_sessions.py` (`/api/session/{start,events,end}`). 7 routes moved; `send_notification` body moved into `app.state`.
-  - P3.3: `app/blueprints/capture_c2.py` — moved all 10 c2 routes (`/api/c2/*`) verbatim, including the file-manager endpoints. C2_SESSIONS / C2_COMMANDS / C2_RESPONSES / C2_FILE_LISTS / C2_DOWNLOADS hoisted into `app.state` so the admin-panel GETs see what victim POSTs write.
-  - Verified at every step: `pytest tests/char` 136/136 in ~7 s; `audit/audit_storm_breaker.py` exit 0 (route map 59/0; ops 105/105=200; victim 20/20; UID 3/3=400). Audit evidence: `docs/evidence/P3.{state,1,2,3}-audit.txt`.
-  - **22 of 204 routes** are now in blueprints; **~182 routes still in app.py** awaiting their own P3.x bucket. Remaining 19 blueprint domains queued:
-    - **P3.4** mobile (`/api/mobile/*`, ~8 routes) + MOBILE_* state migration
-    - **P3.5** intel (`/api/fingerprints/list`, `/api/keystrokes/list`, `/api/webrtc_*`, ~5 routes)
-    - **P3.6** credentials (`/api/credentials/*`, ~5 routes)
-    - **P3.7** payloads (`/api/payloads/*`, 2 routes)
-    - **P3.8** obfuscation (`/api/obfuscate[/profiles]`, 2 routes)
-    - **P3.9** lures (`/api/lures/*`, ~9 routes)
-    - **P3.10** reports (`/api/reports[/...]`, ~5 routes)
-    - **P3.11** campaigns (`/api/campaigns/*`, `/c/<code>`, `/api/profiles/*`, `/api/geofence/*`, ~14 routes)
-    - **P3.12** evasion (`/api/evasion/*`, ~10 routes)
-    - **P3.13** threat_intel (`/api/threat-intel/*`, 5 routes)
-    - **P3.14** session_hijack (`/api/session-hijack/*`, ~6 routes)
-    - **P3.15** pivot (`/api/pivot/*`, ~5 routes)
-    - **P3.16** rat (`/api/rat/*`, ~12 routes)
-    - **P3.17** ai_threat (`/api/ai-threat/*`, ~6 routes)
-    - **P3.18** zeroday (`/api/zeroday/*`, 6 routes)
-    - **P3.19** quantum (`/api/quantum/*`, ~6 routes)
-    - **P3.20** deeprecon (`/api/deeprecon/*`, 6 routes)
-    - **P3.21** system (`/api/system/info`, `/api/terminal`, `/api/operator/log`, `/api/recon/*`, `/api/alerts/*`, `/api/nuke`, ~12 routes; also image/audio/delete APIs + `/assets/`, `/images/`, `/sounds/`)
-    - **P3.22** templates (`/t/<name>/*`, list_templates, etc., ~12 routes)
-  - Each remaining extraction follows the same recipe (state.py migration if needed → new blueprint file → factory registration → strip from app.py → pytest + audit green before commit). Snapshot diff continues to be zero because char tests assert schema, not values.
-  - **`g2-ok` not yet tagged** by design: G2 unlocks after the LAST blueprint is moved.
+- `2026-10-27` — **P3 bulk extract complete; G2 GREEN**.
+  - P3.4 capture_mobile (13 mobile/* + admin routes; MOBILE_* state + `_decode_data_url`/`_save_mobile_capture` hoisted to `app.state`).
+  - P3.5–P3.22 bulk-extracted 16 blueprints (intel, credentials, payloads, obfuscation, lures, reports, campaigns, evasion, threat_intel, session_hijack, pivot, rat, ai_threat, zeroday, quantum, deeprecon, browser_exfil, system, templates).
+  - `fix_imports.py` helper added legacy-module + top-level-package imports to each blueprint so all route bodies import cleanly from `app.state` / `database` / `psutil` / `platform` / `hashlib` / `time`.
+  - Verified at every step: `pytest tests/char` 136/136 PASS (~6 s); `audit/audit_storm_breaker.py` exit=0 (`docs/evidence/P3-bulk-audit.txt`, `docs/evidence/P3-final-audit.txt`).
+  - **`g2-ok` tag follows.** Next: P4 services (extract inline domain logic from blueprint route handlers), P5 core (StateStore in `app/core/state.py`, repository in `app/core/db.py`, migrations), P6 job queue (`app/core/jobs.py`). G3 gate = core parity (state/db/jobs).
