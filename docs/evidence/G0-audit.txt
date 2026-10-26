@@ -1,0 +1,24 @@
+Storm-Breaker audit harness -> http://127.0.0.1:2525
+
+[1] ROUTE MAPPING
+    resolved=58  unresolved=0  template-vars=13
+
+[2] OPERATOR API (authenticated)
+    105/105 returned 200
+
+[3] VICTIM API (no session)
+    20/20 returned 200
+
+[4] UID VALIDATION (corrupt-row guard)
+    all three reject a missing uid with 400
+
+------------------------------------------------------------
+    route mapping      PASS
+    operator api       PASS
+    victim api         PASS
+    uid validation     PASS
+
+[5] CLEANUP
+    removed 33 synthetic record(s)/file(s)
+
+AUDIT PASSED - all features reachable and functional
