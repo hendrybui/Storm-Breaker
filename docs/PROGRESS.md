@@ -8,7 +8,7 @@ A gate must be GREEN before the next phase starts.
 | Gate | Meaning | Status | Evidence |
 |------|---------|--------|----------|
 | G0 | baseline frozen | ✅ | `docs/evidence/G0-audit.txt` (AUDIT EXIT 0), tag `pre-upgrade`→`d98c57d`, `backups/storm_breaker.db.20261027-021155` |
-| G1 | characterization suite green | ⬜ | `tests/char/` |
+| G1 | characterization suite green | ✅ | `pytest tests/char` = 136/136 PASS; `docs/evidence/G1-audit.txt` exit 0; `tests/_frozen/` 136 snapshots |
 | G2 | factory + blueprints, route parity | ⬜ | — |
 | G3 | core (state/db/jobs) parity | ⬜ | — |
 | G4 | hardening shipped | ⬜ | — |
@@ -28,7 +28,7 @@ A gate must be GREEN before the next phase starts.
 | 4 | P0.4 victim contract | ✅ | tests/contract/victim.json | delete | done |
 | 5 | P0.5 ADR-0001/0002 | ✅ | docs/adr/ | — | Option C accepted |
 | 6 | P0.6 tab map | ✅ | docs/TAB-MAP.md | — | done |
-| 7 | P1.1–P1.7 characterization | ⬜ | pytest green | — | MUST precede P3 |
+| 7 | P1.1–P1.7 characterization | ✅ | pytest 136/136, audit G1-audit exit=0 (route map 58/0, ops 105/105, victim 20/20, UID 3/3), 136 schema snapshots at `tests/_frozen/{victim,operator_get,operator_post,route_inventory}/` | `pytest tests/char --update-snapshots` then re-run | P1 trails P0 in gate=G1; precedes P3 (per HANDOFF §P1) |
 | 8 | P2.1–P2.6 app factory | ⬜ | suite green | revert | |
 | 9 | P3.1–P3.24 blueprints | ⬜ | G2 parity | revert per bp | move verbatim |
 | 10 | P4.1–P4.7 services | ⬜ | suite green | revert | |
@@ -57,3 +57,9 @@ Status legend: ⬜ pending · 🟡 in progress · ✅ done · 🔴 blocked · �
   - P0.2 baseline `audit/audit_storm_breaker.py` exit=0; full PASS.
   - P0.3 DB backup `backups/storm_breaker.db.20261027-021155` (md5 verified).
   - Next: P1.x characterization tests, then `g0-ok`.
+- `2026-10-27` — Branch `feat/t1-skeleton` sprouted from tag `g0-ok`. **G1 GREEN**.
+  - P1.1 scaffolded `tests/pytest.ini`, `tests/conftest.py` (live_server + admin_session + storm_app fixtures), `tests/char/{__init__,_helpers,_catalog}.py`, `requirements-dev.txt`.
+  - P1.3-P1.5 added `tests/char/test_{route_inventory,victim,operator_get,operator_post}.py` (136 parametrized cases). Schema-only snapshot helper in `_helpers.py`.
+  - P1.6 captured 136 schema snapshots (route map + 50 operator GET + 55 operator POST + 30 victim) → `tests/_frozen/`. Re-ran `pytest tests/char` 136/136 PASS in 5.95 s. Re-ran `audit/audit_storm_breaker.py` → exit 0. Saved `docs/evidence/G1-audit.txt`.
+  - P1.7 added `tests/char/README.md` (how to add a char test).
+  - Next: P2.x — `create_app()` factory + config + extensions; reduce `app.py` to a shim. Tag `g1-ok` follows.
