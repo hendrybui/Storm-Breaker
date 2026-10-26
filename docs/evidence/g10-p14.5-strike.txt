@@ -1,0 +1,29 @@
+P14.5 verification — strike (generate -> launch -> VERIFY callback); ADDITIVE
+Date: 2026-10-27   Branch: feat/t1-skeleton
+
+1. Full test suite
+   $ python3 -m pytest -q
+   => 242 passed   (237 prior + 5 strike/listener tests)
+
+2. Live strike demo (real processes, real sockets)
+   $ python3 scripts/demo_strike.py
+   => python_reverse -> 127.0.0.1:37225 | callback=VERIFIED | exec_exit=0
+   => bash_reverse   -> 127.0.0.1:43789 | callback=VERIFIED | exec_exit=141
+   (bash exits 141 = SIGPIPE; the strike's ok tracks the CALLBACK, not the exit code)
+
+3. Frozen modules + database.py vs pre-upgrade
+   $ git diff --stat pre-upgrade..HEAD -- <15 modules> storm-web/database.py
+   => EMPTY (byte-identical)
+
+4. Route map vs frozen contract
+   live 201 == frozen 201 ; LOST = [] ; GAINED = []
+
+5. Live audit harness
+   $ bash audit/run_audit.sh
+   => all 4 checks PASS ; "AUDIT PASSED" ; exit=0
+
+6. Operational note
+   Suite + audit must run SERIALLY (both bind :2525) — documented in docs/WORKFLOW.md.
+
+VERDICT: the strike ties adapters -> runner -> verify with no copy-paste and a
+verified callback. Modules, routes, victim contract, DB unchanged. Additive.

@@ -54,6 +54,12 @@ Tauri v2, which needs rustc >= 1.85). The rustup stable toolchain (1.99.1) is th
 reachable via `source ~/.cargo/env`. `src-tauri/rust-toolchain.toml` pins the channel; the build
 script prepends `~/.cargo/bin` so the ambient PATH can't select the system cargo.
 
+## Never run the suite and the audit in parallel
+
+`pytest` (char fixture) and `audit/run_audit.sh` both bind `:2525`. Running them in two
+parallel shells makes one fail to bind and ~42 char tests show false failures. Run them
+**serially**: `pytest` first, then `bash audit/run_audit.sh`.
+
 ## Where things live
 
 | What | Where |

@@ -43,6 +43,7 @@ A gate must be GREEN before the next phase starts.
 | 19 | P14.1 exec/runner.py | ✅ | 8 effect tests green | delete app/exec | execute+capture; never raises |
 | 20 | P14.2 exec/verify.py | ✅ | 8 effect tests green | delete file | tcp/http/file/callback checks |
 | 21 | P14.4 adapters (registry+catalog) | ✅ | 10 tests green; 15/15 modules, 48 actions | delete app/adapters | wraps frozen modules, no edits |
+| 22 | P14.5 strike (generate→launch→verify) | ✅ | 5 tests; live callback VERIFIED | delete app/exec/{listener,strike}.py | real launch; callback is the truth |
 
 Status legend: ⬜ pending · 🟡 in progress · ✅ done · 🔴 blocked · ⏪ rolled back
 
@@ -59,6 +60,7 @@ Status legend: ⬜ pending · 🟡 in progress · ✅ done · 🔴 blocked · �
 - `2026-10-27` — Receiving-agent session start (this run). Branch `feat/t0-safety-net` from `d98c57d`. **G0 GREEN**.
   - P0.1 annotated tag `pre-upgrade` → `d98c57d` (tag-object `6f67ca5c`).
 - `2026-10-27` — Track 5 P14.4 adapters (registry+catalog; 15 modules / 48 actions; 10 tests). Suite 237 green; routes 201/201; audit PASS. ADDITIVE.
+- `2026-10-27` — Track 5 P14.5 strike (listener + strike; generate→launch→VERIFY callback; 5 tests). Suite 242 green; live callbacks VERIFIED; routes 201/201; audit PASS. ADDITIVE.
   - P0.2 baseline `audit/audit_storm_breaker.py` exit=0; full PASS.
   - P0.3 DB backup `backups/storm_breaker.db.20261027-021155` (md5 verified).
   - Next: P1.x characterization tests, then `g0-ok`.
