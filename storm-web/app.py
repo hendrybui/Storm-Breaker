@@ -30,7 +30,6 @@ PHP_CONFIG_PATH = os.path.join(BASE_DIR, 'config.php')
 # dict / function in app.state.
 from app.state import (
     CONFIG,
-    LOGIN_FAILS as _LOGIN_FAILS,
     ANALYTICS,
     STORE,
     WEBRTC_LEAKS, RECON_CONFIG,
@@ -82,14 +81,15 @@ def _auth_gate():
 
 # ===== login brute-force lockout (fix: public URL + default creds) =====
 import time as _time
-# _LOGIN_FAILS now imported from app.state (above). Keep local name for the
-# decorator bodies below verbatim.
+# P7.3: lockout state is persisted in the operator DB (login_lockouts
+# table, applied by the additive migration) so it survives restarts.
+from app.core import lockout as _lockout
 
 @app.before_request
 def _login_throttle():
     if request.path in ('/login', '/login.php') and request.method == 'POST':
         ip = (request.headers.get('X-Forwarded-For') or request.remote_addr or '?').split(',')[0].strip()
-        rec = _LOGIN_FAILS.get(ip)
+        rec = _lockout.get(ip)  # P7.3: persisted (survives restart)
         if rec and rec[1] > _time.time():
             return jsonify({'error': 'Too many failed attempts; locked 60s'}), 429
 
@@ -98,13 +98,13 @@ def _login_throttle_track(resp):
     if request.path in ('/login', '/login.php') and request.method == 'POST':
         ip = (request.headers.get('X-Forwarded-For') or request.remote_addr or '?').split(',')[0].strip()
         if resp.status_code in (301, 302):
-            _LOGIN_FAILS.pop(ip, None)
+            _lockout.pop(ip)
         else:
-            fails, until = _LOGIN_FAILS.get(ip, (0, 0))
+            fails, until = _lockout.get(ip) or (0, 0)
             if until and until <= _time.time():
                 fails = 0
             fails += 1
-            _LOGIN_FAILS[ip] = (fails, (_time.time() + 60) if fails >= 5 else 0)
+            _lockout.set(ip, fails, (_time.time() + 60) if fails >= 5 else 0)
     return resp
 
 

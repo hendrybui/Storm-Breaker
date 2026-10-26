@@ -73,8 +73,11 @@ def create_app() -> Flask:
     app = Flask(__name__, static_folder=STATIC_FOLDER,
                 template_folder=TEMPLATE_FOLDER)
     app.secret_key = _load_or_create_secret_key()
-    # Disable upload size limit completely (verbatim from app.py:43).
-    app.config["MAX_CONTENT_LENGTH"] = None
+    # P7.4: upload caps (was app.py's verbatim MAX_CONTENT_LENGTH = None).
+    # P7.2: session-cookie hardening + Origin/Referer CSRF gate for
+    # operator-authenticated mutating requests (victims exempt).
+    from app.core.hardening import register_hardening
+    register_hardening(app)
     app.config["PORT"] = int(os.environ.get("STORM_WEB_PORT", DEFAULT_PORT))
     app.config["HOST"] = os.environ.get("STORM_WEB_HOST", DEFAULT_HOST)
 
@@ -146,6 +149,16 @@ def create_app() -> Flask:
         app.config["SCHEMA_VERSION"] = _mig.get("schema_version", 1)
     except Exception:  # pragma: no cover -- degraded (read-only FS) startup
         app.config["SCHEMA_VERSION"] = None
+
+    # ----------------------------------------------------------------------------
+    # P7.5: capture-dir retention daemon (hourly; STORM_RETENTION_DAYS=0
+    # disables deletion entirely; first pass delayed 60s).
+    # ----------------------------------------------------------------------------
+    try:
+        from app.core.retention import start_retention_worker
+        start_retention_worker()
+    except Exception:  # pragma: no cover -- never block boot on this
+        pass
 
     return app
 

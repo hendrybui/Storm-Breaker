@@ -71,6 +71,25 @@ def apply_pragmas(conn: sqlite3.Connection) -> List[str]:
     return applied
 
 
+# Additive tables (P7.3): persistent login brute-force lockout.
+TABLES = [
+    """CREATE TABLE IF NOT EXISTS login_lockouts (
+        ip TEXT PRIMARY KEY,
+        fails INTEGER NOT NULL DEFAULT 0,
+        until REAL NOT NULL DEFAULT 0
+    )""",
+]
+
+
+def apply_tables(conn: sqlite3.Connection) -> List[str]:
+    """Create every additive table that does not exist yet."""
+    created: List[str] = []
+    for ddl in TABLES:
+        conn.execute(ddl)
+        created.append(ddl.split("IF NOT EXISTS ", 1)[1].split(" ", 1)[0])
+    return created
+
+
 def apply_indexes(conn: sqlite3.Connection) -> List[str]:
     """Create every index in ``INDEXES`` that does not exist yet."""
     created: List[str] = []
@@ -97,6 +116,7 @@ def migrate(db_path: str = None) -> dict:
     conn = sqlite3.connect(target)
     try:
         applied["pragmas"] = apply_pragmas(conn)
+        applied["tables"] = apply_tables(conn)
         applied["indexes"] = apply_indexes(conn)
         conn.commit()
     finally:

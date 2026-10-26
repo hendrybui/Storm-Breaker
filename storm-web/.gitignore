@@ -24,6 +24,7 @@ videos/
 Settings.json
 check-c.json
 secret_key.bin
+operator_auth.json
 
 # Live database + SQLite WAL sidecars (runtime state; backups/ is the archive)
 storm_breaker.db

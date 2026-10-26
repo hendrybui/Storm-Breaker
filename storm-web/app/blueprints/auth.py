@@ -51,7 +51,11 @@ def login():
         password = request.form.get('password')
         # config.php credentials (see app.state.CONFIG); loaded once at
         # import time of storm-web/app/state.py.
-        if username in CONFIG and CONFIG[username]['password'] == password:
+        # P7.1: a per-user PBKDF2 hash in operator_auth.json wins over the
+        # legacy plaintext compare (fallback keeps config.php deployments
+        # and the audit harness working unchanged).
+        from app.core.passwords import check_operator_login
+        if check_operator_login(username, password, CONFIG):
             session['IAm-logined'] = username
             return redirect('/panel')
         else:
