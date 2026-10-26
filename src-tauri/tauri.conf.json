@@ -33,7 +33,7 @@
     "targets": ["deb", "appimage"],
     "icon": ["icons/icon.png"],
     "resources": {
-      "../sidecar/storm-breaker-backend/": "sidecar/storm-breaker-backend/"
+      "sidecar/storm-breaker-backend/": "sidecar/storm-breaker-backend/"
     }
   }
 }

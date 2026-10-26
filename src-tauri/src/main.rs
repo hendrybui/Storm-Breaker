@@ -11,16 +11,27 @@
 // to the app instead of a per-run temp extraction dir.
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+use std::sync::Mutex;
+
 use tauri::{
     Manager, RunEvent,
     menu::{Menu, MenuItem},
     tray::TrayIconBuilder,
 };
-use tauri_plugin_shell::process::CommandEvent;
+use tauri_plugin_shell::process::{CommandChild, CommandEvent};
 use tauri_plugin_shell::ShellExt;
 
 /// Handle to the running sidecar child, so we can stop it on exit (P9.3).
-struct SidecarChild(tauri_plugin_shell::process::CommandChild);
+/// `Mutex<Option<_>>` because `CommandChild::kill` consumes ownership.
+struct SidecarChild(Mutex<Option<CommandChild>>);
+
+fn stop_sidecar(app: &tauri::AppHandle) {
+    if let Some(state) = app.try_state::<SidecarChild>() {
+        if let Some(child) = state.0.lock().expect("sidecar lock").take() {
+            let _ = child.kill();
+        }
+    }
+}
 
 fn sidecar_exe(app: &tauri::AppHandle) -> std::path::PathBuf {
     let dir = app
@@ -41,7 +52,7 @@ fn main() {
             let (mut rx, child) = sidecar
                 .spawn()
                 .expect("failed to start storm-breaker-backend sidecar");
-            app.manage(SidecarChild(child));
+            app.manage(SidecarChild(Mutex::new(Some(child))));
 
             // pipe sidecar stdout/stderr into this process' log
             tauri::async_runtime::spawn(async move {
@@ -77,9 +88,7 @@ fn main() {
                     }
                     "quit" => {
                         // stop the sidecar, then exit for real
-                        if let Some(state) = app.try_state::<SidecarChild>() {
-                            let _ = state.0.kill();
-                        }
+                        stop_sidecar(app);
                         app.exit(0);
                     }
                     _ => {}
@@ -101,9 +110,7 @@ fn main() {
         .run(|app_handle, event| {
             if let RunEvent::Exit = event {
                 // P9.3: make sure the sidecar never outlives the shell
-                if let Some(state) = app_handle.try_state::<SidecarChild>() {
-                    let _ = state.0.kill();
-                }
+                stop_sidecar(app_handle);
             }
         });
 }

@@ -132,13 +132,12 @@ Each task: move only, no logic change; run char suite after each.
 ### P9 Tauri shell
 - [x] P9.1 scaffold `src-tauri/` (Tauri v2) — rollback: delete dir
 - [x] P9.2 PyInstaller sidecar of the backend
-- [~] P9.3 app boots/stops sidecar; window → `localhost:2525` — code complete in `src-tauri/src/main.rs`; runtime verification pending first `cargo build` (toolchain)
-- [~] P9.4 system tray + start/stop — code complete (tray Show/Quit, close→hide, exit kills sidecar); runtime verification pending build
+- [x] P9.3 app boots/stops sidecar; window → `localhost:2525` (verified live: app spawned sidecar, audit through it PASS)
+- [x] P9.4 system tray + start/stop (verified: tray Show/Quit, close→hide, quit kills sidecar)
 - [x] P9.5 capabilities/CSP lockdown — rollback: relax CSP
-- [ ] P9.6 installers build for host OS; audit green → **G6**
-      BLOCKER (documented): system rustc 1.75 < Tauri v2 MSRV; a dep needs cargo ≥1.85 (`edition2024`).
-      Fix: install rustup → `rustup update stable` → `bash scripts/build_sidecar.sh` → `cd src-tauri && cargo build --release` (deb/appimage via `cargo tauri build`).
-      Sidecar audit ALREADY green against the packaged binary (`docs/evidence/G6-sidecar-audit.txt`).
+- [x] P9.6 installers build for host OS; audit green → **G6**
+      `Storm-Breaker_1.0.0_amd64.deb` (24.88 MiB) via rustup stable + `tauri build --bundles deb`.
+      Known edge (documented): SIGTERM to the shell bypasses the exit hook — use tray Quit; systemd units should set KillMode=control-group.
 
 ### P10 Realtime + native
 - [ ] P10.1 operator push channel (IPC/WS); keep HTTP poll as fallback
