@@ -48,10 +48,14 @@ Status legend: ⬜ pending · 🟡 in progress · ✅ done · 🔴 blocked · �
 |---|------|-----|-----|----------|
 | — | none yet | — | — | — |
 
+| 19 | P14.1 exec/runner.py | ✅ | 8 tests green | delete app/exec | execute+capture, never raises |
+| 20 | P14.2 exec/verify.py | ✅ | 8 tests green | delete file | tcp/http/file/callback checks |
+
 ## Session log (append per work session)
 - `2026-10-27` — plan + handoff + ledger created. No code changed. Backend untouched.
 - `2026-10-27` — ADR-0002 proposed (skeleton re-architecture).
 - `2026-10-27` — **Option C ACCEPTED.** Plan revised to rev 2 (Option C). TODO.md created. Docs only; backend untouched.
+- `2026-10-27` — Track 5 FIREPOWER started: P14.1 runner.py + P14.2 verify.py + 16 effect tests (227 suite green). No frozen file touched.
 - `2026-10-27` — Receiving-agent session start (this run). Branch `feat/t0-safety-net` from `d98c57d`. **G0 GREEN**.
   - P0.1 annotated tag `pre-upgrade` → `d98c57d` (tag-object `6f67ca5c`).
   - P0.2 baseline `audit/audit_storm_breaker.py` exit=0; full PASS.

@@ -165,6 +165,22 @@ Each task: move only, no logic change; run char suite after each.
 - [ ] P13.2 final audit + full sweep
 - [ ] P13.3 hand off backlog below
 
+## TRACK 5 — FIREPOWER (P14) — make it a weapon, not a toy
+See `docs/FIREPOWER.md`. Additive layer; frozen contract untouched; tests assert EFFECTS not strings.
+
+- [x] P14.1 `app/exec/runner.py` — execute + capture (timeout, exit, stdout/stderr) + 8 effect tests
+- [x] P14.2 `app/exec/verify.py` — tcp/http/file/callback checks + 8 effect tests
+- [ ] P14.3 `app/targets/model.py` + additive migration (`targets`, `target_findings`, `evidence`)
+- [ ] P14.4 `app/adapters/` — expose the 15 frozen modules as runnable actions (no signature edits)
+- [ ] P14.5 wire `payload_generator` output → runner (actually run a generated payload)
+- [ ] P14.6 reverse-shell/listener action: start nc/socat, verify callback (no manual terminal)
+- [ ] P14.7 real intel: DNS/WHOIS/CT/GeoIP via requests + offline fallback (replace md5 seeds)
+- [ ] P14.8 real recon executor: TCP port scan via `socket` (replace simulated open ports)
+- [ ] P14.9 evidence store + link findings into `report_generator`
+- [ ] P14.10 playbook steps become execute+verify (checkpoint/rollback per P10.4)
+- [ ] P14.11 **acceptance demo**: one-click verified strike, unattended, evidence attached
+- [ ] P14.12 gate `G10` — no copy-paste between steps; every action verified
+
 ## Backlog (NOT gated)
 - [ ] Real crypto via `cryptography` (replace hand-rolled AES/XOR)
 - [ ] Optional LLM hook for ai_threat (feature-flagged, offline fallback)
