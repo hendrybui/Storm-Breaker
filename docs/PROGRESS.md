@@ -1,0 +1,59 @@
+# PROGRESS — Storm-Breaker Professional Re-architecture (Option C)
+
+Append-only ledger. Never edit a past row — add a new one. Every row cites evidence + rollback.
+A gate must be GREEN before the next phase starts.
+
+## Gate Status
+
+| Gate | Meaning | Status | Evidence |
+|------|---------|--------|----------|
+| G0 | baseline frozen | ✅ | `docs/evidence/G0-audit.txt` (AUDIT EXIT 0), tag `pre-upgrade`→`d98c57d`, `backups/storm_breaker.db.20261027-021155` |
+| G1 | characterization suite green | ⬜ | `tests/char/` |
+| G2 | factory + blueprints, route parity | ⬜ | — |
+| G3 | core (state/db/jobs) parity | ⬜ | — |
+| G4 | hardening shipped | ⬜ | — |
+| G5 | offline frontend | ⬜ | — |
+| G6 | Tauri shell + sidecar | ⬜ | — |
+| G7 | realtime + native | ⬜ | — |
+| G8 | panel parity (UI_V2) | ⬜ | — |
+| G9 | signed packaging | ⬜ | — |
+
+## Ledger
+
+| # | Step | Status | Evidence | Rollback | Notes |
+|---|------|--------|----------|----------|-------|
+| 1 | P0.1 tag `pre-upgrade` | ✅ | tag-object `6f67ca5c` → commit `d98c57d` (annotated) | `git tag -d pre-upgrade` | tags the pre-re-architecture baseline |
+| 2 | P0.2 baseline audit | ✅ | `docs/evidence/G0-audit.txt` → exit=0; route-mapping 58/0 unresolved, operator 105/105=200, victim 20/20=200, UID guard 3/3=400, cleanup 33 | re-run `audit/audit_storm_breaker.py --url http://127.0.0.1:2525` | AUDIT PASSED — all features reachable on `app.run(host=0.0.0.0, port=2525)` |
+| 3 | P0.3 DB backup | ✅ | `backups/storm_breaker.db.20261027-021155` (md5 `41e54189...`) md5-matches live `storm-web/storm_breaker.db` | `cp backups/storm_breaker.db.20261027-021155 storm-web/storm_breaker.db` | SHA verified at backup time; 196608 B |
+| 4 | P0.4 victim contract | ✅ | tests/contract/victim.json | delete | done |
+| 5 | P0.5 ADR-0001/0002 | ✅ | docs/adr/ | — | Option C accepted |
+| 6 | P0.6 tab map | ✅ | docs/TAB-MAP.md | — | done |
+| 7 | P1.1–P1.7 characterization | ⬜ | pytest green | — | MUST precede P3 |
+| 8 | P2.1–P2.6 app factory | ⬜ | suite green | revert | |
+| 9 | P3.1–P3.24 blueprints | ⬜ | G2 parity | revert per bp | move verbatim |
+| 10 | P4.1–P4.7 services | ⬜ | suite green | revert | |
+| 11 | P5.1–P5.7 core state/db | ⬜ | suite green | adapter revert | |
+| 12 | P6.1–P6.6 jobs | ⬜ | G3 parity | disable worker | |
+| 13 | P7.1–P7.6 hardening | ⬜ | G4 | flag off | |
+| 14 | P8.1–P8.4 offline | ⬜ | G5 | restore CDN | |
+| 15 | P9.1–P9.6 tauri shell | ⬜ | G6 | delete src-tauri | |
+| 16 | P10.1–P10.5 realtime | ⬜ | G7 latency<300ms | use poll | |
+| 17 | P11.1–P11.32 panel | ⬜ | G8 parity | flag off | |
+| 18 | P12.1–P12.4 packaging | ⬜ | G9 signed | disable CI | |
+
+Status legend: ⬜ pending · 🟡 in progress · ✅ done · 🔴 blocked · ⏪ rolled back
+
+## BREAKING changes
+| # | What | Old | New | Approved |
+|---|------|-----|-----|----------|
+| — | none yet | — | — | — |
+
+## Session log (append per work session)
+- `2026-10-27` — plan + handoff + ledger created. No code changed. Backend untouched.
+- `2026-10-27` — ADR-0002 proposed (skeleton re-architecture).
+- `2026-10-27` — **Option C ACCEPTED.** Plan revised to rev 2 (Option C). TODO.md created. Docs only; backend untouched.
+- `2026-10-27` — Receiving-agent session start (this run). Branch `feat/t0-safety-net` from `d98c57d`. **G0 GREEN**.
+  - P0.1 annotated tag `pre-upgrade` → `d98c57d` (tag-object `6f67ca5c`).
+  - P0.2 baseline `audit/audit_storm_breaker.py` exit=0; full PASS.
+  - P0.3 DB backup `backups/storm_breaker.db.20261027-021155` (md5 verified).
+  - Next: P1.x characterization tests, then `g0-ok`.
