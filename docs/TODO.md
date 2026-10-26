@@ -83,9 +83,9 @@ Each task: move only, no logic change; run char suite after each.
 - [x] P4.1 `services/capture.py` (ingest image/audio/keystroke/fingerprint/geo)
 - [x] P4.2 `services/c2.py`
 - [x] P4.3 `services/mobile.py`
-- [ ] P4.4 `services/intel.py` (profiles, credentials, webrtc)
-- [ ] P4.5 `services/artifacts.py` (reports, lures, payloads)
-- [ ] P4.6 `services/osint.py` (threat-intel, deeprecon, pivot, session-hijack)
+- [x] P4.4 `services/intel.py` (profiles, credentials, webrtc)
+- [x] P4.5 `services/artifacts.py` (reports, lures, payloads)
+- [x] P4.6 `services/osint.py` (threat-intel, deeprecon, pivot, session-hijack)
 - [x] P4.7 char suite green
 
 ### P5 Core (state / db / migrations)
@@ -98,12 +98,15 @@ Each task: move only, no logic change; run char suite after each.
 - [x] P5.7 char suite green
 
 ### P6 Job queue
-- [ ] P6.1 `core/jobs.py` queue abstraction
-- [ ] P6.2 worker thread with graceful start/stop
-- [ ] P6.3 move notifications (webhook/telegram) off request path
-- [ ] P6.4 move credential scan / report gen off request path
-- [ ] P6.5 additive job-status API
-- [ ] P6.6 char suite + audit green → **G3 core parity**
+- [x] P6.1 `core/jobs.py` queue abstraction
+- [x] P6.2 worker thread with graceful start/stop
+- [x] P6.3 move notifications (webhook/telegram) off request path
+- [x] P6.4 move credential scan / report gen off request path
+- [x] P6.5 additive job-status API
+- [x] P6.6 char suite + audit green → **G3 core parity**
+
+### P3 completion debt (recorded 2026-10-27, see PROGRESS FINDING 1)
+- [ ] P3.23 drain residual `app.py` routes: ~134 dead duplicate registrations + ~25 routes served only from app.py → blueprints, verbatim (char inventory protects; rollback: git checkout g3-ok)
 
 ---
 
