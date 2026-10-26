@@ -1,0 +1,4 @@
+# Development / characterization-test only (not required by the runtime backend).
+# Install: `pip install -r requirements-dev.txt`
+pytest>=8
+requests>=2.31

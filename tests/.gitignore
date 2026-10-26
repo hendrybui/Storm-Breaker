@@ -1,0 +1,3 @@
+# Server logs written by the live_server fixture during a char-test run.
+# Kept out of git because the content churns every test invocation.
+_server.log
