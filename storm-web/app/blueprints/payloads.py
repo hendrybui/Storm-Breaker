@@ -11,6 +11,7 @@ from app.state import BASE_DIR, CONFIG, _decode_data_url, _save_mobile_capture
 import database as db
 
 from payload_generator import PAYLOAD_TYPES
+from app.services import artifacts as artifactsvc
 bp = Blueprint("payloads", __name__,
                template_folder=os.path.join(BASE_DIR, "flask_templates"))
 
@@ -18,7 +19,7 @@ bp = Blueprint("payloads", __name__,
 @bp.route('/api/payloads/types')
 def payloads_types():
     """Get available payload types"""
-    return jsonify({'types': PAYLOAD_TYPES})
+    return jsonify({'types': artifactsvc.payload_types()})
 
 @bp.route('/api/payloads/generate', methods=['POST'])
 def payloads_generate():
@@ -34,7 +35,7 @@ def payloads_generate():
             'obfuscate': data.get('obfuscate', False),
         }
         
-        result = generate_payload(payload_type, config)
+        result = artifactsvc.generate_payload(payload_type, config)
         if 'error' in result:
             return jsonify(result), 400
         

@@ -9,6 +9,7 @@ from flask import (Blueprint, request, jsonify, redirect, url_for, render_templa
 from app.state import *  # noqa: F401,F403  -- P3
 from app.state import BASE_DIR, CONFIG, _decode_data_url, _save_mobile_capture
 import database as db
+from app.services import artifacts as artifactsvc
 
 bp = Blueprint("reports", __name__,
                template_folder=os.path.join(BASE_DIR, "flask_templates"))
@@ -18,7 +19,7 @@ bp = Blueprint("reports", __name__,
 def api_generate_report():
     if 'IAm-logined' not in session:
         return jsonify({'error': 'Not authenticated'}), 401
-    from report_generator import generate_report
+    from report_generator import generate_report  # noqa: F401  -- P6.4 moves gen off request path
     data = request.json or {}
     config = {
         'title': data.get('title', 'Storm-Breaker Penetration Test Report'),
@@ -28,42 +29,21 @@ def api_generate_report():
         'date': data.get('date', datetime.now().strftime('%Y-%m-%d')),
         'classification': data.get('classification', 'CONFIDENTIAL'),
     }
-    result = generate_report(config)
-    # Save to database
-    report_id = db.save_report(
-        name=config['title'],
-        report_type=data.get('type', 'full'),
-        config=config,
-        html_content=result['html'],
-        stats=result['stats'],
-    )
-    db.log_operator_action(session.get('IAm-logined', 'unknown'), 'generate_report',
-                           f'Generated report: {config["title"]}', request.remote_addr)
-    return jsonify({'id': report_id, 'stats': result['stats'], 'generated_at': result['generated_at']})
+    return jsonify(artifactsvc.create_report(
+        config, data.get('type', 'full'),
+        session.get('IAm-logined', 'Operator'), request.remote_addr))
 
 @bp.route('/api/reports')
 def api_list_reports():
     if 'IAm-logined' not in session:
         return jsonify({'error': 'Not authenticated'}), 401
-    reports = db.get_reports()
-    for r in reports:
-        if isinstance(r.get('stats'), str):
-            try:
-                r['stats'] = json.loads(r['stats'])
-            except Exception:
-                pass
-        if isinstance(r.get('config'), str):
-            try:
-                r['config'] = json.loads(r['config'])
-            except Exception:
-                pass
-    return jsonify({'reports': reports})
+    return jsonify({'reports': artifactsvc.list_reports()})
 
 @bp.route('/api/reports/<int:report_id>')
 def api_get_report(report_id):
     if 'IAm-logined' not in session:
         return jsonify({'error': 'Not authenticated'}), 401
-    report = db.get_report(report_id)
+    report = artifactsvc.get_report(report_id)
     if not report:
         return jsonify({'error': 'Report not found'}), 404
     return jsonify(report)
@@ -72,7 +52,7 @@ def api_get_report(report_id):
 def api_view_report(report_id):
     if 'IAm-logined' not in session:
         return redirect('/login')
-    report = db.get_report(report_id)
+    report = artifactsvc.get_report(report_id)
     if not report:
         return 'Report not found', 404
     return Response(report['html_content'], mimetype='text/html')
@@ -81,5 +61,5 @@ def api_view_report(report_id):
 def api_delete_report(report_id):
     if 'IAm-logined' not in session:
         return jsonify({'error': 'Not authenticated'}), 401
-    db.delete_report(report_id)
+    artifactsvc.delete_report(report_id)
     return jsonify({'status': 'deleted'})
