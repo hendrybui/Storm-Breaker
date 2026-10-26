@@ -10,7 +10,8 @@ One page. If a task doesn't fit this loop, stop and update this file first.
                                                              tests/unit = new code)
 3. CODE     move code VERBATIM (NR-2); improvements are P7+ only
 4. VERIFY   python3 -m pytest -q                → all green (char + unit)
-            python3 audit/audit_storm_breaker.py --url http://127.0.0.1:2525 → exit 0
+            bash audit/run_audit.sh             → starts backend if needed,
+              (or --stop)                         runs harness, exit 0 = PASS
             git diff -- storm-web/app.py | grep -E '^-.*@app.route' → investigate
 5. LEDGER   docs/PROGRESS.md row (append-only) + evidence file in docs/evidence/
 6. COMMIT   p<phase>.<step>: <action> [gate=Gx]
