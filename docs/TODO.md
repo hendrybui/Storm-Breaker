@@ -106,7 +106,7 @@ Each task: move only, no logic change; run char suite after each.
 - [x] P6.6 char suite + audit green → **G3 core parity**
 
 ### P3 completion debt (recorded 2026-10-27, see PROGRESS FINDING 1)
-- [ ] P3.23 drain residual `app.py` routes: ~134 dead duplicate registrations + ~25 routes served only from app.py → blueprints, verbatim (char inventory protects; rollback: git checkout g3-ok)
+- [x] P3.23 drain residual `app.py` routes: ~134 dead duplicate registrations + ~25 routes served only from app.py → blueprints, verbatim (char inventory protects; rollback: git checkout g3-ok)
 
 ---
 
