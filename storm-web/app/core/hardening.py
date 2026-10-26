@@ -39,6 +39,29 @@ UPLOAD_TYPE_LIMITS = {
 
 SAFE_METHODS = {'GET', 'HEAD', 'OPTIONS'}
 
+# P9.5: Content-Security-Policy for operator HTML pages.  'unsafe-inline'
+# is required by the legacy panel (tailwind play runtime + inline blocks);
+# everything external is already vendored (P8), so this kills any
+# remaining external-load / framing vector.
+CSP_POLICY = (
+    "default-src 'self'; "
+    "script-src 'self' 'unsafe-inline'; "
+    "style-src 'self' 'unsafe-inline'; "
+    "img-src 'self' data: blob:; "
+    "font-src 'self'; "
+    "connect-src 'self'; "
+    "object-src 'none'; "
+    "base-uri 'self'; "
+    "frame-ancestors 'none'"
+)
+
+
+def csp_header(resp):
+    """Attach the CSP to HTML responses only (API shapes untouched)."""
+    if resp.mimetype == 'text/html':
+        resp.headers.setdefault('Content-Security-Policy', CSP_POLICY)
+    return resp
+
 
 def _header_host(header_value: str) -> str:
     """Extract the host from an Origin/Referer header value."""
@@ -102,6 +125,7 @@ def register_hardening(app: Flask, max_upload_mb: int = None) -> None:
     app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
     app.before_request(upload_cap_gate)   # cheap check first
     app.before_request(csrf_gate)
+    app.after_request(csp_header)         # P9.5: CSP on HTML responses
 
 
 __all__ = [

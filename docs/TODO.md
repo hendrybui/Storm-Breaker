@@ -130,12 +130,15 @@ Each task: move only, no logic change; run char suite after each.
 - [x] P8.4 panel renders with network disabled → **G5** — rollback: restore CDN links
 
 ### P9 Tauri shell
-- [ ] P9.1 scaffold `src-tauri/` (Tauri v2) — rollback: delete dir
-- [ ] P9.2 PyInstaller sidecar of the backend
-- [ ] P9.3 app boots/stops sidecar; window → `localhost:2525`
-- [ ] P9.4 system tray + start/stop
-- [ ] P9.5 capabilities/CSP lockdown — rollback: relax CSP
+- [x] P9.1 scaffold `src-tauri/` (Tauri v2) — rollback: delete dir
+- [x] P9.2 PyInstaller sidecar of the backend
+- [~] P9.3 app boots/stops sidecar; window → `localhost:2525` — code complete in `src-tauri/src/main.rs`; runtime verification pending first `cargo build` (toolchain)
+- [~] P9.4 system tray + start/stop — code complete (tray Show/Quit, close→hide, exit kills sidecar); runtime verification pending build
+- [x] P9.5 capabilities/CSP lockdown — rollback: relax CSP
 - [ ] P9.6 installers build for host OS; audit green → **G6**
+      BLOCKER (documented): system rustc 1.75 < Tauri v2 MSRV; a dep needs cargo ≥1.85 (`edition2024`).
+      Fix: install rustup → `rustup update stable` → `bash scripts/build_sidecar.sh` → `cd src-tauri && cargo build --release` (deb/appimage via `cargo tauri build`).
+      Sidecar audit ALREADY green against the packaged binary (`docs/evidence/G6-sidecar-audit.txt`).
 
 ### P10 Realtime + native
 - [ ] P10.1 operator push channel (IPC/WS); keep HTTP poll as fallback

@@ -22,3 +22,11 @@ audit/restart_after_reboot.sh
 
 # --- ephemeral recon / working data ------------------------------------------------
 storm-web/crtsh.txt
+
+# --- P9 packaging: binary payloads & build outputs (rebuild via scripts/) ----------
+src-tauri/target/
+src-tauri/sidecar/
+src-tauri/gen/
+dist/
+build/
+*.spec.bak

@@ -95,3 +95,26 @@ def test_per_type_limit_gate_allows_small(app):
             '/api/fingerprint', method='POST',
             environ_base={'CONTENT_LENGTH': '256'}):
         assert upload_cap_gate() is None
+
+
+# -- P9.5: CSP on HTML responses ------------------------------------------------
+def test_csp_header_on_html(app, client):
+    rv = client.get('/login')
+    assert 'Content-Security-Policy' in rv.headers
+    csp = rv.headers['Content-Security-Policy']
+    assert "default-src 'self'" in csp
+    assert "frame-ancestors 'none'" in csp
+
+
+def test_csp_header_absent_on_json(app, client):
+    rv = client.get('/api/lures/categories')
+    assert 'Content-Security-Policy' not in rv.headers
+
+
+def test_csp_allows_inline_and_self(app, client):
+    """panel.html needs inline scripts/styles (tailwind play + legacy JS)."""
+    rv = client.get('/login')
+    csp = rv.headers['Content-Security-Policy']
+    assert "script-src 'self' 'unsafe-inline'" in csp
+    assert "style-src 'self' 'unsafe-inline'" in csp
+    assert "connect-src 'self'" in csp
