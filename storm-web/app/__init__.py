@@ -92,6 +92,8 @@ def create_app() -> Flask:
     app.register_blueprint(capture_sessions.bp)
     app.register_blueprint(capture_c2.bp)
 
+    from app.blueprints import capture_mobile  # noqa: F401  -- P3
+    app.register_blueprint(capture_mobile.bp)
     return app
 
 
