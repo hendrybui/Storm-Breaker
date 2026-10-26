@@ -40,6 +40,9 @@ A gate must be GREEN before the next phase starts.
 | 16 | P10.1–P10.5 realtime | ⬜ | G7 latency<300ms | use poll | |
 | 17 | P11.1–P11.32 panel | ⬜ | G8 parity | flag off | |
 | 18 | P12.1–P12.4 packaging | ⬜ | G9 signed | disable CI | |
+| 19 | P14.1 exec/runner.py | ✅ | 8 effect tests green | delete app/exec | execute+capture; never raises |
+| 20 | P14.2 exec/verify.py | ✅ | 8 effect tests green | delete file | tcp/http/file/callback checks |
+| 21 | P14.4 adapters (registry+catalog) | ✅ | 10 tests green; 15/15 modules, 48 actions | delete app/adapters | wraps frozen modules, no edits |
 
 Status legend: ⬜ pending · 🟡 in progress · ✅ done · 🔴 blocked · ⏪ rolled back
 
@@ -48,9 +51,6 @@ Status legend: ⬜ pending · 🟡 in progress · ✅ done · 🔴 blocked · �
 |---|------|-----|-----|----------|
 | — | none yet | — | — | — |
 
-| 19 | P14.1 exec/runner.py | ✅ | 8 tests green | delete app/exec | execute+capture, never raises |
-| 20 | P14.2 exec/verify.py | ✅ | 8 tests green | delete file | tcp/http/file/callback checks |
-
 ## Session log (append per work session)
 - `2026-10-27` — plan + handoff + ledger created. No code changed. Backend untouched.
 - `2026-10-27` — ADR-0002 proposed (skeleton re-architecture).
@@ -58,6 +58,7 @@ Status legend: ⬜ pending · 🟡 in progress · ✅ done · 🔴 blocked · �
 - `2026-10-27` — Track 5 FIREPOWER started: P14.1 runner.py + P14.2 verify.py + 16 effect tests (227 suite green). No frozen file touched.
 - `2026-10-27` — Receiving-agent session start (this run). Branch `feat/t0-safety-net` from `d98c57d`. **G0 GREEN**.
   - P0.1 annotated tag `pre-upgrade` → `d98c57d` (tag-object `6f67ca5c`).
+- `2026-10-27` — Track 5 P14.4 adapters (registry+catalog; 15 modules / 48 actions; 10 tests). Suite 237 green; routes 201/201; audit PASS. ADDITIVE.
   - P0.2 baseline `audit/audit_storm_breaker.py` exit=0; full PASS.
   - P0.3 DB backup `backups/storm_breaker.db.20261027-021155` (md5 verified).
   - Next: P1.x characterization tests, then `g0-ok`.

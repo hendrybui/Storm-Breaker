@@ -1,0 +1,32 @@
+P14.4 verification — module adapters expose 15 frozen modules; ADDITIVE
+Date: 2026-10-27   Branch: feat/t1-skeleton
+
+1. Full test suite
+   $ python3 -m pytest -q
+   => 237 passed   (227 prior + 10 new adapter tests)
+
+2. Frozen modules + database.py vs pre-upgrade
+   $ git diff --stat pre-upgrade..HEAD -- <15 modules> storm-web/database.py
+   => EMPTY (byte-identical)
+
+3. Route map vs frozen contract
+   live 201 == frozen 201 ; LOST = [] ; GAINED = []
+
+4. Live audit harness
+   $ bash audit/run_audit.sh
+   => route mapping 59/0 ; operator 105/105 ; victim 20/20 ; uid guard OK ; AUDIT PASSED ; exit=0
+
+5. Coverage
+   $ python3 -c "from app.adapters import modules, names; ..."
+   => 15/15 frozen modules covered ; 48 actions registered
+
+6. Real-effect test
+   tests/unit/test_adapters.py::test_effect_generated_python_payload_is_valid_python
+   => adapter output compiles as valid Python (the artifact is real code, not a token string)
+
+NOTE (honest): an earlier full-suite run showed 42 failures. Cause = :2525 port
+collision when `pytest` and `audit/run_audit.sh` ran in parallel shells (each
+tries to bind 2525). Serial run => 237 passed. Not a code defect.
+
+VERDICT: adapters are purely additive. Modules, routes, victim contract, and DB
+are unchanged. Non-regression contract intact.
