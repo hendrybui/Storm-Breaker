@@ -20,9 +20,10 @@ class Listener:
     """Background TCP listener that records connecting peers."""
 
     def __init__(self, host: str = "127.0.0.1", port: int = 0, hold: bool = False,
-                 on_connect=None):
+                 interactive: bool = False, on_connect=None):
         self.host = host
         self.hold = hold
+        self.interactive = interactive
         self.on_connect = on_connect
         self._srv = socket.socket()
         self._srv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -49,10 +50,10 @@ class Listener:
                 self._cv.notify_all()
             if self.on_connect is not None:
                 try:
-                    self.on_connect(addr)
+                    self.on_connect(addr, conn)
                 except Exception:  # noqa: BLE001 -- a callback must not kill the loop
                     pass
-            if not self.hold:
+            if not self.hold and not self.interactive:
                 conn.close()
 
     @property

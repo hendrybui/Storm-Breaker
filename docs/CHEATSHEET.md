@@ -277,6 +277,22 @@ $C -X POST $BASE/api/notifications/purge                      # delete delivered
 - A row stuck `pending` with a dead URL is correct-by-design: payload and URL
   were snapshotted at record time. Fix the URL, then `retry`.
 
+## Live listener shells (P18)
+
+```bash
+$C -X POST $BASE/api/listeners/start -d '{"name":"catch1","interactive":true}'
+$C $BASE/api/listeners/sessions                 # key = "catch1|<ip>:<port>"
+$C -X POST $BASE/api/listeners/send -d '{"key":"catch1|10.0.0.7:44444","command":"id"}'
+$C -X POST $BASE/api/listeners/read  -d '{"key":"catch1|10.0.0.7:44444"}'
+$C -X POST $BASE/api/listeners/close -d '{"key":"catch1|10.0.0.7:44444"}'
+```
+
+- Output is **line-buffered**. A shell that prints a prompt with no `\n` shows
+  nothing until the line completes (or the shell dies). `read` drains — lines
+  come back once, not on every call.
+- `start` without `interactive` keeps the old behavior: record the connect,
+  close immediately.
+
 ## Gotchas that will waste your afternoon
 
 - `BASE` must include the port. `127.0.0.1` alone is not `127.0.0.1:2525`.

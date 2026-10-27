@@ -34,6 +34,7 @@ import argparse
 import base64
 import os
 import re
+import subprocess
 import sys
 import time
 
@@ -721,6 +722,51 @@ def check_effects(base, password):
     session.post(base + '/api/agent/exec',
                  json={'uid': 'audit-agent', 'command': '__exit', 'wait': 5},
                  timeout=30, headers={'Origin': base})
+
+    # 10. an interactive listener drives a live reverse shell (P1.2)
+    started = session.post(base + '/api/listeners/start',
+                           json={'name': 'audit-sh', 'interactive': True}, timeout=30,
+                           headers={'Origin': base}).json()
+    port = started.get('listener', {}).get('port')
+    expect('interactive listener starts', bool(port), '-> %s' % started.get('status'))
+    shell_py = (
+        "import socket\n"
+        "s = socket.create_connection(('127.0.0.1', %d), timeout=5)\n"
+        "s.sendall(b'audit-banner\\n')\n"
+        "while True:\n"
+        "    d = s.recv(1024)\n"
+        "    if not d: break\n"
+        "    s.sendall(b'out>' + d)\n" % port)
+    proc = subprocess.Popen([sys.executable, '-c', shell_py],
+                            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    key = None
+    for _ in range(50):
+        rows = session.get(base + '/api/listeners/sessions',
+                           timeout=30).json()['sessions']
+        if rows:
+            key = rows[0]['key']
+            break
+        time.sleep(0.1)
+    expect('reverse shell registers as a live session', key is not None)
+    session.post(base + '/api/listeners/send',
+                 json={'key': key, 'command': 'id'}, timeout=30,
+                 headers={'Origin': base})
+    lines = []
+    for _ in range(30):
+        lines += session.post(base + '/api/listeners/read',
+                              json={'key': key}, timeout=30).json()['lines']
+        if any('out>id' in ln for ln in lines):
+            break
+        time.sleep(0.1)
+    expect('command roundtrips through the live shell',
+           any('audit-banner' in ln for ln in lines)
+           and any('out>id' in ln for ln in lines),
+           '-> %r' % lines[:3])
+    session.post(base + '/api/listeners/close', json={'key': key}, timeout=30,
+                 headers={'Origin': base})
+    session.post(base + '/api/listeners/stop', json={'name': 'audit-sh'}, timeout=30,
+                 headers={'Origin': base})
+    proc.terminate()
 
     return not failures
 
