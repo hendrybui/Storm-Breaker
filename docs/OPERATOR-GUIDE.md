@@ -609,9 +609,8 @@ assertions ok), 0 routes lost.**
 | **SSE test** | `test_sse_stream_delivers_a_beacon_event` now matches the event its own poll produced instead of the first line off the bus — foreign beacons no longer win the race. |
 | **Live listener shells (P1.2)** | `interactive:true` listeners keep the catch alive. New endpoints `GET /api/listeners/sessions`, `POST /api/listeners/send|read|close`. Previously `hold=true` accepted the socket and dropped it — fd leak, no shell. Output is line-buffered: a peer that never sends `\n` shows nothing until it dies. Audit §10 asserts a real command roundtrip. |
 | **Evidence integrity (P1.4)** | Reports are now tamper-evident. Every generated report carries `integrity` (sha256 + HMAC-SHA256, key = Settings `evidence_signing_key`, falling back to `ingest_secret`). `GET /api/reports/<id>/verify` re-verifies stored bytes; exported target reports embed a `<!-- EVIDENCE-SIGNATURE ... -->` trailer, checked by `POST /api/targets/report/verify` — a tampered copy fails. Stdlib only, no new deps. Audit §11 asserts generate→verify→tamper→fail. |
-| **CSRF double-submit (P19)** | Browser-originated mutating POSTs now additionally need the `storm_csrf` token: login plants a readable cookie, the panel/mobile JS patches `fetch`/`XMLHttpRequest` to echo it as `X-CSRF-Token`, and `hardening.csrf_gate` compares cookie==header (plus session binding). Header-less clients (curl, the test harness) are untouched — `SameSite=Lax` still covers them, and the P16 Origin check still 403s cross-origin form posts. Deploy note: open tabs logged in before the upgrade have no token cookie → 403s until re-login. Audit operator section asserts tokenless→403, with-token→200. |
 
-Regression status after P19: **314 tests pass, audit exit 0 (all 23 effect
+Regression status after P18: **308 tests pass, audit exit 0 (all 23 effect
 assertions ok), 0 routes lost.**---
 
 ## 13. Known gaps / backlog

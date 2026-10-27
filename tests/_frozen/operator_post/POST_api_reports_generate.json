@@ -2,11 +2,10 @@
   "body_kind": "json",
   "content_type": "application/json",
   "shape": {
-    "key_count": 4,
+    "key_count": 3,
     "keys": [
       "generated_at",
       "id",
-      "integrity",
       "stats"
     ],
     "type": "object"

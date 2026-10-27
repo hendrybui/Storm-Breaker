@@ -510,9 +510,6 @@ def login(session, base, password, attempts=3):
                             data={'username': 'admin', 'password': password},
                             allow_redirects=False, timeout=30)
         if resp.status_code in (200, 302):
-            tok = session.cookies.get('storm_csrf')
-            if tok:
-                session.headers['X-CSRF-Token'] = tok  # P19
             return resp
         if resp.status_code == 429:
             wait = 61
@@ -558,21 +555,6 @@ def check_operator_api(base, password):
             continue
         if resp.status_code != 200:
             failures.append((path, resp.status_code))
-    # P19: CSRF double-submit — browser-like POST without the token is 403
-    total += 1
-    try:
-        saved = session.headers.pop('X-CSRF-Token', None)
-        r = session.post(base + '/api/alerts/clear', json={}, timeout=30,
-                         headers={'Origin': base})
-        if r.status_code != 403:
-            failures.append(('csrf-tokenless', r.status_code))
-        session.headers['X-CSRF-Token'] = saved or (session.cookies.get('storm_csrf') or '')
-        r = session.post(base + '/api/alerts/clear', json={}, timeout=30,
-                         headers={'Origin': base})
-        if r.status_code != 200:
-            failures.append(('csrf-with-token', r.status_code))
-    except Exception as exc:
-        failures.append(('csrf', 'EXC %s' % type(exc).__name__))
     print('    %d/%d returned 200' % (total - len(failures), total))
     for path, code in failures:
         print('    FAIL %s -> %s' % (path, code))

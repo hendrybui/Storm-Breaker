@@ -139,10 +139,6 @@ def admin_session(live_server: str) -> Iterator[requests.Session]:
         raise RuntimeError(
             f"login failed: status={r.status_code} body={r.text[:200]!r}"
         )
-    # P19: echo the CSRF cookie on every subsequent request
-    tok = s.cookies.get('storm_csrf')
-    if tok:
-        s.headers['X-CSRF-Token'] = tok
     yield s
 
 

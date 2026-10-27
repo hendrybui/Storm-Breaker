@@ -149,39 +149,7 @@
         }
     </style>
   <link rel="stylesheet" href="/assets/css/tokens.css?v=51fe2015">
-      <script>
-    /* P19 CSRF: double-submit token on every mutating fetch/XHR */
-    (function () {
-        function tok() {
-            var m = document.cookie.match(/(?:^|;\s*)storm_csrf=([^;]+)/);
-            return m ? decodeURIComponent(m[1]) : '';
-        }
-        var mt = ['POST', 'PUT', 'PATCH', 'DELETE'];
-        var open = XMLHttpRequest.prototype.open;
-        XMLHttpRequest.prototype.open = function (method) {
-            this.__sbM = String(method || '').toUpperCase();
-            return open.apply(this, arguments);
-        };
-        var send = XMLHttpRequest.prototype.send;
-        XMLHttpRequest.prototype.send = function () {
-            if (mt.indexOf(this.__sbM) >= 0) {
-                try { this.setRequestHeader('X-CSRF-Token', tok()); } catch (e) {}
-            }
-            return send.apply(this, arguments);
-        };
-        var of_ = window.fetch;
-        window.fetch = function (input, init) {
-            init = init || {};
-            var m = String(init.method || (input && input.method) || 'GET').toUpperCase();
-            if (mt.indexOf(m) >= 0) {
-                init.headers = new Headers(init.headers || {});
-                init.headers.set('X-CSRF-Token', tok());
-            }
-            return of_.call(this, input, init);
-        };
-    })();
-    </script>
-</head>
+  </head>
 
 <body>
     <div class="container">
