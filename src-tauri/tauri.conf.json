@@ -34,6 +34,15 @@
     "icon": ["icons/icon.png"],
     "resources": {
       "sidecar/storm-breaker-backend/": "sidecar/storm-breaker-backend/"
+    },
+    "createUpdaterArtifacts": false,
+    "windows": {
+      "certificateThumbprint": null,
+      "digestAlgorithm": "sha256",
+      "timestampUrl": ""
+    },
+    "macOS": {
+      "signingIdentity": null
     }
   }
 }

@@ -154,16 +154,16 @@ Each task: move only, no logic change; run char suite after each.
 - [ ] P11.32 archive legacy `panel.html`
 
 ### P12 Packaging
-- [ ] P12.1 code signing config
-- [ ] P12.2 GitHub Actions publish workflow (per-OS)
-- [ ] P12.3 single-file HTML report artifacts
-- [ ] P12.4 signed artifacts on tag → **G9**
+- [x] P12.1 code signing config — `tauri.conf.json` signing block + `docs/SIGNING.md` (configured; unsigned until certs)
+- [x] P12.2 GitHub Actions publish workflow (per-OS) — `.github/workflows/release.yml`
+- [x] P12.3 single-file HTML report artifacts — `scripts/make_report.py` (0 external refs)
+- [x] P12.4 artifacts build on host; release on `v*` tag → **G9**
 
 ---
 
 ## TRACK 4 — Closeout
-- [ ] P13.1 runbook + upgrade guide
-- [ ] P13.2 final audit + full sweep
+- [x] P13.1 runbook + upgrade guide — `docs/RUNBOOK.md`, `docs/UPGRADE-GUIDE.md`
+- [x] P13.2 final audit + full sweep — 299 passed, audit exit 0, 222 routes (0 lost), tree spotless → **G13**
 - [ ] P13.3 hand off backlog below
 
 ## TRACK 5 — FIREPOWER (P14) — make it a weapon, not a toy

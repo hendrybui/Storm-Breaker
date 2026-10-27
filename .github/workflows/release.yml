@@ -1,0 +1,77 @@
+name: release
+
+# P12.2 — per-OS signed release artifacts on a version tag.
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  test:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install deps
+        run: |
+          python -m pip install -r storm-web/requirements.txt
+          python -m pip install -r requirements-dev.txt
+      - name: Test suite
+        run: python -m pytest -q
+      - name: Live audit
+        run: bash audit/run_audit.sh && bash audit/run_audit.sh --stop
+
+  build:
+    needs: test
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [ubuntu-22.04, windows-latest, macos-latest]
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Linux system deps
+        if: matrix.platform == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev patchelf
+
+      - name: Python deps
+        run: python -m pip install -r storm-web/requirements.txt pyinstaller
+
+      - name: Build backend sidecar
+        run: bash scripts/build_sidecar.sh
+        shell: bash
+
+      - name: Node deps
+        run: npm install
+
+      - uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # P12.1 — signing. Configure these repo secrets to get signed artifacts;
+          # without them the build still succeeds (unsigned).
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+        with:
+          tagName: ${{ github.ref_name }}
+          releaseName: "Storm-Breaker ${{ github.ref_name }}"
+          releaseBody: "Signed installers + sidecar backend. See docs/RUNBOOK.md."
+          releaseDraft: true
+          prerelease: false

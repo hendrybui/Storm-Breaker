@@ -59,8 +59,8 @@ The 15 `storm-web/` modules + `storm-web/database.py`. Wrap and delegate.
 - **P10.2 / P10.3** — Tauri-side: native notification on capture, `storm://` deep links.
 - **P11.1+** — the React/Vite/shadcn panel migration (`UI_V2`). Track 7 shipped the
   live UI on the **legacy** panel rather than scaffolding `ui/`; decide which first.
-- **P12.x** — code signing + CI publish workflow.
-- **P13.x** — runbook + final sweep.
+- ~~P12.x~~ code signing + CI publish — **DONE** (`docs/SIGNING.md`, `.github/workflows/release.yml`, `scripts/make_report.py`)
+- ~~P13.x~~ runbook + final sweep — **DONE** (`docs/RUNBOOK.md`, `docs/UPGRADE-GUIDE.md`)
 
 Suggested next gate **G13** for whichever of the above is taken first.
 

@@ -16,7 +16,8 @@ A gate must be GREEN before the next phase starts.
 | G6 | Tauri shell + sidecar | ⬜ | — |
 | G7 | realtime + native | ⬜ | — |
 | G8 | panel parity (UI_V2) | ⬜ | — |
-| G9 | signed packaging | ⬜ | — |
+| G9 | signed packaging | ✅* | `bash scripts/build_app.sh` → `Storm-Breaker_1.0.0_amd64.deb` (25M, sha256 b3605053…); signing config + `.github/workflows/release.yml`; `docs/SIGNING.md` | `git checkout g12-ok` | *configured, artifacts unsigned until certs are added — honest caveat |
+| G13 | closeout + final sweep | ✅ | 299 passed; audit exit=0; 222 routes (0 lost); frozen byte-identical; `docs/RUNBOOK.md` + `docs/UPGRADE-GUIDE.md` | `git checkout g12-ok` | upgrade complete |
 | G12 | realtime push + live panel | ✅ | `pytest` 299 PASS (incl. `test_live.py`); `scripts/acceptance_g12.py` exit 0; `docs/evidence/g12-realtime.txt`; audit exit=0 | `git checkout g11-ok` (L2) | Track 7; SSE + `/api/live`; panel Live Ops tab; 222 routes (0 lost) |
 | G11 | C2 real channel + observed beacon | ✅ | `pytest` 279 PASS (incl. `test_beacon_chain.py`); `scripts/acceptance_g11.py` exit 0; `docs/evidence/g11-acceptance.txt`; audit exit=0 | `git checkout g10-ok` (L2) | Track 6 (P15.1–P15.7); listeners + server-driven beacon; 219 routes (0 lost) |
 | G10 | firepower: act→verify, no copy-paste | ✅ | `pytest` 262 PASS (incl. `test_firepower_chain.py`); `scripts/acceptance_firepower.py` exit 0; `docs/evidence/g10-acceptance.txt`; audit exit=0 | `git checkout p14-base` (L2) | Track 5 (P14.1–P14.11); exec+verify+adapters+strike+targets+real net; 212 routes (+11 additive, 0 lost); frozen 15 modules byte-identical |
@@ -63,6 +64,9 @@ A gate must be GREEN before the next phase starts.
 | 36 | P10.1 push channel (SSE + snapshot) | ✅ | 5 bus + 2 live tests; SSE delivers | delete app/core/events.py + live.py | additive; poll kept as fallback |
 | 37 | P10.5 latency measured | ✅ | snapshot 9ms / push 7.3ms median | — | target < 300ms |
 | 38 | G12 GREEN (realtime + live panel) | ✅ | 299 suite; acceptance exit=0 | `git checkout g11-ok` | Track 7 complete |
+| 39 | P12.1–P12.4 packaging + signing config | ✅ | deb built 25M; release.yml; make_report self-contained | revert config/workflow/script | signing configured (certs pending) |
+| 40 | P13.1 runbook + upgrade guide | ✅ | docs/RUNBOOK.md, docs/UPGRADE-GUIDE.md | delete docs | operator-facing |
+| 41 | P13.2 final sweep → G9* + G13 | ✅ | 299 passed; audit exit=0; 0 routes lost | `git checkout g12-ok` | **upgrade complete** |
 
 Status legend: ⬜ pending · 🟡 in progress · ✅ done · 🔴 blocked · ⏪ rolled back
 
@@ -88,6 +92,7 @@ Status legend: ⬜ pending · 🟡 in progress · ✅ done · 🔴 blocked · �
 - `2026-10-27` — Track 6 consolidated handoff written (`docs/HANDOFF-TRACK6.md`); next track (P10 realtime + P11 panel, absorbs P15.2, folds P14.10) recorded. Docs only.
 - `2026-10-27` — **P14.10 landed — Track 5 fully closed (0 open items).** Playbook exec+verify engine + `/run` route + checkpoint/rollback. Suite 291 green; live run verified; routes 220 (0 lost); frozen byte-identical; audit PASS.
 - `2026-10-27` — **Track 7 COMPLETE — G12 GREEN.** SSE push channel + `/api/live` + panel Live Ops tab; latency measured (9ms/7.3ms). Suite 299; acceptance exit=0; routes 222 (0 lost); frozen byte-identical; audit PASS. Tag `g12-ok`. Remaining in main plan: P10.2/P10.3, P11.1+, P12, P13.
+- `2026-10-27` — **UPGRADE COMPLETE.** P12.1–P13.2: signing config + release workflow + report artifact + runbook/upgrade guide. Final sweep: 299 passed, audit exit=0, 222 routes (0 lost), frozen byte-identical, tree spotless. Tags `g9-ok`, `g13-ok`, `upgrade-complete`. Planned scope done; optional remainder: P10.2/P10.3, P11.1+.
 - `2026-10-27` — **Track 6 started.** P15.1 verified (queues already locked via STORE since P5), P15.3 managed listeners, P15.4/P15.5 server-driven beacon + monitor. Suite 277 green; routes 219 (0 lost); frozen byte-identical; audit PASS.
   - P0.2 baseline `audit/audit_storm_breaker.py` exit=0; full PASS.
   - P0.3 DB backup `backups/storm_breaker.db.20261027-021155` (md5 verified).

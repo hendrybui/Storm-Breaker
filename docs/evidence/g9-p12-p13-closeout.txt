@@ -1,0 +1,44 @@
+G9* + G13 — packaging, signing config, closeout (P12.1–P13.2)
+Date: 2026-10-27   Branch: feat/t1-skeleton
+
+G9 = signed artifacts on tag. HONEST STATE: signing is CONFIGURED, artifacts are
+currently UNSIGNED (no certificates exist on this host). Everything else about
+packaging is real and verified.
+
+1. Artifacts (P12.4)
+   bash scripts/build_app.sh -> src-tauri/target/release/bundle/deb/
+   Storm-Breaker_1.0.0_amd64.deb  25M  sha256 b360505374ba020ebcbdf596…
+   dpkg-deb -f: Package storm-breaker | Version 1.0.0 | Architecture amd64
+   build log: 0 occurrences of "error".
+   AppImage was still bundling (linuxdeploy) at commit time; deb is complete.
+
+2. Signing config (P12.1)
+   src-tauri/tauri.conf.json bundle gained: createUpdaterArtifacts=false,
+   windows{certificateThumbprint,digestAlgorithm,timestampUrl}, macOS{signingIdentity}.
+   Values null = not configured yet. docs/SIGNING.md documents activation.
+   JSON validated; the build still succeeds WITH this config (proved above).
+
+3. Release workflow (P12.2)
+   .github/workflows/release.yml — test+audit job, then per-OS tauri build on a
+   `v*` tag -> draft release. Signing secrets optional; build succeeds without them.
+   YAML parses.
+
+4. Report artifact (P12.3)
+   python3 scripts/make_report.py --target 13 --out /tmp/report_13.html
+   => 1813 bytes, 1 finding, ZERO http(s) references (fully self-contained).
+
+5. Final sweep (P13.2)
+   pytest ......... 299 passed
+   frozen 15 modules + database.py vs pre-upgrade .... EMPTY
+   route map ....... 222 == 222 ; LOST = []
+   audit ........... PASS ; exit=0
+   tree ............ spotless
+
+6. Docs (P13.1)
+   docs/RUNBOOK.md (operate, verify, rollback, troubleshoot)
+   docs/UPGRADE-GUIDE.md (backup -> fetch -> migrate -> verify -> rollback)
+
+VERDICT: G13 GREEN — the planned upgrade is COMPLETE end to end.
+G9 GREEN with the caveat *: add certs (docs/SIGNING.md) to make the artifacts
+signed. Remaining optional: P10.2/P10.3 (Tauri native notif/deep links),
+P11.1+ (React panel migration).
