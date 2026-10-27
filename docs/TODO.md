@@ -181,6 +181,23 @@ See `docs/FIREPOWER.md`. Additive layer; frozen contract untouched; tests assert
 - [x] P14.11 **acceptance chain**: scan→strike→verify→evidence→report, unattended (`tests/char/test_firepower_chain.py`)
 - [x] P14.12 gate `G10` — **GREEN**: 262 suite, audit exit=0, 0 routes lost, frozen modules byte-identical
 
+## TRACK 6 — C2 / LISTENER / BEACON (P15) — real channel, managed listener, observed beacons
+
+Gate G11. Coverage gaps (measured): C2 is poll-based (1500 ms, `c2_client.js:130`) over
+UNLOCKED raw dicts with `list.pop(0)` (thread-unsafe, O(n), lost on restart);
+no listener *service* exists (only the P14.5 strike listener); the beacon is a simulated
+schedule (`evasion_framework.py:567,612`) never applied to real traffic nor observed.
+
+- [ ] P15.1 C2/mobile queues → StateStore-backed locked `deque` (fix thread-safety, O(n) pop, restart loss)
+- [ ] P15.2 persistent channel (SSE/WebSocket) replacing the 1500 ms poll; keep poll as victim fallback
+- [ ] P15.3 `ListenerService` — start/stop named listeners, `GET /api/listeners`, auto-finding on connect
+- [ ] P15.4 real beacon — apply sleep/jitter from timing profiles to the victim loop; timeline from real arrivals
+- [ ] P15.5 beacon monitor — `GET /api/c2/beacons` (arrival timeline, interval stats, missed-beacon detection)
+- [ ] P15.6 retire the frontend poll in favour of push (fallback kept); add routes to the audit catalogue
+- [ ] P15.7 gate `G11` — jitter observed; listener start/stop verified; C2 survives restart; 0 routes lost
+
+Rollback: `git checkout g10-ok`.
+
 ## Backlog (NOT gated)
 - [ ] Real crypto via `cryptography` (replace hand-rolled AES/XOR)
 - [ ] Optional LLM hook for ai_threat (feature-flagged, offline fallback)

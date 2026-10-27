@@ -72,6 +72,7 @@ Status legend: ⬜ pending · 🟡 in progress · ✅ done · 🔴 blocked · �
 - `2026-10-27` — Track 5 P14.3+P14.6 target model + strike/targets API. Suite 251 green; live HTTP strike VERIFIED + evidence persisted; routes 206 (+5 additive); audit PASS. Fixed 201→200. ADDITIVE.
 - `2026-10-27` — Track 5 P14.7+P14.8 real net (DNS/WHOIS/GeoIP) + real TCP scan. Suite 261 green; live geoip real data; routes 211 (+5 additive); audit PASS. ADDITIVE.
 - `2026-10-27` — **Track 5 COMPLETE — G10 GREEN.** P14.9 report + P14.11 acceptance chain + P14.12 gate. Suite 262 green; acceptance script exit=0; routes 212 (0 lost); frozen modules byte-identical; audit PASS. Tag `g10-ok`.
+- `2026-10-27` — Track 5 consolidated handoff written (`docs/HANDOFF-TRACK5.md`); Track 6 (P15 C2/listener/beacon) added to TODO with measured gap analysis. Docs only.
   - P0.2 baseline `audit/audit_storm_breaker.py` exit=0; full PASS.
   - P0.3 DB backup `backups/storm_breaker.db.20261027-021155` (md5 verified).
   - Next: P1.x characterization tests, then `g0-ok`.
