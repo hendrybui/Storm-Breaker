@@ -1129,11 +1129,53 @@
       "rule": "/api/session/start"
     },
     {
+      "endpoint": "strike.api_strike_actions",
+      "methods": [
+        "GET"
+      ],
+      "rule": "/api/strike/actions"
+    },
+    {
+      "endpoint": "strike.api_strike_reverse",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/strike/reverse"
+    },
+    {
       "endpoint": "system.system_info",
       "methods": [
         "GET"
       ],
       "rule": "/api/system/info"
+    },
+    {
+      "endpoint": "targets.api_targets_list",
+      "methods": [
+        "GET"
+      ],
+      "rule": "/api/targets"
+    },
+    {
+      "endpoint": "targets.api_targets_create",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/targets"
+    },
+    {
+      "endpoint": "targets.api_target_detail",
+      "methods": [
+        "GET"
+      ],
+      "rule": "/api/targets/<int:target_id>"
+    },
+    {
+      "endpoint": "targets.api_target_add_finding",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/targets/<int:target_id>/findings"
     },
     {
       "endpoint": "panel.telegram_config",

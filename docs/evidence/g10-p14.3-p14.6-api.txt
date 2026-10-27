@@ -1,0 +1,26 @@
+P14.3 + P14.6 verification — target model + strike/targets API; ADDITIVE
+Date: 2026-10-27   Branch: feat/t1-skeleton
+
+1. Full test suite
+   $ python3 -m pytest -q
+   => 251 passed   (242 prior + 5 target-store tests + 4 new-route char tests)
+
+2. Live end-to-end over HTTP (real login, real strike, real process)
+   POST /api/strike/actions   -> 200, runnable = ['python_reverse','bash_reverse']
+   POST /api/strike/reverse   -> 200, python_reverse -> 127.0.0.1:45169 | callback=VERIFIED | exec_exit=0
+   GET  /api/targets/<id>     -> evidence recorded: kind=strike, evidence={artifact, callback_ok, exec_exit, ...}
+   GET  /api/targets          -> 13 targets (audit + tests + demo)
+
+3. Frozen modules + database.py vs pre-upgrade
+   => EMPTY (byte-identical; target tables written via app/core/migrations/targets.py, not database.py)
+
+4. Route map vs frozen contract
+   live 206 == frozen 206 ; LOST = []; GAINED = [] (5 new additive rules baselined)
+
+5. Live audit harness
+   => operator 109/109 (incl. the new strike POST) ; all 4 checks PASS ; exit=0
+   DEFECT FOUND & FIXED: POST /api/targets returned 201 -> audit expects 200;
+   changed both new POSTs to 200 to match app convention; re-baselined snapshot.
+
+VERDICT: additive. The panel can now fire a payload and the verified result is
+stored as evidence on a target. No frozen module/route/victim/DB change.

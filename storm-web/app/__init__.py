@@ -141,6 +141,10 @@ def create_app() -> Flask:
     app.register_blueprint(panel.bp)
     from app.blueprints import playbooks  # noqa: F401  -- P3.23 (drained from app.py)
     app.register_blueprint(playbooks.bp)
+    from app.blueprints import targets  # noqa: F401  -- P14.3 (additive)
+    app.register_blueprint(targets.bp)
+    from app.blueprints import strike  # noqa: F401  -- P14.6 (additive)
+    app.register_blueprint(strike.bp)
 
     # ----------------------------------------------------------------------------
     # Core migrations (P5.5/P5.6): idempotent baseline + WAL + hot-path indexes.

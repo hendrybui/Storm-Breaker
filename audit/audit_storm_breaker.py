@@ -179,6 +179,8 @@ OPERATOR_GETS = [
     '/api/ai-threat/response-plan', '/api/quantum/algorithms',
     '/api/quantum/benchmark', '/api/quantum/threat', '/api/get_settings',
     '/api/telegram/config', '/api/mobile/captures', '/list_templates',
+    # P14.3 / P14.6 additive firepower surface
+    '/api/targets', '/api/strike/actions',
 ]
 
 OPERATOR_POSTS = [
@@ -240,6 +242,9 @@ OPERATOR_POSTS = [
     ('/api/webrtc_leak', {}),
     ('/api/alerts/add', {'message': 'audit test', 'severity': 'info'}),
     ('/api/alerts/clear', {}),
+    # P14.3 / P14.6 additive firepower surface
+    ('/api/targets', {'name': 'audit-target', 'host': '127.0.0.1', 'notes': 'audit'}),
+    ('/api/strike/reverse', {'payload_type': 'python_reverse', 'lhost': '127.0.0.1'}),
 ]
 
 def victim_endpoints():

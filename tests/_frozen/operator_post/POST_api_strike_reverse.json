@@ -1,0 +1,18 @@
+{
+  "body_kind": "json",
+  "content_type": "application/json",
+  "shape": {
+    "key_count": 7,
+    "keys": [
+      "callback",
+      "exec",
+      "finding_id",
+      "ok",
+      "status",
+      "summary",
+      "target_id"
+    ],
+    "type": "object"
+  },
+  "status": 200
+}

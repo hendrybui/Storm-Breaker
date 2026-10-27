@@ -19,6 +19,7 @@ from pathlib import Path
 from typing import List
 
 from app.core.migrations.baseline import ensure_baseline
+from app.core.migrations.targets import ensure_targets
 
 _HERE = Path(__file__).resolve().parent
 _STORM_WEB = str(_HERE.parents[2])
@@ -118,6 +119,7 @@ def migrate(db_path: str = None) -> dict:
         applied["pragmas"] = apply_pragmas(conn)
         applied["tables"] = apply_tables(conn)
         applied["indexes"] = apply_indexes(conn)
+        applied["targets"] = ensure_targets(conn)  # P14.3 additive tables
         conn.commit()
     finally:
         conn.close()
