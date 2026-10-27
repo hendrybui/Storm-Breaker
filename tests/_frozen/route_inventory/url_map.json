@@ -764,6 +764,13 @@
       "rule": "/api/network/receive"
     },
     {
+      "endpoint": "live.api_notify_pending",
+      "methods": [
+        "GET"
+      ],
+      "rule": "/api/notify/pending"
+    },
+    {
       "endpoint": "system.nuke_all_data",
       "methods": [
         "POST"

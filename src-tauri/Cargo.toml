@@ -11,6 +11,13 @@ tauri-build = { version = "2", features = [] }
 [dependencies]
 tauri = { version = "2", features = ["tray-icon"] }
 tauri-plugin-shell = "2"
+tauri-plugin-single-instance = "2"   # P10.3: deep links must focus the running app
+tauri-plugin-notification = "2"      # P10.2: native capture/beacon alerts
+tauri-plugin-deep-link = "2"         # P10.3: storm:// deep links
+
+# Pin: tauri-plugin-deep-link 2.6.2 does not compile against rust-ini >= 0.21.3
+# (ini::ParseOption gained two fields). 0.21.1 is the compatible release.
+rust-ini = "=0.21.1"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 

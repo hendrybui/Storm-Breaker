@@ -67,6 +67,8 @@ A gate must be GREEN before the next phase starts.
 | 39 | P12.1–P12.4 packaging + signing config | ✅ | deb built 25M; release.yml; make_report self-contained | revert config/workflow/script | signing configured (certs pending) |
 | 40 | P13.1 runbook + upgrade guide | ✅ | docs/RUNBOOK.md, docs/UPGRADE-GUIDE.md | delete docs | operator-facing |
 | 41 | P13.2 final sweep → G9* + G13 | ✅ | 299 passed; audit exit=0; 0 routes lost | `git checkout g12-ok` | **upgrade complete** |
+| 42 | P10.2 native notifications | ✅ | `cargo build --release` EXIT=0; unauth cursor poll 200 delivers events | remove plugin+poller | shell alerts on capture |
+| 43 | P10.3 deep links storm:// | ✅ | plugin compiles; storm://panel + /t/<name> route to the webview | remove plugin | focus-or-launch |
 
 Status legend: ⬜ pending · 🟡 in progress · ✅ done · 🔴 blocked · ⏪ rolled back
 

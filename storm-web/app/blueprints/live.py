@@ -47,6 +47,19 @@ def api_live():
     })
 
 
+@bp.route('/api/notify/pending')
+def api_notify_pending():
+    """P10.2 — cursor poll for the desktop shell's native notifications.
+
+    Deliberately UNAUTHENTICATED: the Tauri shell polls it over loopback with
+    no cookie jar. Read-only, so that is safe.
+    """
+    since = float(request.args.get('since', 0) or 0)
+    events = [e for e in BUS.recent(int(request.args.get('limit', 100)))
+              if e.get('ts', 0) > since]
+    return jsonify({'events': events, 'now': time.time()})
+
+
 @bp.route('/api/events')
 def api_events():
     """SSE stream.  EventSource sends cookies, so the operator session applies."""

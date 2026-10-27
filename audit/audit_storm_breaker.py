@@ -186,7 +186,7 @@ OPERATOR_GETS = [
     # P15.3/P15.4 additive listener + beacon surface
     '/api/listeners', '/api/c2/beacons',
     # P10 additive realtime snapshot (SSE /api/events stays out: never returns)
-    '/api/live',
+    '/api/live', '/api/notify/pending',
 ]
 
 OPERATOR_POSTS = [

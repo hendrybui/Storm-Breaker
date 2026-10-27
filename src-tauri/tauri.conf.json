@@ -28,6 +28,13 @@
       "tooltip": "Storm-Breaker"
     }
   },
+  "plugins": {
+    "deep-link": {
+      "desktop": {
+        "schemes": ["storm"]
+      }
+    }
+  },
   "bundle": {
     "active": true,
     "targets": ["deb", "appimage"],

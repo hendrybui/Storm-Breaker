@@ -1,0 +1,33 @@
+P10.2 + P10.3 — native notifications + storm:// deep links
+Date: 2026-10-27   Branch: feat/t1-skeleton
+
+P10.2 native notifications
+  backend : GET /api/notify/pending?since=<ts> (cursor) added to live.py and to
+            the victim/public allowlist in app.py -- the Tauri shell has no cookie
+            jar, so this endpoint is deliberately unauthenticated.
+  verified: unauth 200, keys ['events','now']; cursor poll after a listener
+            connect returned [('listener','127.0.0.1')].
+  shell   : spawn_notifier() polls loopback every 4s (raw TcpStream -- no new
+            HTTP crate) and raises a native notification per new event.
+
+P10.3 deep links
+  tauri.conf.json: plugins.deep-link.desktop.schemes = ["storm"]
+  main.rs: single-instance (first, so a link focuses the running app) + deep-link
+           plugin; on_open_url maps storm://panel -> /panel and storm://t/<name>
+           -> /t/<name>/ inside the existing webview.
+  capabilities: notification:default + deep-link:default.
+
+BUILD: cargo build --release => Finished, EXIT=0  (2m35s)
+
+REAL BUG FOUND AND FIXED
+  tauri-plugin-deep-link 2.6.2 does not compile against rust-ini >= 0.21.3
+  (ini::ParseOption gained two fields). Pinned rust-ini = "=0.21.1" in
+  src-tauri/Cargo.toml with a comment. Without the pin the shell does not build.
+
+HONEST LIMITS
+  - Notification delivery + deep-link activation need a desktop session; the
+    compile + endpoint contract are verified, the OS-level prompt is not.
+  - Deep-link scheme registration on Linux is done by the .deb desktop entry
+    (`register_all()` is called at startup as well).
+
+NON-REGRESSION: suite 300 passed; routes 223 (0 lost); audit PASS exit=0.

@@ -141,8 +141,8 @@ Each task: move only, no logic change; run char suite after each.
 
 ### P10 Realtime + native
 - [x] P10.1 operator push channel → `GET /api/events` (SSE) + `GET /api/live` snapshot; HTTP poll kept as fallback  **(Track 7)**
-- [ ] P10.2 native notifications on capture  ← Tauri-side, remaining
-- [ ] P10.3 deep links `storm://`  ← Tauri-side, remaining
+- [x] P10.2 native notifications on capture — `/api/notify/pending` cursor + notification plugin (`spawn_notifier`)
+- [x] P10.3 deep links `storm://` — single-instance + deep-link plugin, opens `/panel` or `/t/<name>`
 - [x] P10.4 safe-exec wrapper (checkpoint/rollback) — shipped as `app/exec/playbook.py` (P14.10)
 - [x] P10.5 latency measured → **G12** (snapshot 9 ms median, push 7.3 ms median; target < 300 ms)
 
