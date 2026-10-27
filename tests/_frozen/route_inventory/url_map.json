@@ -897,6 +897,13 @@
       "rule": "/api/playbooks/<int:pb_id>/execute"
     },
     {
+      "endpoint": "playbooks.api_run_playbook",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/playbooks/<int:pb_id>/run"
+    },
+    {
       "endpoint": "campaigns.profiles_get",
       "methods": [
         "GET"

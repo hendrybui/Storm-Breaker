@@ -1,0 +1,34 @@
+P14.10 verification — playbook steps become execute + verify; ADDITIVE
+Date: 2026-10-27   Branch: feat/t1-skeleton   (closes the last Track 5 item)
+
+WHY: /api/playbooks/<id>/execute only ever *generated* things (payloads, reports,
+lures). No step ran a command, confirmed an effect, or could undo anything.
+
+1. Full test suite
+   $ python3 -m pytest -q
+   => 291 passed  (279 prior + 10 engine + 2 playbook char)
+
+2. Live HTTP run (real subprocess + real socket check)
+   steps: checkpoint -> exec "echo target-scan-complete" -> verify tcp :2525
+   => executed | ok: True
+      step 1 checkpoint [success] checkpoint start
+      step 2 exec       [success] exit=0 (expected 0) | target-scan-complete
+      step 3 verify     [success] connected 127.0.0.1:2525
+   failing run (exec exit 9, on_fail=rollback) => failed | rolled_back_to: cp
+
+3. New surface (additive; legacy /execute untouched, now delegates engine actions)
+   app/exec/playbook.py  — exec | verify | strike | checkpoint | rollback | log | delay
+   POST /api/playbooks/<id>/run
+
+4. Non-regression
+   frozen 15 modules + database.py vs pre-upgrade => EMPTY
+   routes 220 == 220 ; LOST = []
+   audit => all 4 checks PASS ; exit=0
+   legacy /api/playbooks/<id>/execute keeps its branches; engine actions delegated.
+
+5. Honest note
+   A char test caught that exec surfaced only the exit code, not stdout; fixed so
+   the step output includes captured stdout (trimmed).
+
+VERDICT: playbooks now act and verify, with checkpoint/rollback on failure.
+Track 5 (P14.1–P14.12) has zero open items. Nothing frozen weakened.

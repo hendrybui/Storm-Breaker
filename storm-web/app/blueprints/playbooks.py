@@ -12,6 +12,8 @@ from flask import Blueprint, jsonify, request, session
 
 import database as db
 
+from app.exec import playbook as playbook_engine
+
 bp = Blueprint("playbooks", __name__)
 
 
@@ -69,6 +71,31 @@ def api_delete_playbook(pb_id):
         return jsonify({'error': 'Not authenticated'}), 401
     db.delete_playbook(pb_id)
     return jsonify({'status': 'deleted'})
+@bp.route('/api/playbooks/<int:pb_id>/run', methods=['POST'])
+def api_run_playbook(pb_id):
+    """P14.10: execute the engine steps (exec/verify/strike/checkpoint) with
+    an honest per-step result -- nothing is claimed without a check."""
+    if 'IAm-logined' not in session:
+        return jsonify({'error': 'Not authenticated'}), 401
+    pb = db.get_playbook(pb_id)
+    if not pb:
+        return jsonify({'error': 'Playbook not found'}), 404
+    steps = json.loads(pb['steps']) if isinstance(pb['steps'], str) else pb['steps']
+    variables = json.loads(pb['variables']) if isinstance(pb['variables'], str) else pb['variables']
+    data = request.json or {}
+    run = playbook_engine.run_playbook(steps, variables,
+                                       on_fail=data.get('on_fail', 'stop'),
+                                       target_id=data.get('target_id'))
+    db.update_playbook(pb_id,
+                       status='completed' if run['ok'] else 'failed',
+                       execution_log=run['results'],
+                       last_run=datetime.now().isoformat(),
+                       run_count=(pb.get('run_count', 0) or 0) + 1)
+    db.log_operator_action(session.get('IAm-logined', 'unknown'), 'run_playbook',
+                           f'Ran playbook #{pb_id}: {pb.get("name")}', request.remote_addr)
+    return jsonify({'status': 'executed' if run['ok'] else 'failed', **run})
+
+
 @bp.route('/api/playbooks/<int:pb_id>/execute', methods=['POST'])
 def api_execute_playbook(pb_id):
     """Execute a playbook's steps sequentially"""
@@ -80,6 +107,7 @@ def api_execute_playbook(pb_id):
     steps = json.loads(pb['steps']) if isinstance(pb['steps'], str) else pb['steps']
     variables = json.loads(pb['variables']) if isinstance(pb['variables'], str) else pb['variables']
     execution_log = []
+    pb_ctx = playbook_engine.new_context(variables)
     for i, step in enumerate(steps):
         step_result = {'step': i + 1, 'action': step.get('action', ''), 'status': 'pending', 'timestamp': datetime.now().isoformat()}
         try:
@@ -90,6 +118,26 @@ def api_execute_playbook(pb_id):
                 if isinstance(v, str):
                     for var_name, var_val in variables.items():
                         params[k] = params[k].replace(f'{{{{{var_name}}}}}', str(var_val))
+
+            # P14.10: execute + verify + checkpoint/rollback actions.
+            if playbook_engine.handles(action):
+                step['_index'] = i
+                outcome = playbook_engine.run_step(step, pb_ctx)
+                step_result['status'] = outcome['status']
+                step_result['output'] = outcome['output']
+                step_result['verified'] = outcome.get('verified')
+                if outcome.get('checkpoint'):
+                    step_result['checkpoint'] = outcome['checkpoint']
+                if outcome['status'] == 'error':
+                    behave = step.get('on_fail', 'stop')
+                    if behave == 'rollback':
+                        step_result['rollback'] = playbook_engine.rollback(pb_ctx)
+                    execution_log.append(step_result)
+                    if behave != 'continue':
+                        break
+                    continue
+                execution_log.append(step_result)
+                continue
 
             if action == 'generate_payload':
                 from payload_generator import generate_payload

@@ -37,7 +37,9 @@ and reports**, with no copy-paste.
 | P14.11 | `tests/char/test_firepower_chain.py` + `scripts/acceptance_firepower.py` — the acceptance chain |
 | P14.12 | gate G10 |
 
-**Open item:** `P14.10` — playbook steps become execute+verify (checkpoint/rollback per P10.4). Not done.
+**Open items:** none. `P14.10` (playbook steps execute+verify, checkpoint/rollback) landed
+after this handoff — `app/exec/playbook.py` + `POST /api/playbooks/<id>/run`, see
+`docs/evidence/g10-p14.10-playbook.txt`. Track 5 (P14.1–P14.12) is fully closed.
 
 ## 2. Design rules this track obeyed (keep obeying them)
 
