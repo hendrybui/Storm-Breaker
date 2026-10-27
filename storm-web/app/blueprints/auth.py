@@ -56,8 +56,15 @@ def login():
         # and the audit harness working unchanged).
         from app.core.passwords import check_operator_login
         if check_operator_login(username, password, CONFIG):
+            import secrets
+            tok = session.get('csrf') or secrets.token_hex(32)
+            session['csrf'] = tok
             session['IAm-logined'] = username
-            return redirect('/panel')
+            resp = redirect('/panel')
+            # P19: readable cookie the panel JS echoes back as X-CSRF-Token
+            resp.set_cookie('storm_csrf', tok, max_age=60 * 60 * 24 * 7,
+                            samesite='Lax', httponly=False, path='/')
+            return resp
         else:
             error = 'Invalid username or password'
     return render_template('login.html', error=error)

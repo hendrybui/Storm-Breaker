@@ -88,6 +88,38 @@
         @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
         .cursor-blink::after { content: '▋'; animation: blink 1s step-end infinite; color: #3b82f6; }
     </style>
+    <script>
+    /* P19 CSRF: double-submit token on every mutating fetch/XHR */
+    (function () {
+        function tok() {
+            var m = document.cookie.match(/(?:^|;\s*)storm_csrf=([^;]+)/);
+            return m ? decodeURIComponent(m[1]) : '';
+        }
+        var mt = ['POST', 'PUT', 'PATCH', 'DELETE'];
+        var open = XMLHttpRequest.prototype.open;
+        XMLHttpRequest.prototype.open = function (method) {
+            this.__sbM = String(method || '').toUpperCase();
+            return open.apply(this, arguments);
+        };
+        var send = XMLHttpRequest.prototype.send;
+        XMLHttpRequest.prototype.send = function () {
+            if (mt.indexOf(this.__sbM) >= 0) {
+                try { this.setRequestHeader('X-CSRF-Token', tok()); } catch (e) {}
+            }
+            return send.apply(this, arguments);
+        };
+        var of_ = window.fetch;
+        window.fetch = function (input, init) {
+            init = init || {};
+            var m = String(init.method || (input && input.method) || 'GET').toUpperCase();
+            if (mt.indexOf(m) >= 0) {
+                init.headers = new Headers(init.headers || {});
+                init.headers.set('X-CSRF-Token', tok());
+            }
+            return of_.call(this, input, init);
+        };
+    })();
+    </script>
 </head>
 
 <body class="bg-slate-950 text-slate-200 font-sans antialiased h-screen overflow-hidden flex"
