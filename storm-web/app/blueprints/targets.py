@@ -65,6 +65,17 @@ def api_target_report(target_id):
         return jsonify({'error': 'Target not found'}), 404
     return Response(render_html(target), mimetype='text/html')
 
+@bp.route('/api/targets/report/verify', methods=['POST'])
+def api_verify_target_report():
+    """P1.4: verify an exported target report (signature trailer intact)."""
+    bad = _guard()
+    if bad:
+        return bad
+    from app.targets.report import verify_render
+    rendered = (request.json or {}).get('html', '')
+    ok = verify_render(rendered)
+    return jsonify({'status': 'verified' if ok else 'tampered-or-unsigned'})
+
 
 @bp.route('/api/targets/<int:target_id>/findings', methods=['POST'])
 def api_target_add_finding(target_id):

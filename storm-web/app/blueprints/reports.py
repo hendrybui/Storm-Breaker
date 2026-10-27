@@ -57,6 +57,26 @@ def api_view_report(report_id):
         return 'Report not found', 404
     return Response(report['html_content'], mimetype='text/html')
 
+@bp.route('/api/reports/<int:report_id>/verify')
+def api_verify_report(report_id):
+    """P1.4: recompute the report's evidence signature over stored bytes."""
+    if 'IAm-logined' not in session:
+        return jsonify({'error': 'Not authenticated'}), 401
+    from app.core.integrity import verify_content
+    report = artifactsvc.get_report(report_id)
+    if not report:
+        return jsonify({'error': 'Report not found'}), 404
+    stats = report.get('stats')
+    if isinstance(stats, str):
+        try:
+            stats = json.loads(stats)
+        except Exception:
+            stats = {}
+    integrity = (stats or {}).get('integrity')
+    ok = verify_content(report.get('html_content') or '', integrity)
+    return jsonify({'status': 'verified' if ok else 'tampered-or-unsigned',
+                    'report_id': report_id})
+
 @bp.route('/api/reports/<int:report_id>', methods=['DELETE'])
 def api_delete_report(report_id):
     if 'IAm-logined' not in session:

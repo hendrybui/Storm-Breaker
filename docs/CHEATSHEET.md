@@ -293,6 +293,23 @@ $C -X POST $BASE/api/listeners/close -d '{"key":"catch1|10.0.0.7:44444"}'
 - `start` without `interactive` keeps the old behavior: record the connect,
   close immediately.
 
+## Evidence integrity (P18)
+
+Reports are signed: generate returns `integrity = {alg, sha256, signature}`
+(HMAC-SHA256 over the exact HTML, key = Settings `evidence_signing_key` or
+`ingest_secret`).
+
+```bash
+$C $BASE/api/reports/<ID>/verify                    # {"status":"verified"}
+$C $BASE/api/targets/<ID>/report > report.html      # carries <!-- EVIDENCE-SIGNATURE ... --> trailer
+$C -X POST $BASE/api/targets/report/verify -d "$(jq -n --rawfile h report.html '{html:$h}')"
+```
+
+- Edit one byte of the report → verify returns `tampered-or-unsigned`. The
+  HMAC cannot be forged without the key; the sha256 pins the exact bytes.
+- Signing key lives in `Settings.json` — rotate `evidence_signing_key` to
+  invalidate all previously exported signatures.
+
 ## Gotchas that will waste your afternoon
 
 - `BASE` must include the port. `127.0.0.1` alone is not `127.0.0.1:2525`.

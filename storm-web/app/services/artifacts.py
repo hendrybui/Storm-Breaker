@@ -21,19 +21,23 @@ def create_report(config: dict, report_type: str, operator: str,
                   ip: str) -> dict:
     """Generate a report via the frozen module, persist + audit-log it."""
     from report_generator import generate_report  # lazy import preserved
+    from app.core.integrity import sign_content
     result = generate_report(config)
+    integrity = sign_content(result['html'])
+    stats = dict(result['stats'])
+    stats['integrity'] = integrity
     # Save to database
     report_id = db.save_report(
         name=config['title'],
         report_type=report_type,
         config=config,
         html_content=result['html'],
-        stats=result['stats'],
+        stats=stats,
     )
     db.log_operator_action(operator, 'generate_report',
                            f'Generated report: {config["title"]}', ip)
-    return {'id': report_id, 'stats': result['stats'],
-            'generated_at': result['generated_at']}
+    return {'id': report_id, 'stats': stats,
+            'generated_at': result['generated_at'], 'integrity': integrity}
 
 
 def list_reports() -> list:

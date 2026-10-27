@@ -608,8 +608,9 @@ assertions ok), 0 routes lost.**
 | **Audit** | Effects now 16 assertions: §8 outbox records+delivers, §9 agent spawns→registers→executes→listed. Spawn uses `keep:true` and **cleans up with `__exit`** so no stray agent beacons into later test runs. |
 | **SSE test** | `test_sse_stream_delivers_a_beacon_event` now matches the event its own poll produced instead of the first line off the bus — foreign beacons no longer win the race. |
 | **Live listener shells (P1.2)** | `interactive:true` listeners keep the catch alive. New endpoints `GET /api/listeners/sessions`, `POST /api/listeners/send|read|close`. Previously `hold=true` accepted the socket and dropped it — fd leak, no shell. Output is line-buffered: a peer that never sends `\n` shows nothing until it dies. Audit §10 asserts a real command roundtrip. |
+| **Evidence integrity (P1.4)** | Reports are now tamper-evident. Every generated report carries `integrity` (sha256 + HMAC-SHA256, key = Settings `evidence_signing_key`, falling back to `ingest_secret`). `GET /api/reports/<id>/verify` re-verifies stored bytes; exported target reports embed a `<!-- EVIDENCE-SIGNATURE ... -->` trailer, checked by `POST /api/targets/report/verify` — a tampered copy fails. Stdlib only, no new deps. Audit §11 asserts generate→verify→tamper→fail. |
 
-Regression status after P18: **305 tests pass, audit exit 0 (all 19 effect
+Regression status after P18: **308 tests pass, audit exit 0 (all 23 effect
 assertions ok), 0 routes lost.**---
 
 ## 13. Known gaps / backlog

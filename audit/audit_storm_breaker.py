@@ -768,6 +768,37 @@ def check_effects(base, password):
                  headers={'Origin': base})
     proc.terminate()
 
+    # 11. evidence integrity: reports carry sha256 + HMAC signatures (P1.4)
+    rep = session.post(base + '/api/reports/generate',
+                       json={'title': 'audit-evidence', 'target': 'audit.local'},
+                       timeout=30, headers={'Origin': base}).json()
+    integrity = rep.get('integrity') or {}
+    expect('report generation returns an evidence signature',
+           len(str(integrity.get('sha256') or '')) == 64
+           and len(str(integrity.get('signature') or '')) == 64,
+           '-> %s' % integrity.get('alg'))
+    verdict = session.get(base + '/api/reports/%d/verify' % rep.get('id', 0),
+                          timeout=30).json().get('status')
+    expect('stored report verifies against its signature', verdict == 'verified',
+           '-> %s' % verdict)
+    tgt = session.post(base + '/api/targets', json={'name': 'audit-evidence'},
+                       timeout=30, headers={'Origin': base}).json()
+    tid = (tgt.get('target') or {}).get('id') or tgt.get('id')
+    session.post(base + '/api/targets/%s/findings' % tid,
+                 json={'kind': 'audit', 'detail': 'evidence row'},
+                 timeout=30, headers={'Origin': base})
+    html = session.get(base + '/api/targets/%s/report' % tid, timeout=30).text
+    expect('target report embeds a signature trailer',
+           'EVIDENCE-SIGNATURE' in html and len(html) > 500)
+    v_ok = session.post(base + '/api/targets/report/verify', json={'html': html},
+                        timeout=30, headers={'Origin': base}).json().get('status')
+    v_bad = session.post(base + '/api/targets/report/verify',
+                         json={'html': html.replace('audit', 'tampered')},
+                         timeout=30, headers={'Origin': base}).json().get('status')
+    expect('exported report verifies, tampered copy does not',
+           v_ok == 'verified' and v_bad == 'tampered-or-unsigned',
+           '-> %s / %s' % (v_ok, v_bad))
+
     return not failures
 
 
