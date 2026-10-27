@@ -1,4 +1,5 @@
 # Development / characterization-test only (not required by the runtime backend).
-# Install: `pip install -r requirements-dev.txt`
-pytest>=8
-requests>=2.31
+# Install: `pip install -r requirements.txt -r requirements-dev.txt`
+pytest==9.0.3
+pluggy==1.6.0
+requests==2.34.2

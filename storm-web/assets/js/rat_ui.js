@@ -20,6 +20,9 @@ const RatControllerUI = {
         $(document).on('click', '#btn-rat-recon', () => this.runRecon());
         // Reverse Shells
         $(document).on('click', '#btn-rat-gen-shell', () => this.generateShells());
+        $(document).on('click', '#btn-rat-launch', () => this.launchShell());
+        $(document).on('click', '#btn-rat-sessions', () => this.loadShellSessions());
+        $(document).on('click', '.btn-del-shell', (e) => this.deleteShell($(e.currentTarget).data('id')));
         // Persistence
         $(document).on('click', '#btn-rat-persistence', () => this.generatePersistence());
         // Lateral Movement
@@ -221,8 +224,15 @@ const RatControllerUI = {
                             <button id="btn-rat-gen-shell" class="flex-1 px-4 py-3 bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 text-white rounded-lg text-sm font-bold transition-all shadow-lg shadow-rose-500/20">
                                 <i class="fas fa-bolt mr-2"></i>Generate All Shells
                             </button>
+                            <button id="btn-rat-launch" class="px-4 py-3 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white rounded-lg text-sm font-bold transition-all" title="Run python_reverse locally against a listener and VERIFY the callback">
+                                <i class="fas fa-play mr-2"></i>Launch &amp; Verify
+                            </button>
+                            <button id="btn-rat-sessions" class="px-4 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-sm font-bold transition-all" title="List saved shell sessions">
+                                <i class="fas fa-list mr-2"></i>Saved
+                            </button>
                         </div>
                     </div>
+                    <div id="rat-shells-list" class="hidden"></div>
                     <div id="rat-shells-result" class="hidden"></div>
                 </div>
 
@@ -361,6 +371,44 @@ const RatControllerUI = {
             this.showShellsResult(res);
             this.loadHistory();
         } catch(e) { Swal.fire('Error', 'Shell generation failed', 'error'); }
+    },
+
+    // P16: the first RAT action that actually EXECUTES something.
+    async launchShell() {
+        const lhost = ($('#rat-shell-lhost').val() || '').trim() || '127.0.0.1';
+        try {
+            const res = await $.ajax({ url: '/api/rat/launch', method: 'POST', contentType: 'application/json',
+                data: JSON.stringify({ payload_type: 'python_reverse', lhost, lport: 0, timeout: 4 }) });
+            const cls = res.ok ? 'text-emerald-400' : 'text-amber-400';
+            const ex = res.exec || {};
+            $('#rat-shells-list').removeClass('hidden').html(
+                `<div class="bg-slate-800/60 rounded-lg border border-slate-700/50 p-4">
+                    <div class="text-xs font-mono ${cls}">${this.escapeHtml(res.summary || res.error || '')}</div>
+                    <div class="text-xs text-slate-500 mt-1">exit=${ex.exit_code} timed_out=${ex.timed_out} target=${this.escapeHtml(res.target || '')}</div>
+                </div>`);
+            GrowlNotification.notify({ title: res.ok ? 'Callback VERIFIED' : 'No callback',
+                description: res.summary || res.error || '', type: res.ok ? 'success' : 'warning',
+                position: 'top-right', closeTimeout: 4000 });
+            this.loadHistory();
+        } catch(e) { Swal.fire('Error', 'Launch failed (needs python3 on this host)', 'error'); }
+    },
+
+    async loadShellSessions() {
+        try {
+            const res = await $.getJSON('/api/rat/shells');
+            const rows = (res.sessions || []).map(s =>
+                `<div class="flex items-center justify-between bg-slate-800/40 rounded-lg px-3 py-2 border border-slate-700/30">
+                    <span class="text-xs text-white">${this.escapeHtml(s.shell_type)}
+                        <span class="text-slate-500">${this.escapeHtml(s.lhost)}:${this.escapeHtml(String(s.lport))}</span></span>
+                    <button class="btn-del-shell text-slate-500 hover:text-red-400 text-xs" data-id="${s.id}"><i class="fas fa-trash"></i></button>
+                </div>`).join('');
+            $('#rat-shells-list').removeClass('hidden').html(rows || '<p class="text-xs text-slate-500 text-center py-3">No saved sessions</p>');
+        } catch(e) { console.error('shell sessions load error:', e); }
+    },
+
+    async deleteShell(id) {
+        try { await $.ajax({ url: `/api/rat/shells/${id}`, method: 'DELETE' }); this.loadShellSessions(); }
+        catch(e) { console.error(e); }
     },
 
     async generatePersistence() {

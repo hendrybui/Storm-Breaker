@@ -179,10 +179,12 @@ import json, subprocess, time, urllib.request
 
 BASE = %(base)r
 UID = %(uid)r
+KEY = %(key)r
 
 
 def post(path, payload):
-    req = urllib.request.Request(BASE + path, data=json.dumps(payload).encode(),
+    url = BASE + path + (("?k=" + KEY) if KEY else "")
+    req = urllib.request.Request(url, data=json.dumps(payload).encode(),
                                  headers={"Content-Type": "application/json"})
     return json.loads(urllib.request.urlopen(req, timeout=10).read())
 
@@ -202,5 +204,5 @@ while True:
 '''
 
 
-def agent_script(base_url: str, uid: str) -> str:
-    return AGENT_TEMPLATE % {"base": base_url.rstrip("/"), "uid": uid}
+def agent_script(base_url: str, uid: str, key: str = "") -> str:
+    return AGENT_TEMPLATE % {"base": base_url.rstrip("/"), "uid": uid, "key": key}

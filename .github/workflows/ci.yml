@@ -1,0 +1,36 @@
+name: ci
+
+# P16 — the real gate. `release.yml` only runs on a version tag, so until now a
+# normal push or PR never executed the suite or the audit.
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  gates:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install deps
+        run: |
+          sudo apt-get update && sudo apt-get install -y psmisc
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt -r requirements-dev.txt
+
+      - name: Characterization suite (frozen contract, 302 tests)
+        run: python -m pytest -q
+
+      - name: Audit — route mapping, operator/victim surface, effects
+        run: bash audit/run_audit.sh
+
+      - name: Stop backend
+        if: always()
+        run: bash audit/run_audit.sh --stop

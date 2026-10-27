@@ -7,6 +7,8 @@ import time
 import pytest
 import requests
 
+from ._helpers import ingest_suffix
+
 
 @pytest.mark.char
 def test_live_snapshot_shape(live_server: str, admin_session: requests.Session) -> None:
@@ -32,7 +34,8 @@ def test_sse_stream_delivers_a_beacon_event(live_server: str,
     time.sleep(0.6)                                  # let the stream subscribe
 
     # a victim poll publishes a 'beacon' event on the bus
-    requests.post(f"{live_server}/api/c2/poll", json={"uid": "sse-agent"}, timeout=10)
+    requests.post(f"{live_server}/api/c2/poll{ingest_suffix()}",
+                  json={"uid": "sse-agent"}, timeout=10)
 
     worker.join(8)
     assert got, "no SSE data received"

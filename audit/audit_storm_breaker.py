@@ -14,6 +14,9 @@ not just that the server starts. Four checks:
                       phishing templates, so they must not be auth-gated).
   4. UID GUARDS     - a registration without a uid is rejected, so one
                       malformed row cannot break the client list.
+  5. EFFECTS        - selected endpoints are asserted on their OUTPUT/effects,
+                      not just their status code, and the ingest-key gate is
+                      exercised when configured.
 
 Usage:
     python3 audit/audit_storm_breaker.py [--url http://127.0.0.1:2525]
@@ -57,6 +60,34 @@ def read_password():
     if not match:
         sys.exit("could not parse a password out of %s" % cfg_path)
     return match.group(1)
+
+
+def read_setting(name, default=None):
+    """Read a key out of storm-web/Settings.json (the file app.py resolves to)."""
+    import json
+    try:
+        with open(os.path.join(STORM_WEB, 'Settings.json'), encoding='utf-8') as fh:
+            return json.load(fh).get(name, default)
+    except Exception:
+        return default
+
+
+def ingest_suffix():
+    """``?k=<secret>`` when an ingest secret is configured, else ``''``.
+
+    P16: victim endpoints can require a shared secret; the audit must present
+    it or every victim check would 401.
+    """
+    secret = (read_setting('ingest_secret') or '').strip()
+    return ('?k=' + secret) if secret else ''
+
+
+def with_key(path):
+    """Append the ingest key to a path if one is configured."""
+    secret = (read_setting('ingest_secret') or '').strip()
+    if not secret:
+        return path
+    return path + ('&' if '?' in path else '?') + 'k=' + secret
 
 
 def iter_frontend_files():
@@ -209,7 +240,7 @@ OPERATOR_POSTS = [
     ('/api/playbooks', {'name': 'AuditPB', 'description': 'd',
                         'steps': [{'action': 'log', 'params': {'message': 'hi'}}],
                         'variables': {}}),
-    ('/api/terminal', {'command': 'echo STORMBREAKER_AUDIT_OK'}),
+    ('/api/terminal', {'cmd': 'echo STORMBREAKER_AUDIT_OK'}),
     ('/api/c2/queue_command', {'uid': 'audit-nonexistent', 'command': 'whoami'}),
     ('/api/mobile/send_command', {'uid': 'audit-nonexistent', 'command': 'whoami'}),
     ('/api/credentials/scan', {'data': {'user': 'a', 'pass': 'b'}}),
@@ -513,7 +544,11 @@ def check_operator_api(base, password):
     for path, payload in OPERATOR_POSTS:
         total += 1
         try:
-            resp = session.post(base + path, json=payload, timeout=45)
+            # P16: send a browser-like Origin. curl/requests send none, and the
+            # CSRF gate short-circuits without one -- which is exactly how a
+            # broken CSRF comparison hid here for the whole project.
+            resp = session.post(base + path, json=payload, timeout=45,
+                                headers={'Origin': base})
         except Exception as exc:
             failures.append((path, 'EXC %s' % type(exc).__name__))
             continue
@@ -532,7 +567,7 @@ def check_victim_api(base):
     cases = victim_endpoints()
     for path, payload in cases:
         try:
-            resp = requests.post(base + path, json=payload, timeout=45)
+            resp = requests.post(base + with_key(path), json=payload, timeout=45)
         except Exception as exc:
             failures.append((path, 'EXC %s' % type(exc).__name__))
             continue
@@ -549,7 +584,7 @@ def check_uid_guards(base):
     print('\n[4] UID VALIDATION (corrupt-row guard)')
     ok = True
     for path in ('/api/mobile/register', '/api/c2/register', '/api/c2/response'):
-        resp = requests.post(base + path, json={'info': {}}, timeout=30)
+        resp = requests.post(base + with_key(path), json={'info': {}}, timeout=30)
         if resp.status_code != 400:
             print('    FAIL %s without uid -> %s (expected 400)'
                   % (path, resp.status_code))
@@ -557,6 +592,102 @@ def check_uid_guards(base):
     if ok:
         print('    all three reject a missing uid with 400')
     return ok
+
+
+def check_effects(base, password):
+    """Assert on EFFECTS, not status codes.
+
+    P16: the harness used to only check ``status_code == 200``.  That let two
+    real bugs live here for the life of the project:
+
+      * ``/api/terminal`` was posted with the key ``command`` while the server
+        reads ``cmd`` -> a 200 with an empty body, forever.
+      * ``/api/net/scan {"ports": "1-1024"}`` silently fell back to 25 default
+        ports while still reporting success.
+
+    Every case below asserts on a value the server had to actually compute.
+    """
+    print('\n[5] EFFECTS (behaviour, not just status)')
+    session = requests.Session()
+    login(session, base, password)
+    failures = []
+
+    def expect(name, cond, detail=''):
+        if cond:
+            print('    ok   %s' % name)
+        else:
+            print('    FAIL %s %s' % (name, detail))
+            failures.append(name)
+
+    # 0. the ingest-key gate actually gates (only meaningful when configured)
+    secret = (read_setting('ingest_secret') or '').strip()
+    if secret:
+        r = requests.post(base + '/api/fingerprint', json={'uid': 'audit-nokey'}, timeout=30)
+        expect('ingest key rejects a keyless victim POST', r.status_code == 401,
+               '-> %s' % r.status_code)
+        r = requests.post(base + '/api/fingerprint?k=' + secret,
+                          json={'uid': 'audit-nokey'}, timeout=30)
+        expect('ingest key accepts the correct key', r.status_code == 200,
+               '-> %s' % r.status_code)
+    else:
+        print('    --   ingest_secret empty; gate off')
+
+    # 1. settings resolve from storm-web regardless of cwd (the split-brain fix)
+    r = session.get(base + '/api/get_settings', timeout=30)
+    keys = r.json() if r.status_code == 200 else {}
+    expect('settings resolve to the real file (>3 keys)', len(keys) > 3,
+           '-> %d keys' % len(keys))
+
+    # 2. terminal actually runs and returns stdout
+    r = session.post(base + '/api/terminal', json={'cmd': 'echo STORMBREAKER_AUDIT_OK'},
+                     timeout=45, headers={'Origin': base})
+    out = (r.json().get('output') or '') if r.status_code == 200 else ''
+    expect('terminal returns real stdout', 'STORMBREAKER_AUDIT_OK' in out,
+           '-> %r' % out[:60])
+
+    # 3. port-range parsing ("1-1024" used to be silently ignored)
+    r = session.post(base + '/api/net/scan', json={'host': '127.0.0.1', 'ports': '1-1024'},
+                     timeout=60, headers={'Origin': base})
+    body = r.json() if r.status_code == 200 else {}
+    expect('port range 1-1024 parses to 1024 ports', body.get('requested') == 1024,
+           '-> requested=%s scanned=%s' % (body.get('requested'), body.get('scanned')))
+
+    # 4. target create -> read back
+    r = session.post(base + '/api/targets', json={'name': 'audit-effect', 'host': '127.0.0.1'},
+                     timeout=30, headers={'Origin': base})
+    tid = (r.json().get('target') or {}).get('id') if r.status_code == 200 else None
+    expect('target create returns an id', bool(tid), '-> %s' % tid)
+    if tid:
+        r = session.get(base + '/api/targets/%d' % tid, timeout=30)
+        expect('target reads back', r.status_code == 200
+               and r.json().get('target', {}).get('id') == tid, '-> %s' % r.status_code)
+
+    # 5. notification sink round-trip
+    token = 'audit-%d' % int(time.time())
+    session.post(base + '/api/notify/inbox', json={'audit': token}, timeout=30,
+                 headers={'Origin': base})
+    r = session.get(base + '/api/notify/inbox', timeout=30)
+    items = r.json().get('items', []) if r.status_code == 200 else []
+    expect('notify inbox round-trips', any(token == (i.get('payload') or {}).get('audit')
+                                           for i in items), '-> %d items' % len(items))
+
+    # 6. saved shell sessions are readable (was write-only)
+    r = session.get(base + '/api/rat/shells', timeout=30)
+    expect('rat shell sessions list is readable',
+           r.status_code == 200 and 'sessions' in (r.json() or {}), '-> %s' % r.status_code)
+
+    # 7. every lure kit actually renders (was a 500 for ALL 13 kits)
+    kits = sorted(p.name for p in __import__('pathlib').Path(STORM_WEB, 'templates').iterdir()
+                  if p.is_dir() and not p.name.startswith('.')
+                  and (p / 'index.html').exists())
+    broken = []
+    for kit in kits:
+        r = requests.get('%s/t/%s/%s' % (base, kit, ingest_suffix()), timeout=30)
+        if r.status_code != 200 or 'html' not in (r.headers.get('Content-Type') or ''):
+            broken.append('%s->%s' % (kit, r.status_code))
+    expect('all %d lure kits render' % len(kits), not broken, '-> %s' % broken)
+
+    return not failures
 
 
 def main():
@@ -576,6 +707,7 @@ def main():
         'operator api': check_operator_api(base, password),
         'victim api': check_victim_api(base),
         'uid validation': check_uid_guards(base),
+        'effects': check_effects(base, password),
     }
 
     print('\n%s' % ('-' * 60))
@@ -583,7 +715,7 @@ def main():
         print('    %-18s %s' % (name, 'PASS' if passed else 'FAIL'))
     failed = [n for n, ok in results.items() if not ok]
 
-    print('\n[5] CLEANUP')
+    print('\n[6] CLEANUP')
     cleanup(baseline)
 
     if failed:

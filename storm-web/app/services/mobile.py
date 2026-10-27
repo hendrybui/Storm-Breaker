@@ -65,6 +65,11 @@ def pop_response(uid: str):
 
 def add_tracking(uid: str, tracking_data: dict) -> None:
     """Store one background-tracking sample (+ notify on location events)."""
+    # P16 fix: the mobile client may post ``data`` as a bare string/base64
+    # blob, but this function did ``tracking_data['received_at'] = ...`` and
+    # blew up with TypeError on a str -> 500.
+    if not isinstance(tracking_data, dict):
+        tracking_data = {'data': tracking_data}
     # Store tracking data with timestamp
     # (per-uid list, trim-at-100, lives in the StateStore since P5.3)
     tracking_data['received_at'] = datetime.now().isoformat()

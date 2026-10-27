@@ -13,6 +13,8 @@ import database as db
 bp = Blueprint("templates", __name__,
                template_folder=os.path.join(BASE_DIR, "flask_templates"))
 
+SETTINGS_PATH = os.path.join(BASE_DIR, 'Settings.json')
+
 
 @bp.route('/list_templates')
 def list_templates():
@@ -43,13 +45,13 @@ def save_settings():
     try:
         data = request.json
         settings = {}
-        if os.path.exists('Settings.json'):
-            with open('Settings.json', 'r') as f:
+        if os.path.exists(SETTINGS_PATH):
+            with open(SETTINGS_PATH, 'r') as f:
                 settings = json.load(f)
         
         settings.update(data)
         
-        with open('Settings.json', 'w') as f:
+        with open(SETTINGS_PATH, 'w') as f:
             json.dump(settings, f)
         return jsonify({'status': 'success'})
     except Exception as e:
@@ -57,8 +59,8 @@ def save_settings():
 
 @bp.route('/api/get_settings')
 def get_settings():
-    if os.path.exists('Settings.json'):
-        with open('Settings.json', 'r') as f:
+    if os.path.exists(SETTINGS_PATH):
+        with open(SETTINGS_PATH, 'r') as f:
             return jsonify(json.load(f))
     return jsonify({})
 

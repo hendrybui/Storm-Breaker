@@ -42,6 +42,31 @@ def api_net_reverse():
     return jsonify({'ip': ip, 'name': net.reverse_dns(ip)})
 
 
+def _parse_ports(spec):
+    """Parse a port spec: "22,80" / "1-1024" / "1..1024" / "22 443".
+
+    P16 fix: the range form was documented but unparsed -- ``"1-1024"`` failed
+    ``isdigit()``, produced an empty list and silently fell back to
+    ``DEFAULT_PORTS`` (25 ports) while still reporting a successful scan.
+    """
+    out = []
+    for tok in str(spec).replace(',', ' ').split():
+        tok = tok.strip()
+        if not tok:
+            continue
+        sep = '..' if '..' in tok else ('-' if '-' in tok[1:] else None)
+        if sep:
+            lo, _, hi = tok.partition(sep)
+            if lo.strip().isdigit() and hi.strip().isdigit():
+                lo, hi = int(lo), int(hi)
+                if lo <= hi and (hi - lo) < 65536:
+                    out.extend(range(lo, hi + 1))
+            continue
+        if tok.isdigit():
+            out.append(int(tok))
+    return [p for p in out if 0 < p < 65536]
+
+
 @bp.route('/api/net/scan', methods=['POST'])
 def api_net_scan():
     bad = _guard()
@@ -53,8 +78,11 @@ def api_net_scan():
         return jsonify({'error': 'host required'}), 400
     ports = data.get('ports')
     if isinstance(ports, str):
-        ports = [int(p) for p in ports.replace(',', ' ').split() if p.strip().isdigit()]
+        ports = _parse_ports(ports)
+    elif isinstance(ports, (list, tuple)):
+        ports = [int(p) for p in ports if str(p).isdigit()]
     result = net.port_scan(host, ports, timeout=float(data.get('timeout', 0.5)))
+    result['requested'] = len(ports) if ports else None
     return jsonify({'status': 'ok', **result})
 
 

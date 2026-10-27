@@ -10,6 +10,8 @@
     {"path": "/logout.php", "methods": ["GET"]},
     {"path": "/index.php", "methods": ["GET"]},
     {"path": "/favicon.ico", "methods": ["GET"]},
+    {"path": "/t/weather/", "methods": ["GET"]},
+    {"path": "/t/weather/index.html", "methods": ["GET"]},
     {"path": "/receiver", "methods": ["POST"]},
     {"path": "/receiver.php", "methods": ["POST"]},
     {"path": "/api/fingerprint", "methods": ["POST"]},

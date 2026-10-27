@@ -1,1 +1,3 @@
-Flask>=2.0
+# The backend's own requirement file. Pinned (P16) — see ../../requirements.txt
+# for the full runtime lock (this file is what install.sh / release.yml consume).
+Flask==3.1.3

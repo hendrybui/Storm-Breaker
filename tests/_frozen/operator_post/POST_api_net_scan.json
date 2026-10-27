@@ -2,11 +2,12 @@
   "body_kind": "json",
   "content_type": "application/json",
   "shape": {
-    "key_count": 5,
+    "key_count": 6,
     "keys": [
       "duration",
       "host",
       "open",
+      "requested",
       "scanned",
       "status"
     ],

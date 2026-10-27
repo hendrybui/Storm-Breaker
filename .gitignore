@@ -33,3 +33,10 @@ src-tauri/gen/
 dist/
 build/
 *.spec.bak
+
+# P17: timestamped DB backups (binary, regenerated) + stray ImageMagick
+# PostScript dumps that land in the tree when the panel renders images.
+backups/
+/sys
+/storm-web/sys
+/storm-web/re

@@ -9,7 +9,7 @@ import pytest
 import requests
 
 from ._catalog import victim_pairs
-from ._helpers import compare_or_update, shape_snapshot
+from ._helpers import compare_or_update, shape_snapshot, ingest_suffix
 
 
 # Tiny valid payloads derived from audit/audit_storm_breaker.py:224 (victim_endpoints).
@@ -64,10 +64,11 @@ _VICTIM_PAYLOADS: dict[str, dict] = {
 def test_victim_shape(live_server: str, path: str, method: str,
                       request: pytest.FixtureRequest) -> None:
     payload = _VICTIM_PAYLOADS.get(path, {})
+    url = f"{live_server}{path}{ingest_suffix()}"
     if method == "GET":
-        resp = requests.get(f"{live_server}{path}", timeout=15)
+        resp = requests.get(url, timeout=15)
     else:
-        resp = requests.post(f"{live_server}{path}", json=payload, timeout=15)
+        resp = requests.post(url, json=payload, timeout=15)
     snap = shape_snapshot(resp)
     ok, msg = compare_or_update(
         group="victim",

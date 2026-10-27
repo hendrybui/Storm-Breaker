@@ -13,7 +13,9 @@ from __future__ import annotations
 import json
 import os
 import queue
+import threading
 import time
+from collections import deque
 
 from flask import Blueprint, Response, jsonify, request, session
 
@@ -30,6 +32,48 @@ def _guard():
     if 'IAm-logined' not in session:
         return jsonify({'error': 'Not authenticated'}), 401
     return None
+
+
+# --- P16: webhook sink -----------------------------------------------------
+# generic_webhook used to point at /panel, which is GET-only AND behind the
+# auth gate -> the before_request gate 302'd to /login before routing, so the
+# POSTed JSON was silently swallowed (requests quietly followed the redirect
+# and got a 200).  This is a real receiver: bounded, lock-guarded, inspectable.
+_INBOX = deque(maxlen=200)
+_INBOX_LOCK = threading.Lock()
+
+
+@bp.route('/api/notify/inbox', methods=['POST'])
+def api_notify_inbox_post():
+    """PUBLIC sink for generic_webhook deliveries (no session required)."""
+    payload = request.get_json(silent=True)
+    if payload is None:
+        payload = request.get_data(as_text=True)[:8000]
+    with _INBOX_LOCK:
+        _INBOX.append({'ts': time.time(), 'payload': payload})
+        count = len(_INBOX)
+    return jsonify({'status': 'stored', 'count': count})
+
+
+@bp.route('/api/notify/inbox')
+def api_notify_inbox_get():
+    """Operator read of the last delivered notifications."""
+    bad = _guard()
+    if bad:
+        return bad
+    with _INBOX_LOCK:
+        items = list(_INBOX)
+    return jsonify({'count': len(items), 'items': items[-100:]})
+
+
+@bp.route('/api/notify/inbox/clear', methods=['POST'])
+def api_notify_inbox_clear():
+    bad = _guard()
+    if bad:
+        return bad
+    with _INBOX_LOCK:
+        _INBOX.clear()
+    return jsonify({'status': 'cleared'})
 
 
 @bp.route('/api/live')

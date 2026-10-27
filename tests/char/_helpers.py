@@ -27,6 +27,20 @@ FROZEN_ROOT = Path(__file__).resolve().parents[1] / "_frozen"
 _TITLE_RE = re.compile(r"<title[^>]*>(.*?)</title>", re.IGNORECASE | re.DOTALL)
 
 
+def ingest_suffix() -> str:
+    """``?k=<secret>`` when storm-web/Settings.json configures an ingest secret.
+
+    P16: victim endpoints can require a shared secret, and these replays send no
+    session. Without the suffix every victim characterization test would 401.
+    """
+    p = Path(__file__).resolve().parents[2] / "storm-web" / "Settings.json"
+    try:
+        secret = (json.loads(p.read_text(encoding="utf-8")).get("ingest_secret") or "").strip()
+    except Exception:
+        return ""
+    return ("?k=" + secret) if secret else ""
+
+
 def _safe_json_payload(resp: requests.Response) -> Any:
     try:
         return resp.json()

@@ -35,15 +35,44 @@ class TelegramBot:
         self.app_ref = None  # Reference to Flask app for command handling
         self.load_config()
 
+    @staticmethod
+    def _normalize_chat_id(value):
+        """Numeric id passes through; a bare name gets the @ prefix.
+
+        Telegram's sendMessage accepts an integer chat id or an
+        ``@channelusername``.  A plain word (e.g. ``vvianrubot``) is rejected.
+        """
+        cid = str(value or '').strip()
+        if not cid:
+            return ''
+        if cid.lstrip('-').isdigit() or cid.startswith('@'):
+            return cid
+        return '@' + cid
+
     def load_config(self):
         try:
             if os.path.exists(self.config_path):
                 with open(self.config_path, 'r') as f:
                     cfg = json.load(f)
                 self.token = cfg.get('token', '')
-                self.chat_id = cfg.get('chat_id', '')
+                self.chat_id = self._normalize_chat_id(cfg.get('chat_id', ''))
                 self.enabled = cfg.get('enabled', False)
                 self.alert_types = cfg.get('alert_types', self.alert_types)
+                return
+        except Exception:
+            pass
+        # P16 fallback: the panel's Settings tab writes telegram_token /
+        # telegram_chat_id into Settings.json -- NOT telegram_config.json, which
+        # did not exist, so the bot silently stayed disabled.  Read them.
+        try:
+            settings_path = os.path.join(
+                os.path.dirname(os.path.abspath(__file__)), 'Settings.json')
+            with open(settings_path, 'r') as f:
+                s = json.load(f)
+            self.token = s.get('telegram_token', '') or ''
+            self.chat_id = self._normalize_chat_id(s.get('telegram_chat_id', ''))
+            self.enabled = bool(self.token and self.chat_id) and \
+                bool(s.get('telegram_enabled', True))
         except Exception:
             pass
 
@@ -62,7 +91,7 @@ class TelegramBot:
 
     def configure(self, token, chat_id, alert_types=None):
         self.token = token
-        self.chat_id = str(chat_id)
+        self.chat_id = self._normalize_chat_id(chat_id)
         self.enabled = bool(token and chat_id)
         if alert_types:
             self.alert_types.update(alert_types)
