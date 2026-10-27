@@ -5,7 +5,7 @@
 | | |
 |---|---|
 | Branch | `feat/t1-skeleton` |
-| Head | `TBD` (see `git log --oneline -1`) |
+| Head | `64519c4` |
 | Tags | `g11-ok` (track rollback), `g12-ok` (gate) |
 | Gate | **G12 ✅** — `docs/PROGRESS.md` gate table |
 | Suite | **299 passed** |
