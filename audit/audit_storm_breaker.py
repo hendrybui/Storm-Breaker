@@ -183,6 +183,8 @@ OPERATOR_GETS = [
     '/api/targets', '/api/strike/actions',
     # P14.7/P14.8 additive real-network surface
     '/api/net/resolve',
+    # P15.3/P15.4 additive listener + beacon surface
+    '/api/listeners', '/api/c2/beacons',
 ]
 
 OPERATOR_POSTS = [
@@ -249,6 +251,9 @@ OPERATOR_POSTS = [
     ('/api/strike/reverse', {'payload_type': 'python_reverse', 'lhost': '127.0.0.1'}),
     # P14.7/P14.8 additive real-network surface
     ('/api/net/scan', {'host': '127.0.0.1', 'ports': '1,2525', 'timeout': 0.5}),
+    # P15.3/P15.4 additive listener + beacon surface
+    ('/api/listeners/start', {'name': 'audit-listen', 'host': '127.0.0.1', 'port': 0}),
+    ('/api/c2/beacon_config', {'profile': 'always_on'}),
 ]
 
 def victim_endpoints():

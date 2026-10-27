@@ -1,0 +1,34 @@
+P15.1–P15.5 verification — queue safety (verified), managed listeners, real beacon
+Date: 2026-10-27   Branch: feat/t1-skeleton   (G11 partial)
+
+1. Full test suite
+   $ python3 -m pytest -q
+   => 277 passed  (262 prior + 8 beacon + 3 listener-service tests + 4 route char)
+
+2. HONEST FINDING — P15.1 needs no rebuild
+   `app/services/c2.py` already routes every queue op through `app.state.STORE`
+   (`MemoryStore`: RLock + deque, `popleft`), built in P5. Verified by reading the
+   service + core/state.py. The "unlocked raw dicts" note in the earlier TODO was
+   true of the ORIGINAL app; the skeleton rebuild already fixed it.
+
+3. Live listener (P15.3) — real port, real connect, real evidence
+   POST /api/listeners/start {name:demo,host:127.0.0.1,port:0} -> :42339
+   socket connect -> GET /api/listeners => connections:1, clients:[['127.0.0.1',39896]]
+   finding recorded on target "listener:127.0.0.1:42339" (listener-connect)
+
+4. Real beacon (P15.4/P15.5) — server-driven, jittered, OBSERVED
+   POST /api/c2/poll x3 => next_interval_ms [17016, 16695, 14350]  (jittered, not fixed)
+   GET /api/c2/beacons/demo-agent => stats{count,interval_ms,missed}, profile=always_on
+   GET /api/c2/beacon_agent => drop-in agent that honours next_interval_ms (compiles)
+
+5. Non-regression
+   frozen 15 modules + database.py vs pre-upgrade => EMPTY
+   routes 219 (0 lost; +7 additive: /api/listeners[,…], /api/c2/beacons[…], beacon_config, beacon_agent)
+   audit => all 4 checks PASS, exit=0
+
+6. Snapshot drift (expected, additive)
+   POST /api/c2/poll gained `next_interval_ms` -> rebaselined; victim shape test still green.
+
+VERDICT: C2 is now server-driven with an observed beacon timeline and a managed
+listener service. Nothing frozen weakened. Remaining for G11: P15.2 (push → P10)
+and P15.6 (ship the agent for the templates).

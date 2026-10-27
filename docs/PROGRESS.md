@@ -52,6 +52,9 @@ A gate must be GREEN before the next phase starts.
 | 27 | P14.9 findings → report | ✅ | self-contained HTML; chain assert | delete app/targets/report.py | no CDN, standalone deliverable |
 | 28 | P14.11 acceptance chain | ✅ | `test_firepower_chain.py` green; script exit 0 | delete test + script | scan→strike→verify→evidence→report |
 | 29 | P14.12 G10 GREEN | ✅ | 262 suite; audit exit=0; routes 212 no loss | `git checkout p14-base` | track 5 complete |
+| 30 | P15.1 C2 queue safety | ✅ | service already on STORE (RLock+deque) since P5 | — | verified, no rebuild |
+| 31 | P15.3 managed listeners | ✅ | 3 tests; live start/stop + connect evidence | delete listener_service+blueprint | named listeners, auto-finding |
+| 32 | P15.4/P15.5 real beacon + monitor | ✅ | 8 tests; live jittered intervals observed | delete app/exec/beacon.py+blueprint | server-driven, observed |
 
 Status legend: ⬜ pending · 🟡 in progress · ✅ done · 🔴 blocked · ⏪ rolled back
 
@@ -73,6 +76,7 @@ Status legend: ⬜ pending · 🟡 in progress · ✅ done · 🔴 blocked · �
 - `2026-10-27` — Track 5 P14.7+P14.8 real net (DNS/WHOIS/GeoIP) + real TCP scan. Suite 261 green; live geoip real data; routes 211 (+5 additive); audit PASS. ADDITIVE.
 - `2026-10-27` — **Track 5 COMPLETE — G10 GREEN.** P14.9 report + P14.11 acceptance chain + P14.12 gate. Suite 262 green; acceptance script exit=0; routes 212 (0 lost); frozen modules byte-identical; audit PASS. Tag `g10-ok`.
 - `2026-10-27` — Track 5 consolidated handoff written (`docs/HANDOFF-TRACK5.md`); Track 6 (P15 C2/listener/beacon) added to TODO with measured gap analysis. Docs only.
+- `2026-10-27` — **Track 6 started.** P15.1 verified (queues already locked via STORE since P5), P15.3 managed listeners, P15.4/P15.5 server-driven beacon + monitor. Suite 277 green; routes 219 (0 lost); frozen byte-identical; audit PASS.
   - P0.2 baseline `audit/audit_storm_breaker.py` exit=0; full PASS.
   - P0.3 DB backup `backups/storm_breaker.db.20261027-021155` (md5 verified).
   - Next: P1.x characterization tests, then `g0-ok`.

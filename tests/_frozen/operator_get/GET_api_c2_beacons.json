@@ -1,0 +1,14 @@
+{
+  "body_kind": "json",
+  "content_type": "application/json",
+  "shape": {
+    "key_count": 3,
+    "keys": [
+      "beacons",
+      "profile",
+      "profiles"
+    ],
+    "type": "object"
+  },
+  "status": 200
+}

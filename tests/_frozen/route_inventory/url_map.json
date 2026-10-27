@@ -127,6 +127,34 @@
       "rule": "/api/browser-exfil/stats"
     },
     {
+      "endpoint": "beacon.api_beacon_agent",
+      "methods": [
+        "GET"
+      ],
+      "rule": "/api/c2/beacon_agent"
+    },
+    {
+      "endpoint": "beacon.api_beacon_config",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/c2/beacon_config"
+    },
+    {
+      "endpoint": "beacon.api_beacons",
+      "methods": [
+        "GET"
+      ],
+      "rule": "/api/c2/beacons"
+    },
+    {
+      "endpoint": "beacon.api_beacon_detail",
+      "methods": [
+        "GET"
+      ],
+      "rule": "/api/c2/beacons/<uid>"
+    },
+    {
       "endpoint": "capture_c2.c2_list_clients",
       "methods": [
         "GET"
@@ -503,6 +531,27 @@
         "GET"
       ],
       "rule": "/api/keystrokes/view/<filename>"
+    },
+    {
+      "endpoint": "listeners.api_listeners",
+      "methods": [
+        "GET"
+      ],
+      "rule": "/api/listeners"
+    },
+    {
+      "endpoint": "listeners.api_listeners_start",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/listeners/start"
+    },
+    {
+      "endpoint": "listeners.api_listeners_stop",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/listeners/stop"
     },
     {
       "endpoint": "lures.api_lure_bulk",

@@ -188,12 +188,12 @@ UNLOCKED raw dicts with `list.pop(0)` (thread-unsafe, O(n), lost on restart);
 no listener *service* exists (only the P14.5 strike listener); the beacon is a simulated
 schedule (`evasion_framework.py:567,612`) never applied to real traffic nor observed.
 
-- [ ] P15.1 C2/mobile queues → StateStore-backed locked `deque` (fix thread-safety, O(n) pop, restart loss)
-- [ ] P15.2 persistent channel (SSE/WebSocket) replacing the 1500 ms poll; keep poll as victim fallback
-- [ ] P15.3 `ListenerService` — start/stop named listeners, `GET /api/listeners`, auto-finding on connect
-- [ ] P15.4 real beacon — apply sleep/jitter from timing profiles to the victim loop; timeline from real arrivals
-- [ ] P15.5 beacon monitor — `GET /api/c2/beacons` (arrival timeline, interval stats, missed-beacon detection)
-- [ ] P15.6 retire the frontend poll in favour of push (fallback kept); add routes to the audit catalogue
+- [x] P15.1 C2/mobile queues — **already locked** via `app.state.STORE` (`MemoryStore`, RLock+deque) from P5; verified, no rebuild needed
+- [ ] P15.2 persistent channel (SSE/WebSocket) replacing the 1500 ms poll; keep poll as victim fallback  ← fold into P10
+- [x] P15.3 `ListenerService` — start/stop named listeners, `GET /api/listeners`, auto-finding on connect
+- [x] P15.4 real beacon — `/api/c2/poll` returns jittered `next_interval_ms`; real arrival timeline recorded
+- [x] P15.5 beacon monitor — `GET /api/c2/beacons[/<uid>]`, `POST /api/c2/beacon_config`, `GET /api/c2/beacon_agent`
+- [ ] P15.6 agent-side: ship/emit the beacon agent for the frozen templates; retire fixed sleeps
 - [ ] P15.7 gate `G11` — jitter observed; listener start/stop verified; C2 survives restart; 0 routes lost
 
 Rollback: `git checkout g10-ok`.

@@ -2,9 +2,10 @@
   "body_kind": "json",
   "content_type": "application/json",
   "shape": {
-    "key_count": 1,
+    "key_count": 2,
     "keys": [
-      "command"
+      "command",
+      "next_interval_ms"
     ],
     "type": "object"
   },
