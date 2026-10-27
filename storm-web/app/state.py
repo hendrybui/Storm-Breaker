@@ -192,13 +192,16 @@ def send_notification(message_data: Dict[str, Any]) -> None:
                 settings = json.load(f)
             webhook_url = settings.get('generic_webhook')
             if webhook_url:
+                # P1.3: record durably FIRST, then attempt delivery.  A dead
+                # webhook no longer loses the event; the outbox worker retries.
+                from app.core import outbox  # lazy: avoid import cycle
+                row = outbox.record(message_data, webhook_url)
                 from app.core.jobs import get_queue  # lazy: avoid import cycle
                 _queue_ = get_queue()
                 if _queue_.running:
-                    _queue_.enqueue(_requests.post, webhook_url,
-                                    json=message_data)
+                    _queue_.enqueue(outbox.deliver, row)
                 else:
-                    _requests.post(webhook_url, json=message_data)
+                    outbox.deliver(row)
     except Exception:
         pass
 

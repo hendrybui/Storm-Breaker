@@ -687,6 +687,41 @@ def check_effects(base, password):
             broken.append('%s->%s' % (kit, r.status_code))
     expect('all %d lure kits render' % len(kits), not broken, '-> %s' % broken)
 
+    # 8. notification outbox records durably and delivers (P1.3)
+    def _total(s):
+        return sum(s.get(k, 0) for k in ('delivered', 'pending', 'failed'))
+    before = session.get(base + '/api/notifications/stats', timeout=30).json().get('stats', {})
+    requests.post(base + '/api/mobile/register' + ingest_suffix(),
+                  json={'uid': 'audit-obx', 'info': {}}, timeout=30)
+    time.sleep(1.2)
+    after = session.get(base + '/api/notifications/stats', timeout=30).json().get('stats', {})
+    expect('notification outbox records the event', _total(after) > _total(before),
+           '-> %s' % after)
+    expect('notification outbox delivers to the sink',
+           after.get('delivered', 0) > before.get('delivered', 0), '-> %s' % after)
+
+    # 9. the resident agent really runs and really executes (P1.1)
+    src = requests.get(base + '/api/agent/agent.py', timeout=30)
+    expect('agent script is publicly fetchable',
+           src.status_code == 200 and 'BASE = ' in src.text, '-> %s' % src.status_code)
+    spawned = session.post(base + '/api/agent/spawn',
+                           json={'uid': 'audit-agent', 'keep': True}, timeout=60,
+                           headers={'Origin': base}).json()
+    expect('agent spawns and registers', spawned.get('registered') is True,
+           '-> %s' % spawned.get('status'))
+    ran = session.post(base + '/api/agent/exec',
+                       json={'uid': 'audit-agent', 'command': 'echo STORM_AGENT_OK',
+                             'wait': 10}, timeout=60, headers={'Origin': base}).json()
+    expect('agent executes a shell command',
+           'STORM_AGENT_OK' in (ran.get('output') or ''), '-> %r' % (ran.get('output') or '')[:60])
+    expect('agent appears in the agent list',
+           'audit-agent' in [a['uid'] for a in
+                             session.get(base + '/api/agent/agents', timeout=30).json()['agents']])
+    # cleanup: keep:True agent must not linger beaconing into later test runs
+    session.post(base + '/api/agent/exec',
+                 json={'uid': 'audit-agent', 'command': '__exit', 'wait': 5},
+                 timeout=30, headers={'Origin': base})
+
     return not failures
 
 

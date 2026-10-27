@@ -25,7 +25,8 @@ def test_sse_stream_delivers_a_beacon_event(live_server: str,
         with requests.get(f"{live_server}/api/events", cookies=admin_session.cookies,
                           stream=True, timeout=15) as resp:
             for line in resp.iter_lines(decode_unicode=True):
-                if line and line.startswith("data:"):
+                # foreign beacons may share the bus; match only our own poll's event
+                if line and line.startswith("data:") and "sse-agent" in line:
                     got.append(line)
                     break
 

@@ -179,6 +179,10 @@ def create_app() -> Flask:
     app.register_blueprint(beacon.bp)
     from app.blueprints import live  # noqa: F401  -- P10 realtime (additive)
     app.register_blueprint(live.bp)
+    from app.blueprints import outbox  # noqa: F401  -- P1.3 (additive)
+    app.register_blueprint(outbox.bp)
+    from app.blueprints import agent  # noqa: F401  -- P1.1 (additive)
+    app.register_blueprint(agent.bp)
 
     # ----------------------------------------------------------------------------
     # Core migrations (P5.5/P5.6): idempotent baseline + WAL + hot-path indexes.
@@ -199,6 +203,15 @@ def create_app() -> Flask:
     try:
         from app.core.retention import start_retention_worker
         start_retention_worker()
+    except Exception:  # pragma: no cover -- never block boot on this
+        pass
+
+    # ----------------------------------------------------------------------------
+    # P1.3: notification outbox retry worker (durable webhook delivery).
+    # ----------------------------------------------------------------------------
+    try:
+        from app.core import outbox as _outbox
+        _outbox.start()
     except Exception:  # pragma: no cover -- never block boot on this
         pass
 

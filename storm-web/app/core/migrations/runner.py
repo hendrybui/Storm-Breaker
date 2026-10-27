@@ -53,6 +53,9 @@ INDEXES = [
     "ON rat_operations(operation_type)",
     "CREATE INDEX IF NOT EXISTS idx_rat_persistence_target_os "
     "ON rat_persistence(target_os)",
+    # P1.3: outbox drain hot path.
+    "CREATE INDEX IF NOT EXISTS idx_notification_outbox_status_next "
+    "ON notification_outbox(status, next_attempt_at)",
 ]
 
 
@@ -78,6 +81,18 @@ TABLES = [
         ip TEXT PRIMARY KEY,
         fails INTEGER NOT NULL DEFAULT 0,
         until REAL NOT NULL DEFAULT 0
+    )""",
+    # P1.3: durable notification outbox (retry + backoff).
+    """CREATE TABLE IF NOT EXISTS notification_outbox (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        url TEXT NOT NULL,
+        payload TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT 'pending',
+        attempts INTEGER NOT NULL DEFAULT 0,
+        next_attempt_at REAL NOT NULL DEFAULT 0,
+        last_error TEXT,
+        created_at REAL NOT NULL,
+        delivered_at REAL
     )""",
 ]
 

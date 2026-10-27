@@ -238,6 +238,45 @@ $C -X POST $BASE/api/save_settings -H 'Content-Type: application/json' \
    -d '{"generic_webhook":"https://discord.com/api/webhooks/XXX/YYY"}'
 ```
 
+## Resident agent (P18)
+
+```bash
+# fetch the generator (public, carries the ingest key) and spawn one
+curl -s "$BASE/api/agent/agent.py?uid=demo1&download=1" -o /tmp/storm_agent.py
+$C -X POST $BASE/api/agent/spawn -d "{\"uid\":\"demo1\",\"keep\":true}"
+# run shell on it (returns in ~2s, not 15s — beacon is clamped)
+$C -X POST $BASE/api/agent/exec -d '{"uid":"demo1","command":"id","wait":10}'
+# list / kill
+$C $BASE/api/agent/agents
+$C -X POST $BASE/api/agent/exec -d '{"uid":"demo1","command":"__exit","wait":5}'
+```
+
+- `spawn` without `"keep":true` **terminates the process right after it
+  registers** — a following `exec` then times out with empty output. Always
+  `keep:true` unless you only wanted the registration check.
+- Magic commands: `__sysinfo __pwd __cd <dir> __file_get <path>
+  __file_put <path> <b64> __persist [name] __sleep <ms> __exit`. Anything else
+  is shell exec in the agent's tracked CWD.
+- `__file_get` returns `__FILEDATA__:<base64>` as the response body, not shell output.
+- uid persists in `~/.storm_agent.json`; the agent re-registers after restarts.
+
+## Durable notification outbox (P18)
+
+```bash
+$C "$BASE/api/notifications/outbox?limit=20&status=failed"   # list
+$C "$BASE/api/notifications/stats"                            # counters
+$C -X POST $BASE/api/notifications/outbox/3/retry             # force one row
+$C -X POST $BASE/api/notifications/replay                     # requeue all failed
+$C -X POST $BASE/api/notifications/drain                      # deliver what's due now
+$C -X POST $BASE/api/notifications/purge                      # delete delivered
+```
+
+- Every notification is **recorded before delivery**. A webhook that was down at
+  send time is not lost — retry with backoff up to 6 attempts (2s→15min), then
+  status `failed`; `replay` resurrects it.
+- A row stuck `pending` with a dead URL is correct-by-design: payload and URL
+  were snapshotted at record time. Fix the URL, then `retry`.
+
 ## Gotchas that will waste your afternoon
 
 - `BASE` must include the port. `127.0.0.1` alone is not `127.0.0.1:2525`.

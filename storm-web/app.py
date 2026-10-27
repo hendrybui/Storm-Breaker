@@ -38,6 +38,8 @@ _VICTIM_PUBLIC_PATHS = {
     '/api/browser-exfil/receive', '/api/network/receive',
     # P10.2: the desktop shell polls this cookie-less over loopback
     '/api/notify/pending',
+    # P1.1: agents self-fetch the generator (carries only base + ingest key)
+    '/api/agent/agent.py',
 }
 _VICTIM_PUBLIC_PREFIXES = ('/t/', '/assets/', '/c/')
 

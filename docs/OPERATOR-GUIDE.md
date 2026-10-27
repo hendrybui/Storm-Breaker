@@ -596,6 +596,23 @@ assertions ok), 0 routes lost.**
 
 ---
 
+## 12c. Changelog — what P18 changed (the resident agent + durable outbox)
+
+| Area | Change |
+|---|---|
+| **Resident agent (P1.1)** | `app/exec/agent.py` — a persistent Python implant that speaks the **existing** `/api/c2/*` contract (register/poll/response), so it appears in the Victim Shells tab with zero new victim endpoints. Magic commands `__sysinfo __pwd __cd __file_get __file_put __persist __sleep __exit`; anything else is shell exec in a tracked CWD. Survives restarts via `~/.storm_agent.json` uid. |
+| **Beacon clamp** | Server-driven `next_interval_ms` is clamped in-agent to `[200, 2000]` ms so `/api/agent/exec` returns in seconds instead of waiting out a 15 s beacon. |
+| **Agent endpoints** | `GET /api/agent/agent.py` (self-fetch, bakes base+key, `?uid=` pins, `?download=1`), `GET /api/agent/commands`, `GET /api/agent/agents`, `POST /api/agent/spawn` (subprocess + registration poll; **`keep:true`** to leave it running — default terminates after registering), `POST /api/agent/exec` (queue + wait drain). |
+| **Durable outbox (P1.3)** | `app/core/outbox.py` + `notification_outbox` table. `state.send_notification` now **records first, delivers second** — a webhook that fails is retried with backoff `(2,5,15,60,300,900)` s up to 6 attempts, then `failed`. Payload+URL snapshotted at record time. |
+| **Outbox endpoints** | `GET /api/notifications/outbox`, `GET /api/notifications/stats`, `POST /api/notifications/outbox/<id>/retry`, `/replay`, `/purge`, `/drain` (returns `delivered_now` + `stats`). |
+| **Audit** | Effects now 16 assertions: §8 outbox records+delivers, §9 agent spawns→registers→executes→listed. Spawn uses `keep:true` and **cleans up with `__exit`** so no stray agent beacons into later test runs. |
+| **SSE test** | `test_sse_stream_delivers_a_beacon_event` now matches the event its own poll produced instead of the first line off the bus — foreign beacons no longer win the race. |
+
+Regression status after P18: **304 tests pass, audit exit 0 (all 16 effect
+assertions ok), 0 routes lost.**
+
+---
+
 ## 13. Known gaps / backlog
 
 **Closed in P17** (keep the reasoning, it mattered):
@@ -624,7 +641,9 @@ assertions ok), 0 routes lost.**
 - No session rotation on privilege change; no CSRF double-submit token (the
   Origin + SameSite=Lax pair is what you have).
 - `CSP` still allows `'unsafe-inline'` (legacy panel requirement).
-- No outbound retry/backoff for `generic_webhook`; failures are swallowed.
+- ~~No outbound retry/backoff for `generic_webhook`; failures are swallowed~~ →
+  closed in P18 by the durable outbox (§12c): every notification is recorded
+  first, delivered with backoff, replayable from the API.
 - No multi-operator / RBAC — one session flag, one `config.php` user.
 - Optional LLM hook for the AI Threat tab (feature-flag + offline fallback).
 - `/api/terminal` has no PTY — line-at-a-time only.
