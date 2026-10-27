@@ -102,6 +102,17 @@ def csrf_gate():
     candidate = origin or referer
     if _header_host(candidate) != host:
         return jsonify({'error': 'CSRF validation failed'}), 403
+    # P19: double-submit token on top of the Origin check.  Browsers always
+    # send Origin/Referer, so every browser-originated mutating request must
+    # echo the storm_csrf cookie in X-CSRF-Token (the panel JS patch injects
+    # it).  Header-less API clients (curl, scripts) keep working untouched --
+    # SameSite=Lax already keeps their session cookie out of cross-site flows.
+    tok = (request.cookies.get('storm_csrf') or '').strip()
+    hdr = (request.headers.get('X-CSRF-Token') or '').strip()
+    from flask import session as _sess
+    bound = _sess.get('csrf')
+    if not tok or hdr != tok or (bound and bound != tok):
+        return jsonify({'error': 'CSRF token missing or invalid'}), 403
     return None
 
 

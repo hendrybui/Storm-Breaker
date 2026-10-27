@@ -310,6 +310,16 @@ $C -X POST $BASE/api/targets/report/verify -d "$(jq -n --rawfile h report.html '
 - Signing key lives in `Settings.json` — rotate `evidence_signing_key` to
   invalidate all previously exported signatures.
 
+## CSRF token (P19)
+
+Browser POSTs carry an automatic `X-CSRF-Token` (JS patch reads the
+`storm_csrf` cookie). You only notice it when it's missing:
+
+- Old tab open across an upgrade → POSTs 403 "CSRF token missing" → re-login.
+- curl/scripts: no `Origin` header → token never required. Cookie-jar flows
+  (`$C -b $J -X POST ...`) keep working as-is.
+- `POST /login` itself is exempt (no session yet).
+
 ## Gotchas that will waste your afternoon
 
 - `BASE` must include the port. `127.0.0.1` alone is not `127.0.0.1:2525`.
