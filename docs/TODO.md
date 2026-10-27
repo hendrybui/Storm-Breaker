@@ -147,8 +147,11 @@ Each task: move only, no logic change; run char suite after each.
 - [x] P10.5 latency measured → **G12** (snapshot 9 ms median, push 7.3 ms median; target < 300 ms)
 
 ### P11 Panel migration (behind `UI_V2`)
-- [~] Live Ops tab shipped in the legacy panel (`assets/js/storm_live.js` SSE consumer) — **Track 7**
-- [ ] P11.1 scaffold `ui/` (React/Vite/shadcn)  ← remaining
+- [x] P11.hot Live Ops tab shipped in the legacy panel (`assets/js/storm_live.js` SSE consumer) — Track 7
+- [x] P11.1 scaffold `ui/` (Vite + React) building into `storm-web/assets/ui_v2/`
+- [x] P11.2–P11.30 all 30 tabs present in V2 via a descriptor registry (`ui/src/tabs.js`), wired to the SAME endpoints; Live Ops + strike are custom components
+- [x] P11.31 `/panel2` served; **default NOT flipped** (interactive tabs are read-only in V2) → **G8\***
+- [ ] P11.32 archive legacy `panel.html`  ← deferred until the flag flips
 - [ ] P11.2–P11.30 migrate each of the 30 tabs (one per subtask; parity + screenshot diff + audit each)
 - [ ] P11.31 flip default to V2 at 100% parity → **G8** — rollback: flag off
 - [ ] P11.32 archive legacy `panel.html`

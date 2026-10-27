@@ -1,0 +1,33 @@
+G8* — V2 panel (P11.1–P11.31)
+Date: 2026-10-27   Branch: feat/t1-skeleton
+
+DELIVERED
+  ui/                        Vite + React scaffold (P11.1), builds into
+                             storm-web/assets/ui_v2/ (base /assets/ui_v2/).
+  ui/src/tabs.js             registry: all 30 legacy tabs by id+label+icon, each
+                             mapped to the REAL endpoints it reads.
+  ui/src/App.jsx             sidebar + generic endpoint renderer (tables/JSON),
+                             custom LiveTab (SSE) and a strike button.
+  storm-web/flask_templates/panel2.html + /panel2 route (login-guarded).
+  legacy panel gained a "V2" sidebar link.
+
+VERIFIED LIVE
+  GET /panel2                200, contains #root and loads ui_v2/app.js
+  GET /assets/ui_v2/app.js   200 (151,855 bytes)
+  GET /assets/ui_v2/app.css  200 (3,667 bytes)
+  every V2 endpoint the panel calls -> 200 (live, strike/actions, beacons,
+  listeners, targets, list_templates)
+
+TESTS: tests/char/test_panel2.py (serves+bundle, login redirect). Suite 302.
+NON-REGRESSION: frozen modules+DB byte-identical; routes 225 (0 lost); audit PASS.
+
+HONEST LIMITS — why G8 is starred, not clean
+  - The default route is still `/panel`. V2 covers all 30 tabs but several are
+    READ-ONLY descriptors (terminal, file manager, some module UIs have no JSON
+    endpoint). Flipping the default now would be a UX downgrade for those.
+  - P11.32 (archive legacy panel.html) is therefore deferred.
+  - zERODAY tab has no JSON endpoint; V2 shows an explanatory card.
+
+FIXED DURING WORK
+  Vite base was set to /static/... but Flask's factory sets static_url_path='/assets'
+  -> bundle 404. Base corrected and rebuilt.

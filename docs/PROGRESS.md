@@ -69,6 +69,8 @@ A gate must be GREEN before the next phase starts.
 | 41 | P13.2 final sweep → G9* + G13 | ✅ | 299 passed; audit exit=0; 0 routes lost | `git checkout g12-ok` | **upgrade complete** |
 | 42 | P10.2 native notifications | ✅ | `cargo build --release` EXIT=0; unauth cursor poll 200 delivers events | remove plugin+poller | shell alerts on capture |
 | 43 | P10.3 deep links storm:// | ✅ | plugin compiles; storm://panel + /t/<name> route to the webview | remove plugin | focus-or-launch |
+| 44 | P11.1 scaffold ui/ (Vite+React) | ✅ | builds to assets/ui_v2 (152kB js, 3.7kB css) | delete ui/ + assets/ui_v2 | V2 served at /panel2 |
+| 45 | P11.2–P11.31 V2 panel + 30 tabs + G8* | ✅ | 302 passed (incl. panel2 char); /panel2 200; bundle 200 | `git checkout g12-ok` | *default not flipped |
 
 Status legend: ⬜ pending · 🟡 in progress · ✅ done · 🔴 blocked · ⏪ rolled back
 

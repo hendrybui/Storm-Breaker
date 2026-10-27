@@ -1539,6 +1539,13 @@
       "rule": "/panel.php"
     },
     {
+      "endpoint": "panel.panel2",
+      "methods": [
+        "GET"
+      ],
+      "rule": "/panel2"
+    },
+    {
       "endpoint": "capture_rx.receiver",
       "methods": [
         "POST"

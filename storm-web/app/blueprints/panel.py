@@ -23,6 +23,15 @@ from telegram_bot import telegram_bot
 bp = Blueprint("panel", __name__)
 
 
+@bp.route('/panel2')
+def panel2():
+    """P11 — V2 (React/Vite) panel. Served alongside the legacy panel; the
+    legacy stays the default until parity is complete."""
+    if not session.get('IAm-logined'):
+        return redirect('/login')
+    return render_template('panel2.html')
+
+
 @bp.route('/panel')
 def panel():
     key = load_check_c()
