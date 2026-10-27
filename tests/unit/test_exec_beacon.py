@@ -56,6 +56,19 @@ def test_schedule_returns_and_records():
     assert t.stats("u3")["count"] == 1
 
 
+def test_base_ms_override_wins_and_is_jittered():
+    beacon.CONFIG.set_base_ms(800)
+    try:
+        # override wins over the profile base (always_on var 0.2 -> 640..960),
+        # NOT always_on's own 15s base
+        vals = [beacon.next_interval_ms("always_on", now=_ts(12)) for _ in range(30)]
+        assert all(600 <= v <= 1000 for v in vals)
+        assert len(set(vals)) > 1                    # still jittered
+    finally:
+        beacon.CONFIG.set_base_ms(None)
+    assert beacon.CONFIG.base_ms() is None
+
+
 def test_agent_script_honours_server_interval():
     src = beacon.agent_script("http://127.0.0.1:2525", "abc")
     assert "/api/c2/poll" in src

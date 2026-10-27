@@ -44,6 +44,17 @@ class _Config:
         self._lock = threading.Lock()
         self._default = "always_on"
         self._per_uid: Dict[str, str] = {}
+        self._base_ms: Optional[int] = None  # explicit override (beacon "speed")
+
+    def set_base_ms(self, ms: Optional[int]) -> Optional[int]:
+        """Force the beacon base interval (ms); ``None``/0 restores the profile."""
+        with self._lock:
+            self._base_ms = int(ms) if ms else None
+            return self._base_ms
+
+    def base_ms(self) -> Optional[int]:
+        with self._lock:
+            return self._base_ms
 
     def set_default(self, profile: str) -> str:
         if profile not in _evasion.TIMING_PROFILES:
@@ -89,8 +100,13 @@ def next_interval_ms(profile: Optional[str] = None, interactive: bool = False,
     prof = _evasion.TIMING_PROFILES.get(profile or CONFIG.default())
     if prof is None:
         prof = _evasion.TIMING_PROFILES["always_on"]
-    base = float(prof.get("base_interval", 15)) * 1000.0
     variance = float(prof.get("variance", 0.2))
+    override = CONFIG.base_ms()
+    if override:
+        # explicit override wins -> predictable speed, still jittered
+        jittered = float(override) * (1.0 + random.uniform(-variance, variance))
+        return int(max(FLOOR_MS, jittered))
+    base = float(prof.get("base_interval", 15)) * 1000.0
     jittered = base * (1.0 + random.uniform(-variance, variance))
     if not _active(prof, now):
         jittered *= INACTIVE_FACTOR

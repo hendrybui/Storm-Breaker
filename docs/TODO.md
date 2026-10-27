@@ -193,8 +193,8 @@ schedule (`evasion_framework.py:567,612`) never applied to real traffic nor obse
 - [x] P15.3 `ListenerService` — start/stop named listeners, `GET /api/listeners`, auto-finding on connect
 - [x] P15.4 real beacon — `/api/c2/poll` returns jittered `next_interval_ms`; real arrival timeline recorded
 - [x] P15.5 beacon monitor — `GET /api/c2/beacons[/<uid>]`, `POST /api/c2/beacon_config`, `GET /api/c2/beacon_agent`
-- [ ] P15.6 agent-side: ship/emit the beacon agent for the frozen templates; retire fixed sleeps
-- [ ] P15.7 gate `G11` — jitter observed; listener start/stop verified; C2 survives restart; 0 routes lost
+- [x] P15.6 agent-side: `/api/c2/beacon_agent` emits a drop-in agent; `base_ms` tune knob; agent proven to honour server schedule (`tests/char/test_beacon_chain.py`)
+- [x] P15.7 gate `G11` — **GREEN**: jitter observed; listener start/stop verified; C2 survives restart; 0 routes lost (`scripts/acceptance_g11.py` exit 0)
 
 Rollback: `git checkout g10-ok`.
 

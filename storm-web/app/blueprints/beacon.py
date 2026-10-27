@@ -15,6 +15,8 @@ from app.state import BASE_DIR
 bp = Blueprint("beacon", __name__,
                template_folder=os.path.join(BASE_DIR, "flask_templates"))
 
+_UNSET = object()
+
 
 def _guard():
     if 'IAm-logined' not in session:
@@ -28,6 +30,7 @@ def api_beacons():
     if bad:
         return bad
     return jsonify({'profile': beacon.CONFIG.default(), 'profiles': beacon.profiles(),
+                    'base_ms': beacon.CONFIG.base_ms(),
                     'beacons': beacon.TRACKER.all_stats()})
 
 
@@ -48,18 +51,23 @@ def api_beacon_config():
         return bad
     data = request.json or {}
     profile = data.get('profile')
-    if not profile:
-        return jsonify({'error': 'profile required',
+    base_ms = data.get('base_ms', _UNSET)
+    if not profile and base_ms is _UNSET:
+        return jsonify({'error': 'profile or base_ms required',
                         'profiles': beacon.profiles()}), 400
     try:
-        if data.get('uid'):
-            beacon.CONFIG.set_for(data['uid'], profile)
-        else:
-            beacon.CONFIG.set_default(profile)
+        if profile:
+            if data.get('uid'):
+                beacon.CONFIG.set_for(data['uid'], profile)
+            else:
+                beacon.CONFIG.set_default(profile)
+        if base_ms is not _UNSET:
+            beacon.CONFIG.set_base_ms(base_ms)
     except ValueError as exc:
         return jsonify({'error': str(exc), 'profiles': beacon.profiles()}), 400
-    return jsonify({'status': 'ok', 'profile': profile,
-                    'uid': data.get('uid'), 'profiles': beacon.profiles()})
+    return jsonify({'status': 'ok', 'profile': profile or beacon.CONFIG.default(),
+                    'base_ms': beacon.CONFIG.base_ms(), 'uid': data.get('uid'),
+                    'profiles': beacon.profiles()})
 
 
 @bp.route('/api/c2/beacon_agent')

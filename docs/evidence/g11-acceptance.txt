@@ -1,0 +1,28 @@
+G11 ACCEPTANCE — C2 real channel + observed beacon (P15.1–P15.7)
+Date: 2026-10-27   Branch: feat/t1-skeleton   Tag: g11-ok
+
+Gate criterion: jitter OBSERVED, listener start/stop verified, C2 survives
+restart, 0 routes lost — nothing existing weakened.
+
+1. Full test suite
+   $ python3 -m pytest -q
+   => 279 passed  (262 pre-track + 12 beacon/listener tests + 5 route char)
+
+2. Acceptance (scripts/acceptance_g11.py, exit 0)
+   PASS  C2 session survives restart          (DB-backed registry re-imported)
+   PASS  listener start/stop + connect evidence
+   PASS  real agent beacons on server schedule (>=3 arrivals at ~600ms, from base_ms)
+   PASS  server chose jittered intervals      (distinct expected_ms -> not a fixed cadence)
+
+3. Non-regression
+   frozen 15 modules + database.py vs pre-upgrade => EMPTY
+   routes 219 == 219 ; LOST = []
+   audit => all 4 checks PASS ; exit=0
+
+4. Why this is not a toy
+   The agent sleeps for the SERVER's next_interval_ms (jittered, profile-driven,
+   base_ms-tunable), and the server records the REAL arrivals + detects misses.
+   Before, every agent slept a hard-coded 2-3s and nothing observed it.
+
+VERDICT: G11 GREEN. Rollback: git checkout g10-ok.
+Deferred: P15.2 (persistent push channel) folded into P10 realtime.
