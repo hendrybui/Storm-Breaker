@@ -80,6 +80,7 @@ Status legend: ⬜ pending · 🟡 in progress · ✅ done · 🔴 blocked · �
 - `2026-10-27` — **Track 5 COMPLETE — G10 GREEN.** P14.9 report + P14.11 acceptance chain + P14.12 gate. Suite 262 green; acceptance script exit=0; routes 212 (0 lost); frozen modules byte-identical; audit PASS. Tag `g10-ok`.
 - `2026-10-27` — Track 5 consolidated handoff written (`docs/HANDOFF-TRACK5.md`); Track 6 (P15 C2/listener/beacon) added to TODO with measured gap analysis. Docs only.
 - `2026-10-27` — **Track 6 COMPLETE — G11 GREEN.** P15.6 beacon agent + base_ms knob + P15.7 gate. Suite 279 green; acceptance exit=0; routes 219 (0 lost); frozen byte-identical; audit PASS. Tag `g11-ok`. P15.2 (push) folded into P10.
+- `2026-10-27` — Track 6 consolidated handoff written (`docs/HANDOFF-TRACK6.md`); next track (P10 realtime + P11 panel, absorbs P15.2, folds P14.10) recorded. Docs only.
 - `2026-10-27` — **Track 6 started.** P15.1 verified (queues already locked via STORE since P5), P15.3 managed listeners, P15.4/P15.5 server-driven beacon + monitor. Suite 277 green; routes 219 (0 lost); frozen byte-identical; audit PASS.
   - P0.2 baseline `audit/audit_storm_breaker.py` exit=0; full PASS.
   - P0.3 DB backup `backups/storm_breaker.db.20261027-021155` (md5 verified).
