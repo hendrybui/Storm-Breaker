@@ -76,7 +76,7 @@ The 15 `storm-web/` modules (`credential_parser`, `payload_generator`,
 
 Also: victim endpoints (`tests/contract/victim.json`) and every existing route path.
 
-## 5. Next track — P10 REALTIME + P11 PANEL (proposed: Track 7)
+## 5. Next track — P10 REALTIME + P11 PANEL (DELIVERED as Track 7 — see `docs/HANDOFF-TRACK7.md`)
 
 **Why this is next:** every organ now exists but the **operator still drives it
 from the API**, not the panel. The browser also still polls the old fixed

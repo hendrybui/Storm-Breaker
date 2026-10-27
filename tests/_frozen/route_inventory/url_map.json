@@ -435,6 +435,13 @@
       "rule": "/api/evasion/saved/<int:config_id>"
     },
     {
+      "endpoint": "live.api_events",
+      "methods": [
+        "GET"
+      ],
+      "rule": "/api/events"
+    },
+    {
       "endpoint": "panel.export_all_data",
       "methods": [
         "POST"
@@ -552,6 +559,13 @@
         "POST"
       ],
       "rule": "/api/listeners/stop"
+    },
+    {
+      "endpoint": "live.api_live",
+      "methods": [
+        "GET"
+      ],
+      "rule": "/api/live"
     },
     {
       "endpoint": "lures.api_lure_bulk",

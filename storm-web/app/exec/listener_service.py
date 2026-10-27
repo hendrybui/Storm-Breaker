@@ -9,6 +9,7 @@ from __future__ import annotations
 import threading
 from typing import Any, Dict, List, Optional
 
+from app.core import events
 from app.exec.listener import Listener
 from app.targets import TargetStore
 
@@ -59,6 +60,7 @@ class ListenerService:
         TargetStore().add_finding(target["id"], "listener-connect",
                                   "connection from %s:%s" % (addr[0], addr[1]),
                                   evidence={"peer": addr[0], "port": addr[1]})
+        events.publish("listener", host=host, port=port, peer=addr[0], peer_port=addr[1])
 
 
 SERVICE = ListenerService()

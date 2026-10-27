@@ -12,6 +12,7 @@ import os
 from flask import Blueprint, jsonify, request, session
 
 from app.adapters import call as call_action
+from app.core import events
 from app.exec.strike import launch_payload
 from app.state import BASE_DIR
 from app.targets import TargetStore
@@ -60,6 +61,10 @@ def api_strike_reverse():
         'timed_out': strike.exec.timed_out,
         'artifact': strike.generated.get('filename'),
     })
+    events.publish('strike', payload_type=payload_type, ok=strike.ok,
+                   callback_ok=strike.callback.ok, target=strike.target,
+                   target_id=target['id'])
+
     return jsonify({
         'status': 'ok',
         'ok': strike.ok,

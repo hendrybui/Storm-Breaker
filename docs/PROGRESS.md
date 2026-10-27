@@ -17,6 +17,7 @@ A gate must be GREEN before the next phase starts.
 | G7 | realtime + native | ⬜ | — |
 | G8 | panel parity (UI_V2) | ⬜ | — |
 | G9 | signed packaging | ⬜ | — |
+| G12 | realtime push + live panel | ✅ | `pytest` 299 PASS (incl. `test_live.py`); `scripts/acceptance_g12.py` exit 0; `docs/evidence/g12-realtime.txt`; audit exit=0 | `git checkout g11-ok` (L2) | Track 7; SSE + `/api/live`; panel Live Ops tab; 222 routes (0 lost) |
 | G11 | C2 real channel + observed beacon | ✅ | `pytest` 279 PASS (incl. `test_beacon_chain.py`); `scripts/acceptance_g11.py` exit 0; `docs/evidence/g11-acceptance.txt`; audit exit=0 | `git checkout g10-ok` (L2) | Track 6 (P15.1–P15.7); listeners + server-driven beacon; 219 routes (0 lost) |
 | G10 | firepower: act→verify, no copy-paste | ✅ | `pytest` 262 PASS (incl. `test_firepower_chain.py`); `scripts/acceptance_firepower.py` exit 0; `docs/evidence/g10-acceptance.txt`; audit exit=0 | `git checkout p14-base` (L2) | Track 5 (P14.1–P14.11); exec+verify+adapters+strike+targets+real net; 212 routes (+11 additive, 0 lost); frozen 15 modules byte-identical |
 
@@ -59,6 +60,9 @@ A gate must be GREEN before the next phase starts.
 | 33 | P15.6 beacon agent + base_ms | ✅ | char chain test; agent honours server schedule | delete agent route | real agent, jittered |
 | 34 | P15.7 G11 GREEN | ✅ | 279 suite; acceptance exit=0; C2 survives restart | `git checkout g10-ok` | track 6 complete |
 | 35 | P14.10 playbook execute+verify | ✅ | 12 tests; live run exec→verify + rollback | delete app/exec/playbook.py | track 5 now 0 open items |
+| 36 | P10.1 push channel (SSE + snapshot) | ✅ | 5 bus + 2 live tests; SSE delivers | delete app/core/events.py + live.py | additive; poll kept as fallback |
+| 37 | P10.5 latency measured | ✅ | snapshot 9ms / push 7.3ms median | — | target < 300ms |
+| 38 | G12 GREEN (realtime + live panel) | ✅ | 299 suite; acceptance exit=0 | `git checkout g11-ok` | Track 7 complete |
 
 Status legend: ⬜ pending · 🟡 in progress · ✅ done · 🔴 blocked · ⏪ rolled back
 
@@ -83,6 +87,7 @@ Status legend: ⬜ pending · 🟡 in progress · ✅ done · 🔴 blocked · �
 - `2026-10-27` — **Track 6 COMPLETE — G11 GREEN.** P15.6 beacon agent + base_ms knob + P15.7 gate. Suite 279 green; acceptance exit=0; routes 219 (0 lost); frozen byte-identical; audit PASS. Tag `g11-ok`. P15.2 (push) folded into P10.
 - `2026-10-27` — Track 6 consolidated handoff written (`docs/HANDOFF-TRACK6.md`); next track (P10 realtime + P11 panel, absorbs P15.2, folds P14.10) recorded. Docs only.
 - `2026-10-27` — **P14.10 landed — Track 5 fully closed (0 open items).** Playbook exec+verify engine + `/run` route + checkpoint/rollback. Suite 291 green; live run verified; routes 220 (0 lost); frozen byte-identical; audit PASS.
+- `2026-10-27` — **Track 7 COMPLETE — G12 GREEN.** SSE push channel + `/api/live` + panel Live Ops tab; latency measured (9ms/7.3ms). Suite 299; acceptance exit=0; routes 222 (0 lost); frozen byte-identical; audit PASS. Tag `g12-ok`. Remaining in main plan: P10.2/P10.3, P11.1+, P12, P13.
 - `2026-10-27` — **Track 6 started.** P15.1 verified (queues already locked via STORE since P5), P15.3 managed listeners, P15.4/P15.5 server-driven beacon + monitor. Suite 277 green; routes 219 (0 lost); frozen byte-identical; audit PASS.
   - P0.2 baseline `audit/audit_storm_breaker.py` exit=0; full PASS.
   - P0.3 DB backup `backups/storm_breaker.db.20261027-021155` (md5 verified).

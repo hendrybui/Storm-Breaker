@@ -140,14 +140,15 @@ Each task: move only, no logic change; run char suite after each.
       Known edge (documented): SIGTERM to the shell bypasses the exit hook — use tray Quit; systemd units should set KillMode=control-group.
 
 ### P10 Realtime + native
-- [ ] P10.1 operator push channel (IPC/WS); keep HTTP poll as fallback
-- [ ] P10.2 native notifications on capture
-- [ ] P10.3 deep links `storm://`
-- [ ] P10.4 safe-exec wrapper (checkpoint/rollback/retry) for terminal + playbooks — flag off
-- [ ] P10.5 latency test < 300 ms + idle-call delta measured → **G7**
+- [x] P10.1 operator push channel → `GET /api/events` (SSE) + `GET /api/live` snapshot; HTTP poll kept as fallback  **(Track 7)**
+- [ ] P10.2 native notifications on capture  ← Tauri-side, remaining
+- [ ] P10.3 deep links `storm://`  ← Tauri-side, remaining
+- [x] P10.4 safe-exec wrapper (checkpoint/rollback) — shipped as `app/exec/playbook.py` (P14.10)
+- [x] P10.5 latency measured → **G12** (snapshot 9 ms median, push 7.3 ms median; target < 300 ms)
 
 ### P11 Panel migration (behind `UI_V2`)
-- [ ] P11.1 scaffold `ui/` (React/Vite/shadcn)
+- [~] Live Ops tab shipped in the legacy panel (`assets/js/storm_live.js` SSE consumer) — **Track 7**
+- [ ] P11.1 scaffold `ui/` (React/Vite/shadcn)  ← remaining
 - [ ] P11.2–P11.30 migrate each of the 30 tabs (one per subtask; parity + screenshot diff + audit each)
 - [ ] P11.31 flip default to V2 at 100% parity → **G8** — rollback: flag off
 - [ ] P11.32 archive legacy `panel.html`

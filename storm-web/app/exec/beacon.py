@@ -29,6 +29,8 @@ if _STORM_WEB not in sys.path:
 
 import evasion_framework as _evasion  # noqa: E402  (frozen, read-only)
 
+from app.core import events  # noqa: E402  (P10 realtime push)
+
 FLOOR_MS = 400            # never beacon faster than this
 INTERACTIVE_MS = 1200      # fast path when a command was just served
 INTERACTIVE_JITTER = 300
@@ -125,6 +127,7 @@ class BeaconTracker:
         with self._lock:
             dq = self._hits.setdefault(uid, deque(maxlen=self._keep))
             dq.append((ts if ts is not None else time.time(), int(expected_ms)))
+        events.publish('beacon', uid=uid, expected_ms=int(expected_ms))
 
     def schedule(self, uid: str, interactive: bool = False) -> int:
         """Compute + record this beacon's interval; returns the interval in ms."""

@@ -1,0 +1,34 @@
+G12 ACCEPTANCE — realtime push + live panel (Track 7: P10.1/P10.4/P10.5 + live UI)
+Date: 2026-10-27   Branch: feat/t1-skeleton   Tag: g12-ok
+
+Gate criterion: the operator SEES live activity from the browser while everything
+stays additive; latency under target.
+
+1. Full test suite
+   $ python3 -m pytest -q
+   => 299 passed  (291 prior + 5 event-bus + 2 live char + 1 route char)
+
+2. Acceptance (scripts/acceptance_g12.py, exit 0)
+   PASS  panel ships the Live Ops tab
+   PASS  panel loads the push consumer
+   PASS  SSE delivered a listener event
+   PASS  SSE delivered a beacon event
+   PASS  SSE delivered a strike event
+   PASS  strike event carries the VERIFIED callback   (python_reverse, callback=VERIFIED)
+   PASS  live snapshot reports the listener
+
+3. Latency (P10.5; target < 300 ms)
+   GET /api/live          : min 3ms  median 9ms  max 22ms
+   SSE publish -> deliver : median 7.3ms  max 14.3ms  (n=10)
+   Replaces a blind fixed 1500ms poll.
+
+4. Non-regression
+   frozen 15 modules + database.py vs pre-upgrade => EMPTY
+   routes 222 == 222 ; LOST = []
+   audit => all 4 checks PASS ; exit=0
+   /api/events kept OUT of the audit catalogue on purpose (long-lived stream).
+
+VERDICT: G12 GREEN. Producers (beacon, listener, strike) publish to an event bus;
+the panel consumes via SSE. Rollback: git checkout g11-ok.
+Remaining in the main plan: P10.2/P10.3 (Tauri native notif + deep links) and
+P11.1+ (React/Vite panel migration) — the live UI shipped on the legacy panel.
