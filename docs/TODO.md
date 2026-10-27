@@ -174,8 +174,8 @@ See `docs/FIREPOWER.md`. Additive layer; frozen contract untouched; tests assert
 - [x] P14.4 `app/adapters/` — 15/15 modules wrapped as 48 callable Actions (registry + catalog), no signature edits
 - [x] P14.5 wire `payload_generator` output → runner — `app/exec/strike.py` generate→launch→VERIFY callback (5 tests, live)
 - [x] P14.6 strike API: `POST /api/strike/reverse` + `/api/strike/actions`; records evidence on a target (no manual terminal)
-- [ ] P14.7 real intel: DNS/WHOIS/CT/GeoIP via requests + offline fallback (replace md5 seeds)
-- [ ] P14.8 real recon executor: TCP port scan via `socket` (replace simulated open ports)
+- [x] P14.7 real intel: `app/exec/net.py` DNS/reverse/WHOIS/GeoIP (offline-safe) + `/api/net/*` — replaces md5 seeds
+- [x] P14.8 real recon executor: threaded TCP connect scan + `/api/net/scan` (real open ports)
 - [ ] P14.9 evidence store + link findings into `report_generator`
 - [ ] P14.10 playbook steps become execute+verify (checkpoint/rollback per P10.4)
 - [ ] P14.11 **acceptance demo**: one-click verified strike, unattended, evidence attached

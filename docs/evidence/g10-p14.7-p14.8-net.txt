@@ -1,0 +1,32 @@
+P14.7 + P14.8 verification — real DNS/WHOIS/GeoIP + real TCP scan; ADDITIVE
+Date: 2026-10-27   Branch: feat/t1-skeleton
+
+WHY: deep_recon / threat_intel derive results from md5(domain) seeds ("simulated"
+per their own comments). These helpers do the real thing.
+
+1. Full test suite
+   $ python3 -m pytest -q
+   => 261 passed  (251 prior + 8 net tests + 2 new-route char tests)
+
+2. Live end-to-end over HTTP (real network)
+   POST /api/net/scan  {host:127.0.0.1, ports:1,2525,9999}
+     -> {"open":[2525],"scanned":3,"duration":0.002,"status":"ok"}   (2525 is the live server)
+   GET  /api/net/resolve?host=localhost -> {"addresses":["127.0.0.1"]}
+   GET  /api/net/geoip?ip=8.8.8.8
+     -> {"country":"United States","city":"Ashburn","isp":"Google LLC"}  <-- REAL, not a hash
+
+3. Frozen modules + database.py vs pre-upgrade
+   => EMPTY (byte-identical)
+
+4. Route map
+   live 211 == frozen 211 ; LOST = [] (5 new additive /api/net/* rules baselined)
+
+5. Live audit harness
+   => operator api PASS (incl. /api/net/scan) ; all 4 checks PASS ; exit=0
+
+6. Offline-safety
+   whois/geoip return {"error": ...} rather than raising when the network is down;
+   resolve/reverse/scan are pure-socket and always local-testable.
+
+VERDICT: additive; the md5-seed fakery now has a real counterpart. No frozen
+module/route/victim/DB change.

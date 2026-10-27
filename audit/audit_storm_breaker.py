@@ -181,6 +181,8 @@ OPERATOR_GETS = [
     '/api/telegram/config', '/api/mobile/captures', '/list_templates',
     # P14.3 / P14.6 additive firepower surface
     '/api/targets', '/api/strike/actions',
+    # P14.7/P14.8 additive real-network surface
+    '/api/net/resolve',
 ]
 
 OPERATOR_POSTS = [
@@ -245,6 +247,8 @@ OPERATOR_POSTS = [
     # P14.3 / P14.6 additive firepower surface
     ('/api/targets', {'name': 'audit-target', 'host': '127.0.0.1', 'notes': 'audit'}),
     ('/api/strike/reverse', {'payload_type': 'python_reverse', 'lhost': '127.0.0.1'}),
+    # P14.7/P14.8 additive real-network surface
+    ('/api/net/scan', {'host': '127.0.0.1', 'ports': '1,2525', 'timeout': 0.5}),
 ]
 
 def victim_endpoints():

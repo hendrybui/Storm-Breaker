@@ -652,6 +652,41 @@
       "rule": "/api/mobile/tracking_data/<uid>"
     },
     {
+      "endpoint": "net.api_net_geoip",
+      "methods": [
+        "GET"
+      ],
+      "rule": "/api/net/geoip"
+    },
+    {
+      "endpoint": "net.api_net_resolve",
+      "methods": [
+        "GET"
+      ],
+      "rule": "/api/net/resolve"
+    },
+    {
+      "endpoint": "net.api_net_reverse",
+      "methods": [
+        "GET"
+      ],
+      "rule": "/api/net/reverse"
+    },
+    {
+      "endpoint": "net.api_net_scan",
+      "methods": [
+        "POST"
+      ],
+      "rule": "/api/net/scan"
+    },
+    {
+      "endpoint": "net.api_net_whois",
+      "methods": [
+        "GET"
+      ],
+      "rule": "/api/net/whois"
+    },
+    {
       "endpoint": "intel.api_network_discoveries",
       "methods": [
         "GET"

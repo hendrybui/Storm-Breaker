@@ -46,6 +46,8 @@ A gate must be GREEN before the next phase starts.
 | 22 | P14.5 strike (generate→launch→verify) | ✅ | 5 tests; live callback VERIFIED | delete app/exec/{listener,strike}.py | real launch; callback is the truth |
 | 23 | P14.3 target model (additive tables) | ✅ | 5 tests; migrate creates tables | delete app/targets + migration | targets/target_findings additive |
 | 24 | P14.6 strike+targets API | ✅ | 4 snapshots; audit PASS incl. strike POST | delete 2 blueprints | additive routes (206 total) |
+| 25 | P14.7 real intel (DNS/WHOIS/GeoIP) | ✅ | 8 tests; live geoip real data | delete app/exec/net.py | real net, offline-safe |
+| 26 | P14.8 real TCP port scan | ✅ | live scan found :2525 open | delete /api/net/scan | replaces simulated ports |
 
 Status legend: ⬜ pending · 🟡 in progress · ✅ done · 🔴 blocked · ⏪ rolled back
 
@@ -64,6 +66,7 @@ Status legend: ⬜ pending · 🟡 in progress · ✅ done · 🔴 blocked · �
 - `2026-10-27` — Track 5 P14.4 adapters (registry+catalog; 15 modules / 48 actions; 10 tests). Suite 237 green; routes 201/201; audit PASS. ADDITIVE.
 - `2026-10-27` — Track 5 P14.5 strike (listener + strike; generate→launch→VERIFY callback; 5 tests). Suite 242 green; live callbacks VERIFIED; routes 201/201; audit PASS. ADDITIVE.
 - `2026-10-27` — Track 5 P14.3+P14.6 target model + strike/targets API. Suite 251 green; live HTTP strike VERIFIED + evidence persisted; routes 206 (+5 additive); audit PASS. Fixed 201→200. ADDITIVE.
+- `2026-10-27` — Track 5 P14.7+P14.8 real net (DNS/WHOIS/GeoIP) + real TCP scan. Suite 261 green; live geoip real data; routes 211 (+5 additive); audit PASS. ADDITIVE.
   - P0.2 baseline `audit/audit_storm_breaker.py` exit=0; full PASS.
   - P0.3 DB backup `backups/storm_breaker.db.20261027-021155` (md5 verified).
   - Next: P1.x characterization tests, then `g0-ok`.

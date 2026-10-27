@@ -1,0 +1,13 @@
+{
+  "body_kind": "json",
+  "content_type": "application/json",
+  "shape": {
+    "key_count": 2,
+    "keys": [
+      "addresses",
+      "host"
+    ],
+    "type": "object"
+  },
+  "status": 200
+}
