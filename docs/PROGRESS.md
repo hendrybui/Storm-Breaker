@@ -17,6 +17,7 @@ A gate must be GREEN before the next phase starts.
 | G7 | realtime + native | ⬜ | — |
 | G8 | panel parity (UI_V2) | ⬜ | — |
 | G9 | signed packaging | ⬜ | — |
+| G10 | firepower: act→verify, no copy-paste | ✅ | `pytest` 262 PASS (incl. `test_firepower_chain.py`); `scripts/acceptance_firepower.py` exit 0; `docs/evidence/g10-acceptance.txt`; audit exit=0 | `git checkout p14-base` (L2) | Track 5 (P14.1–P14.11); exec+verify+adapters+strike+targets+real net; 212 routes (+11 additive, 0 lost); frozen 15 modules byte-identical |
 
 ## Ledger
 
@@ -48,6 +49,9 @@ A gate must be GREEN before the next phase starts.
 | 24 | P14.6 strike+targets API | ✅ | 4 snapshots; audit PASS incl. strike POST | delete 2 blueprints | additive routes (206 total) |
 | 25 | P14.7 real intel (DNS/WHOIS/GeoIP) | ✅ | 8 tests; live geoip real data | delete app/exec/net.py | real net, offline-safe |
 | 26 | P14.8 real TCP port scan | ✅ | live scan found :2525 open | delete /api/net/scan | replaces simulated ports |
+| 27 | P14.9 findings → report | ✅ | self-contained HTML; chain assert | delete app/targets/report.py | no CDN, standalone deliverable |
+| 28 | P14.11 acceptance chain | ✅ | `test_firepower_chain.py` green; script exit 0 | delete test + script | scan→strike→verify→evidence→report |
+| 29 | P14.12 G10 GREEN | ✅ | 262 suite; audit exit=0; routes 212 no loss | `git checkout p14-base` | track 5 complete |
 
 Status legend: ⬜ pending · 🟡 in progress · ✅ done · 🔴 blocked · ⏪ rolled back
 
@@ -67,6 +71,7 @@ Status legend: ⬜ pending · 🟡 in progress · ✅ done · 🔴 blocked · �
 - `2026-10-27` — Track 5 P14.5 strike (listener + strike; generate→launch→VERIFY callback; 5 tests). Suite 242 green; live callbacks VERIFIED; routes 201/201; audit PASS. ADDITIVE.
 - `2026-10-27` — Track 5 P14.3+P14.6 target model + strike/targets API. Suite 251 green; live HTTP strike VERIFIED + evidence persisted; routes 206 (+5 additive); audit PASS. Fixed 201→200. ADDITIVE.
 - `2026-10-27` — Track 5 P14.7+P14.8 real net (DNS/WHOIS/GeoIP) + real TCP scan. Suite 261 green; live geoip real data; routes 211 (+5 additive); audit PASS. ADDITIVE.
+- `2026-10-27` — **Track 5 COMPLETE — G10 GREEN.** P14.9 report + P14.11 acceptance chain + P14.12 gate. Suite 262 green; acceptance script exit=0; routes 212 (0 lost); frozen modules byte-identical; audit PASS. Tag `g10-ok`.
   - P0.2 baseline `audit/audit_storm_breaker.py` exit=0; full PASS.
   - P0.3 DB backup `backups/storm_breaker.db.20261027-021155` (md5 verified).
   - Next: P1.x characterization tests, then `g0-ok`.

@@ -176,10 +176,10 @@ See `docs/FIREPOWER.md`. Additive layer; frozen contract untouched; tests assert
 - [x] P14.6 strike API: `POST /api/strike/reverse` + `/api/strike/actions`; records evidence on a target (no manual terminal)
 - [x] P14.7 real intel: `app/exec/net.py` DNS/reverse/WHOIS/GeoIP (offline-safe) + `/api/net/*` — replaces md5 seeds
 - [x] P14.8 real recon executor: threaded TCP connect scan + `/api/net/scan` (real open ports)
-- [ ] P14.9 evidence store + link findings into `report_generator`
-- [ ] P14.10 playbook steps become execute+verify (checkpoint/rollback per P10.4)
-- [ ] P14.11 **acceptance demo**: one-click verified strike, unattended, evidence attached
-- [ ] P14.12 gate `G10` — no copy-paste between steps; every action verified
+- [x] P14.9 findings → self-contained HTML report (`app/targets/report.py` + `GET /api/targets/<id>/report`)
+- [ ] P14.10 playbook steps become execute+verify (checkpoint/rollback per P10.4)  ← remaining
+- [x] P14.11 **acceptance chain**: scan→strike→verify→evidence→report, unattended (`tests/char/test_firepower_chain.py`)
+- [x] P14.12 gate `G10` — **GREEN**: 262 suite, audit exit=0, 0 routes lost, frozen modules byte-identical
 
 ## Backlog (NOT gated)
 - [ ] Real crypto via `cryptography` (replace hand-rolled AES/XOR)

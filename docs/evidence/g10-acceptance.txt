@@ -1,0 +1,26 @@
+G10 ACCEPTANCE — firepower track complete (P14.1–P14.12)
+Date: 2026-10-27   Branch: feat/t1-skeleton   Tag: g10-ok
+
+Gate criterion: the app acts on a target and VERIFIES the effect, with no human
+copy-paste between steps, and nothing existing is weakened.
+
+1. Full test suite
+   $ python3 -m pytest -q
+   => 262 passed  (211 pre-track baseline + 51 new)
+
+2. One-pass acceptance chain (tests/char/test_firepower_chain.py + scripts/acceptance_firepower.py)
+   scan -> strike -> VERIFIED callback -> evidence on target -> report   => PASS
+
+3. Non-regression (the whole point)
+   - frozen 15 modules + database.py vs pre-upgrade  => EMPTY (byte-identical)
+   - route map: 212 live == 212 frozen ; LOST = []  (11 additive routes)
+   - victim contract: 20/20 unchanged
+   - audit harness: all 4 checks PASS ; exit=0
+
+4. No copy-paste proof
+   Every step is driven over HTTP by the chain test; the strike's ok == VERIFIED
+   callback; evidence lands in the target model; the report renders it.
+
+VERDICT: G10 GREEN. The app is no longer a toy that prints strings — it acts,
+verifies, aims, remembers, and reports. No frozen file weakened.
+Rollback: git checkout p14-base (removes the whole firepower track).

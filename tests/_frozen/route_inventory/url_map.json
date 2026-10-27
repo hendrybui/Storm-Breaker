@@ -1213,6 +1213,13 @@
       "rule": "/api/targets/<int:target_id>/findings"
     },
     {
+      "endpoint": "targets.api_target_report",
+      "methods": [
+        "GET"
+      ],
+      "rule": "/api/targets/<int:target_id>/report"
+    },
+    {
       "endpoint": "panel.telegram_config",
       "methods": [
         "GET",

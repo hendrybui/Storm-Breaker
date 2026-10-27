@@ -7,10 +7,11 @@ from __future__ import annotations
 
 import os
 
-from flask import Blueprint, jsonify, request, session
+from flask import Blueprint, Response, jsonify, request, session
 
 from app.state import BASE_DIR
 from app.targets import TargetStore
+from app.targets.report import render_html
 
 bp = Blueprint("targets", __name__,
                template_folder=os.path.join(BASE_DIR, "flask_templates"))
@@ -52,6 +53,17 @@ def api_target_detail(target_id):
     if target is None:
         return jsonify({'error': 'Target not found'}), 404
     return jsonify({'target': target})
+
+
+@bp.route('/api/targets/<int:target_id>/report')
+def api_target_report(target_id):
+    bad = _guard()
+    if bad:
+        return bad
+    target = TargetStore().get(target_id)
+    if target is None:
+        return jsonify({'error': 'Target not found'}), 404
+    return Response(render_html(target), mimetype='text/html')
 
 
 @bp.route('/api/targets/<int:target_id>/findings', methods=['POST'])
