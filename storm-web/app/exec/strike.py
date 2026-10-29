@@ -63,7 +63,11 @@ def launch_payload(payload_type: str = "python_reverse", lhost: str = "127.0.0.1
                                 {"lhost": lhost, "lport": str(listener.port)})
         code = generated.get("code", "")
         argv = _interpreter_for(payload_type) + [code]
-        ex = run(argv, timeout=timeout)
+        # start_new_session: a blocking payload (e.g. /bin/sh -i) would
+        # otherwise inherit the caller's controlling tty; run as a background
+        # process group it takes SIGTTIN and *stops*, so subprocess.run's
+        # waitpid never reaps it and the strike hangs.  Detaching fixes that.
+        ex = run(argv, timeout=timeout, start_new_session=True)
         got = listener.wait_for_client(timeout=min(timeout, 3.0))
         callback = CheckResult("callback", got,
                                "callback %s:%d" % (lhost, listener.port)

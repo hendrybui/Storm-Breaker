@@ -57,7 +57,7 @@ def _decode(blob) -> str:
 
 def run(cmd: Command, *, shell: Optional[bool] = None, cwd: Optional[str] = None,
         timeout: float = DEFAULT_TIMEOUT, env: Optional[Mapping[str, str]] = None,
-        stdin_text: Optional[str] = None) -> ExecResult:
+        stdin_text: Optional[str] = None, start_new_session: bool = False) -> ExecResult:
     """Execute ``cmd`` and return its :class:`ExecResult`.  Never raises."""
     if shell is None:
         shell = isinstance(cmd, str)
@@ -70,6 +70,7 @@ def run(cmd: Command, *, shell: Optional[bool] = None, cwd: Optional[str] = None
         stdin=subprocess.PIPE if stdin_text is not None else None,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
+        start_new_session=start_new_session,
     )
     try:
         proc = subprocess.run(
