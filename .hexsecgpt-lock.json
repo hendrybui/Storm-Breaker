@@ -1,0 +1,18 @@
+{
+  "owner": "HexSecGPT",
+  "locked": true,
+  "since": "2026-10-30",
+  "branch_of_record": "hexsecgpt/security-csrf",
+  "base_commit": "a08f9f2",
+  "rules": "docs/HEXSECGPT-OWNERSHIP.md",
+  "single_writer": true,
+  "gate": {
+    "tests": "python3 -m pytest -q",
+    "audit": "bash audit/run_audit.sh",
+    "must_pass": true
+  },
+  "contents": [
+    "p19 CSRF double-submit (re-landed)",
+    "fix(exec): payload start_new_session / SIGTTIN detach"
+  ]
+}
